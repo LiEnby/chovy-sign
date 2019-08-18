@@ -36,7 +36,7 @@
             this.ISOPath = new System.Windows.Forms.TextBox();
             this.label3 = new System.Windows.Forms.Label();
             this.pictureBox2 = new System.Windows.Forms.PictureBox();
-            this.pictureBox1 = new System.Windows.Forms.PictureBox();
+            this.PsmChan = new System.Windows.Forms.PictureBox();
             this.label4 = new System.Windows.Forms.Label();
             this.label5 = new System.Windows.Forms.Label();
             this.BrowseButton = new System.Windows.Forms.Button();
@@ -47,7 +47,7 @@
             this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.CompressPBP = new System.Windows.Forms.CheckBox();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.PsmChan)).BeginInit();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.SuspendLayout();
@@ -135,15 +135,16 @@
             this.pictureBox2.TabIndex = 9;
             this.pictureBox2.TabStop = false;
             // 
-            // pictureBox1
+            // PsmChan
             // 
-            this.pictureBox1.BackgroundImage = global::CHOVY.Properties.Resources.idkbackground;
-            this.pictureBox1.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
-            this.pictureBox1.Location = new System.Drawing.Point(3, 3);
-            this.pictureBox1.Name = "pictureBox1";
-            this.pictureBox1.Size = new System.Drawing.Size(123, 297);
-            this.pictureBox1.TabIndex = 5;
-            this.pictureBox1.TabStop = false;
+            this.PsmChan.BackgroundImage = global::CHOVY.Properties.Resources.idkbackground;
+            this.PsmChan.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
+            this.PsmChan.Location = new System.Drawing.Point(3, 3);
+            this.PsmChan.Name = "PsmChan";
+            this.PsmChan.Size = new System.Drawing.Size(123, 297);
+            this.PsmChan.TabIndex = 5;
+            this.PsmChan.TabStop = false;
+            this.PsmChan.Click += new System.EventHandler(this.PsmChan_Click);
             // 
             // label4
             // 
@@ -264,13 +265,14 @@
             this.Controls.Add(this.TotalProgress);
             this.Controls.Add(this.label5);
             this.Controls.Add(this.label4);
-            this.Controls.Add(this.pictureBox1);
+            this.Controls.Add(this.PsmChan);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.Name = "CHOVY";
             this.Text = "CHOVYMainForm";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.CHOVY_FormClosing);
             this.Load += new System.EventHandler(this.CHOVY_Load);
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.PsmChan)).EndInit();
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
             this.groupBox2.ResumeLayout(false);
@@ -287,7 +289,7 @@
         private System.Windows.Forms.TextBox Versionkey;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Button FindFromCMA;
-        private System.Windows.Forms.PictureBox pictureBox1;
+        private System.Windows.Forms.PictureBox PsmChan;
         private System.Windows.Forms.TextBox ISOPath;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.PictureBox pictureBox2;

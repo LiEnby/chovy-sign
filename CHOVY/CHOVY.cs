@@ -15,9 +15,11 @@ namespace CHOVY
 
     public partial class CHOVY : Form
     {
+        bool MutedAudio = false;
         public byte[] GetSfo(string ISOFile) 
         {
             FileStream ISO = File.OpenRead(ISOFile);
+            
             CDReader cdr = new CDReader(ISO, false);
             Stream ParamSfo = cdr.OpenFile(@"PSP_GAME\PARAM.SFO", FileMode.Open,FileAccess.Read);
 
@@ -88,6 +90,11 @@ namespace CHOVY
         private void CHOVY_Load(object sender, EventArgs e)
         {
 
+            if(ReadSetting("MuteAudio") == "1")
+            {
+                MutedAudio = true;
+            }
+
             Versionkey.Text = ReadSetting("VersionKey");
             RifPath.Text = ReadSetting("RifPath");
         }
@@ -125,6 +132,7 @@ namespace CHOVY
            // string GameWorkDir = Path.Combine(TmpDir, TitleID);
             string LicenseWorkDir = Path.Combine(TmpDir, "ux0_pspemu_temp_game_PSP_LICENSE");
             string EbootFile = Path.Combine(GameWorkDir, "EBOOT.PBP");
+            string EbootSignature = Path.Combine(GameWorkDir, "__sce_ebootpbp");
             string GamePathFile = Path.Combine(GameWorkDir, "VITA_PATH.TXT");
             string LicensePathFile = Path.Combine(LicenseWorkDir, "VITA_PATH.TXT");
 
@@ -180,6 +188,11 @@ namespace CHOVY
             {
                 Application.DoEvents();
             }
+            if (!File.Exists(EbootSignature) || ChovyGen.ExitCode != 0)
+            {
+                MessageBox.Show("CHOVY-GEN.EXE FAILED!\nArguments:\n" + ChovyGen.StartInfo.Arguments + "\nStdOut:\n" + ChovyGen.StandardOutput.ReadToEnd() + "\nStdErr:\n" + ChovyGen.StandardError.ReadToEnd());
+                return;
+            }
 
             /*
              *  BUILD PSVIMG FILE
@@ -187,7 +200,7 @@ namespace CHOVY
 
             // Pacakge GAME
 
-            
+
             string BackupGameDir = Path.Combine(BackupWorkDir, "game");
             Directory.CreateDirectory(BackupGameDir);
             Process psvimg_create = psvimgtools.PSVIMG_CREATE(Aid, "game" ,TmpDir, Path.Combine(BackupWorkDir,"game"));
@@ -195,7 +208,11 @@ namespace CHOVY
             {
                 Application.DoEvents();
             }
-
+            if (psvimg_create.ExitCode != 0)
+            {
+                MessageBox.Show("PSVIMG-CREATE.EXE FAILED!\nArguments:\n" + psvimg_create.StartInfo.Arguments + "\nStdOut:\n" + psvimg_create.StandardOutput.ReadToEnd() + "\nStdErr:\n" + psvimg_create.StandardError.ReadToEnd());
+                return;
+            }
 
             // Package LICENSE
             try
@@ -212,6 +229,11 @@ namespace CHOVY
             while (!psvimg_create.HasExited)
             {
                 Application.DoEvents();
+            }
+            if(psvimg_create.ExitCode != 0)
+            {
+                MessageBox.Show("PSVIMG-CREATE.EXE FAILED!\nArguments:\n" + psvimg_create.StartInfo.Arguments + "\nStdOut:\n" + psvimg_create.StandardOutput.ReadToEnd() + "\nStdErr:\n" + psvimg_create.StandardError.ReadToEnd());
+                return;
             }
 
             try
@@ -233,9 +255,13 @@ namespace CHOVY
             TotalProgress.Value = 0;
             TotalProgress.Style = ProgressBarStyle.Continuous;
             
-            Stream str = Resources.Murica;
-            SoundPlayer snd = new SoundPlayer(str);
-            snd.Play();
+            if(!MutedAudio)
+            {
+                Stream str = Resources.Murica;
+                SoundPlayer snd = new SoundPlayer(str);
+                snd.Play();
+            }
+            
 
             MessageBox.Show("YOU HAVE MADE A SOCIAL CONTRACT WITH FREEDOM!", "FREEDOM!", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
@@ -312,8 +338,9 @@ namespace CHOVY
             Directory.CreateDirectory(output);
 
             string OutputPbp = Path.Combine(output, "ux0_pspemu_temp_game_PSP_GAME_" + Backup, "EBOOT.PBP");
+            string GameFolder = Path.Combine(output, "ux0_pspemu_temp_game_PSP_GAME_" + Backup);
+            string LicenseFolder = Path.Combine(output, "ux0_pspemu_temp_game_PSP_LICENSE");
 
-            
             Status.Text = "Declaring Independance from the GAME.PSVIMG";
             string BackupPath = Path.Combine(CmaDir, "PGAME", CmaAid, Backup, "game", "game.psvimg");
             if(!File.Exists(BackupPath))
@@ -326,6 +353,11 @@ namespace CHOVY
             {
                 Application.DoEvents();
             }
+            if(!Directory.Exists(GameFolder) || psvimg.ExitCode != 0)
+            {
+                MessageBox.Show("PSVIMG-EXTRACT.EXE FAILED!\nArguments:\n" + psvimg.StartInfo.Arguments + "\nStdOut:\n" + psvimg.StandardOutput.ReadToEnd() + "\nStdErr:\n" + psvimg.StandardError.ReadToEnd());
+                return;
+            }
 
             Status.Text = "Declaring Independance from the LICENSE.PSVIMG";
             BackupPath = Path.Combine(CmaDir, "PGAME", CmaAid, Backup, "license", "license.psvimg");
@@ -334,7 +366,11 @@ namespace CHOVY
             {
                 Application.DoEvents();
             }
-            
+            if (!Directory.Exists(LicenseFolder) || psvimg.ExitCode != 0)
+            {
+                MessageBox.Show("PSVIMG-EXTRACT.EXE FAILED!\nArguments:\n" + psvimg.StartInfo.Arguments + "\nStdOut:\n" + psvimg.StandardOutput.ReadToEnd() + "\nStdErr:\n" + psvimg.StandardError.ReadToEnd());
+                return;
+            }
 
             /* -- This was some debug stuff
             OpenFileDialog Openpbp = new OpenFileDialog();
@@ -352,6 +388,7 @@ namespace CHOVY
             string ContentID = pbp.GetContentId(OutputPbp);
             string Rif = Path.Combine(Application.StartupPath, "GAME.RIF");
             string LicensePath = Path.Combine(output, "ux0_pspemu_temp_game_PSP_LICENSE", ContentID + ".rif");
+
             File.Copy(LicensePath, Rif, true);
             WriteSetting("RifPath", Rif);
             WriteSetting("CmaDir", CmaDir);
@@ -380,6 +417,25 @@ namespace CHOVY
             ofd.Filter = "ISO9660 Image Files (*.iso)|*.iso";
             ofd.ShowDialog();
             ISOPath.Text = ofd.FileName;
+        }
+
+        private void CHOVY_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            Environment.Exit(0);
+        }
+
+        private void PsmChan_Click(object sender, EventArgs e)
+        {
+            if(!MutedAudio)
+            {
+                MutedAudio = true;
+                WriteSetting("MuteAudio", "1");
+            }
+            else
+            {
+                MutedAudio = false;
+                WriteSetting("MuteAudio", "0");
+            }
         }
     }
 }

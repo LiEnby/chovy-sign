@@ -7,7 +7,7 @@
     <ProjectGuid>{D46AA2C2-2BDC-45C7-ACA5-D7A2295564E8}</ProjectGuid>
     <OutputType>WinExe</OutputType>
     <RootNamespace>CHOVY</RootNamespace>
-    <AssemblyName>CHOVY</AssemblyName>
+    <AssemblyName>CHOVY-SIGN</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
@@ -31,6 +31,7 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'CHOVY|AnyCPU'">
     <OutputPath>bin\CHOVY\</OutputPath>

@@ -22,7 +22,8 @@ namespace CHOVY
             psvimgtools.StartInfo.Arguments = "-K " + CmaKey + " \"" + PSVIMG + "\" \"" + OUTPUT + "\"";
             psvimgtools.StartInfo.CreateNoWindow = true;
             psvimgtools.StartInfo.UseShellExecute = false;
-            psvimgtools.StartInfo.RedirectStandardInput = true;
+            psvimgtools.StartInfo.RedirectStandardInput = true; // NO IDEA WHY BUT IT DOESNT WORK WITHOUT THIS
+            psvimgtools.StartInfo.RedirectStandardOutput = true;
             psvimgtools.StartInfo.RedirectStandardError = true;
             psvimgtools.Start();
             return psvimgtools;
@@ -40,7 +41,8 @@ namespace CHOVY
             psvimgtools.StartInfo.Arguments = "-n "+TYPE+" -K " + CmaKey + " \"" + INPUT + "\" \"" + OUTPUT + "\"";
             psvimgtools.StartInfo.CreateNoWindow = true;
             psvimgtools.StartInfo.UseShellExecute = false;
-            psvimgtools.StartInfo.RedirectStandardInput = true;
+            psvimgtools.StartInfo.RedirectStandardInput = true; // NO IDEA WHY BUT IT DOESNT WORK WITHOUT THIS
+            psvimgtools.StartInfo.RedirectStandardOutput = true;
             psvimgtools.StartInfo.RedirectStandardError = true;
             psvimgtools.Start();
             return psvimgtools;
