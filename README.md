@@ -1,2 +1,30 @@
-# chovy-sign
-"Sign" PSP ISO's to run on PSVita
+#ChovyProject 
+Created by the CBPS Team!
+https://discord.gg/2nDCbxJ
+
+-chovy-sign- 
+
+you need a "base" psp game, petz saddle club, locoroco midnight carnival, or ape quest starter pack all work
+some games dont work properly (where working on it). just try another if this happens.
+
+as well as "the clone issue" basically games made with this are "clones" of the original "base game" so if u delete any of them it acturlaly deletes the license.rif which breaks all the other "clones", this can be fixed by re-downloading the base game off of the PSN or copying any "clone" over to your psvita again.
+
+create playable PSP ISO bubbles on your PSVita
+
+had to go public early due to qwikrazor.. thank him later..
+
+PSP PIRACY on 3.71 
+(though, WE DONT CONDONE PIRACY plz ONLY use it for games u acturaly own the UMD for) 
+its purely for BACKUPS xD
+also, lots of shittily dumped iso's online, however iso's obtained by the NPS Browser should work fine.
+if you want to dump your own ISO's use UMD Dumper  or something that isnt ftp-ing over all the files and building it into an ISO with UMDgen or some other tool
+
+Credits:    
+@dots-tb (__sce_ebootpbp signing)    
+SilicaAndPina(me) Developing GUI and re-finding the psp bubbles method and adapting
+Motoharu (For helping dots with __sce_ebootpbp)   
+
+Other indirect help:        
+@swarzesherz for sign_np    
+tpunix for kirk_engine libaries.    
+@yifanlu and xyz for psvimgtools .. 
