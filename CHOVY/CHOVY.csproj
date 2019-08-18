@@ -72,6 +72,7 @@
       <DependentUpon>CHOVYCmaSelector.cs</DependentUpon>
     </Compile>
     <Compile Include="cmakeys.cs" />
+    <Compile Include="KIRK.cs" />
     <Compile Include="param.cs" />
     <Compile Include="pbp.cs" />
     <Compile Include="Program.cs" />
