@@ -28,7 +28,7 @@ namespace CHOVY
         [DllImport("KIRK.dll", CallingConvention = CallingConvention.Cdecl)]
         private unsafe static extern int bbmac_getkey(MAC_KEY *mkey, byte[] bbmac, byte[] vkey);
 
-        public static Process GenPbpFromIso(string ISOPath, string OutputPBP, string ContentId, string VersionKey, bool compress)
+        public static Process GenPbpFromIso(string ISOPath, string OutputPBP, string ContentId, string VersionKey, bool compress, string bootup="")
         {
             string SignNpArgs = "-pbp ";
             if(compress)
@@ -39,7 +39,10 @@ namespace CHOVY
             SignNpArgs += "\"" + OutputPBP + "\" ";
             SignNpArgs += ContentId+" ";
             SignNpArgs += VersionKey;
-
+            if(bootup != "")
+            {
+                SignNpArgs += " \"" + bootup + "\" ";
+            }
 
             Process signnp = new Process();
             signnp.StartInfo.FileName = Path.Combine(Application.StartupPath, "tools", "sign_np.exe");

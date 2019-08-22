@@ -72,7 +72,6 @@
       <DependentUpon>CHOVYCmaSelector.cs</DependentUpon>
     </Compile>
     <Compile Include="cmakeys.cs" />
-    <Compile Include="KIRK.cs" />
     <Compile Include="param.cs" />
     <Compile Include="pbp.cs" />
     <Compile Include="Program.cs" />
@@ -112,10 +111,13 @@
     <None Include="Resources\idkbackground.gif" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\Untitled.gif" />
+    <None Include="Resources\umd.gif" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\Murica.wav" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\MINIS.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

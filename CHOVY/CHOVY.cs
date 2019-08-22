@@ -4,6 +4,7 @@ using Microsoft.Win32;
 using Param_SFO;
 using System;
 using System.Diagnostics;
+using System.Drawing;
 using System.IO;
 using System.Media;
 using System.Text;
@@ -55,6 +56,20 @@ namespace CHOVY
             ISO.Close();
             return TitleID;
         }
+
+        public static bool isMini(string ISOFile)
+        {
+            FileStream ISO = File.OpenRead(ISOFile);
+            CDReader cdr = new CDReader(ISO, false);
+            Stream Icon0 = cdr.OpenFile(@"PSP_GAME\ICON0.PNG", FileMode.Open, FileAccess.Read);
+
+            Bitmap bmp = new Bitmap(Icon0);
+            bool isMini = (bmp.Width == 80 && bmp.Height == 80);
+            bmp.Dispose();
+            ISO.Close();
+
+            return isMini;
+        }
         public string ReadSetting(string Setting)
         {
             string Value = "";
@@ -103,12 +118,12 @@ namespace CHOVY
         {
             if(RifPath.Text == "" || !File.Exists(RifPath.Text))
             {
-                MessageBox.Show("INVALID RIF PATH!", "RIF ERROR", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("INVALID RIF PATH!\nPlease try \"Find from CMA\"", "RIF ERROR", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
             if(Versionkey.Text.Length != 32)
             {
-                MessageBox.Show("INVALID VERSION KEY!", "VERKEY ERROR", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("INVALID VERSION KEY!\nPlease try \"Find from CMA\"", "VERKEY ERROR", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
             if(ISOPath.Text == "" || !File.Exists(ISOPath.Text))
@@ -160,10 +175,17 @@ namespace CHOVY
             string Aid = BitConverter.ToString(RifAid).Replace("-", "").ToLower();
             string BackupWorkDir = Path.Combine(CmaDir, "PGAME", Aid, TitleID);
 
-
             TotalProgress.Style = ProgressBarStyle.Continuous;
             Status.Text = "Overthrowing The PSPEMU Monarchy 00%";
-            Process signnp = pbp.GenPbpFromIso(ISOPath.Text, EbootFile, ContentID, Versionkey.Text, CompressPBP.Checked);
+
+            string BootupImage = "";
+            if (isMini(ISOPath.Text))
+            {
+                BootupImage = Path.Combine(Application.StartupPath, "_tmp", "minis.png");
+                Resources.MINIS.Save(BootupImage);
+            }
+
+            Process signnp = pbp.GenPbpFromIso(ISOPath.Text, EbootFile, ContentID, Versionkey.Text, CompressPBP.Checked, BootupImage);
             while (!signnp.HasExited)
             {
                 string Progress = signnp.StandardOutput.ReadLine();
@@ -177,7 +199,16 @@ namespace CHOVY
                 Application.DoEvents();
             }
             TotalProgress.Value = 100;
-            Status.Text = "Progress % ";
+
+            if (isMini(ISOPath.Text))
+            {
+                try
+                {
+                    File.Delete(BootupImage);
+                }
+                catch (Exception) { };
+                
+            }
 
             File.WriteAllText(GamePathFile, "ux0:pspemu/temp/game/PSP/GAME/" + TitleID + "\x00");
 
@@ -276,41 +307,49 @@ namespace CHOVY
             string accountId = "0000000000000000";
             try
             {
-                //try qcma
-                cmaDir = Registry.CurrentUser.OpenSubKey(@"Software\codestation\qcma").GetValue("appsPath").ToString();
-                accountId = Registry.CurrentUser.OpenSubKey(@"Software\codestation\qcma").GetValue("lastAccountId").ToString();
+                cmaDir = ReadSetting("CmaDir");
             }
-            catch (Exception)
+            catch(Exception)
             {
                 try
                 {
-                    //try sony cma
-                    cmaDir = Registry.CurrentUser.OpenSubKey(@"Software\Sony Corporation\Content Manager Assistant\Settings").GetValue("ApplicationHomePath").ToString();
+                    //try qcma
+                    cmaDir = Registry.CurrentUser.OpenSubKey(@"Software\codestation\qcma").GetValue("appsPath").ToString();
+                    accountId = Registry.CurrentUser.OpenSubKey(@"Software\codestation\qcma").GetValue("lastAccountId").ToString();
                 }
                 catch (Exception)
                 {
                     try
                     {
-                        //try devkit cma
-                        cmaDir = Registry.CurrentUser.OpenSubKey(@"Software\SCE\PSP2\Services\Content Manager Assistant for PlayStation(R)Vita DevKit\Settings").GetValue("ApplicationHomePath").ToString();
+                        //try sony cma
+                        cmaDir = Registry.CurrentUser.OpenSubKey(@"Software\Sony Corporation\Content Manager Assistant\Settings").GetValue("ApplicationHomePath").ToString();
                     }
                     catch (Exception)
                     {
                         try
                         {
-                            string DefaultDir = Path.Combine(Environment.GetEnvironmentVariable("HOMEDRIVE"), Environment.GetEnvironmentVariable("HOMEPATH"), "Documents", "PS Vita");
-                            if (Directory.Exists(DefaultDir))
-                            {
-                                cmaDir = DefaultDir;
-                            }
+                            //try devkit cma
+                            cmaDir = Registry.CurrentUser.OpenSubKey(@"Software\SCE\PSP2\Services\Content Manager Assistant for PlayStation(R)Vita DevKit\Settings").GetValue("ApplicationHomePath").ToString();
                         }
                         catch (Exception)
                         {
-                            //Do nothing
+                            try
+                            {
+                                string DefaultDir = Path.Combine(Environment.GetEnvironmentVariable("HOMEDRIVE"), Environment.GetEnvironmentVariable("HOMEPATH"), "Documents", "PS Vita");
+                                if (Directory.Exists(DefaultDir))
+                                {
+                                    cmaDir = DefaultDir;
+                                }
+                            }
+                            catch (Exception)
+                            {
+                                //Do nothing
+                            }
                         }
                     }
                 }
             }
+            
 
             CHOVYCmaSelector ccs = new CHOVYCmaSelector(cmaDir, accountId);
             ccs.FormClosing += Ccs_FormClosing;
@@ -381,6 +420,7 @@ namespace CHOVY
             OpenRif.ShowDialog();
             string Rif = OpenRif.FileName;
             */
+
             byte[] VersionKey = pbp.GetVersionKey(OutputPbp);
             string VerKey = BitConverter.ToString(VersionKey).Replace("-", "");
             WriteSetting("VersionKey", VerKey);
@@ -388,7 +428,11 @@ namespace CHOVY
             string ContentID = pbp.GetContentId(OutputPbp);
             string Rif = Path.Combine(Application.StartupPath, "GAME.RIF");
             string LicensePath = Path.Combine(output, "ux0_pspemu_temp_game_PSP_LICENSE", ContentID + ".rif");
-
+            if(!File.Exists(LicensePath))
+            {
+                MessageBox.Show("Cannot find RIF", "RIF ERROR", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
             File.Copy(LicensePath, Rif, true);
             WriteSetting("RifPath", Rif);
             WriteSetting("CmaDir", CmaDir);
