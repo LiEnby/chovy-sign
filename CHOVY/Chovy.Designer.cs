@@ -280,7 +280,7 @@
             this.Controls.Add(this.PsmChan);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.Name = "CHOVY";
-            this.Text = "CHOVYMainForm";
+            this.Text = "CHOVY";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.CHOVY_FormClosing);
             this.Load += new System.EventHandler(this.CHOVY_Load);
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).EndInit();
