@@ -114,8 +114,21 @@ namespace CHOVY
             RifPath.Text = ReadSetting("RifPath");
         }
 
+        private void FREEDOM_EnabledChanged(object sender, EventArgs e)
+        {
+            Color red = Color.FromArgb(192, 0, 0);
+            Color black = Color.Black;
+            bool enabled = this.FREEDOM.Enabled;
+            this.FREEDOM.ForeColor = enabled ? red : black;
+            this.FREEDOM.BackColor = enabled ? black : red;
+        }
+
         private void FREEDOM_Click(object sender, EventArgs e)
         {
+            Action enable = () => {
+                this.FREEDOM.Enabled = true;
+            };
+
             if(RifPath.Text == "" || !File.Exists(RifPath.Text))
             {
                 MessageBox.Show("INVALID RIF PATH!\nPlease try \"Find from CMA\"", "RIF ERROR", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -132,6 +145,7 @@ namespace CHOVY
                 return;
             }
 
+            this.FREEDOM.Enabled = false;
             string CmaDir = ReadSetting("CmaDir");
             if(CmaDir == "")
             {
@@ -222,6 +236,7 @@ namespace CHOVY
             if (!File.Exists(EbootSignature) || ChovyGen.ExitCode != 0)
             {
                 MessageBox.Show("CHOVY-GEN.EXE FAILED!\nArguments:\n" + ChovyGen.StartInfo.Arguments + "\nStdOut:\n" + ChovyGen.StandardOutput.ReadToEnd() + "\nStdErr:\n" + ChovyGen.StandardError.ReadToEnd());
+                enable();
                 return;
             }
 
@@ -242,6 +257,7 @@ namespace CHOVY
             if (psvimg_create.ExitCode != 0)
             {
                 MessageBox.Show("PSVIMG-CREATE.EXE FAILED!\nArguments:\n" + psvimg_create.StartInfo.Arguments + "\nStdOut:\n" + psvimg_create.StandardOutput.ReadToEnd() + "\nStdErr:\n" + psvimg_create.StandardError.ReadToEnd());
+                enable();
                 return;
             }
 
@@ -264,6 +280,7 @@ namespace CHOVY
             if(psvimg_create.ExitCode != 0)
             {
                 MessageBox.Show("PSVIMG-CREATE.EXE FAILED!\nArguments:\n" + psvimg_create.StartInfo.Arguments + "\nStdOut:\n" + psvimg_create.StandardOutput.ReadToEnd() + "\nStdErr:\n" + psvimg_create.StandardError.ReadToEnd());
+                enable();
                 return;
             }
 
@@ -293,7 +310,7 @@ namespace CHOVY
                 snd.Play();
             }
             
-
+            enable();
             MessageBox.Show("YOU HAVE MADE A SOCIAL CONTRACT WITH FREEDOM!", "FREEDOM!", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 

@@ -209,6 +209,7 @@
             this.FREEDOM.Text = "FREEDOM";
             this.FREEDOM.UseVisualStyleBackColor = true;
             this.FREEDOM.Click += new System.EventHandler(this.FREEDOM_Click);
+            this.FREEDOM.EnabledChanged += new System.EventHandler(this.FREEDOM_EnabledChanged);
             // 
             // groupBox1
             // 
