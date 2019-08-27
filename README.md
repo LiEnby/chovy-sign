@@ -13,7 +13,7 @@ create playable PSP ISO bubbles on your PSVita
 
 had to go public early due to qwikrazor.. thank him later..
 
-PSP PIRACY on 3.71 
+PSP PIRACY on 3.72 
 (though, WE DONT CONDONE PIRACY plz ONLY use it for games u acturaly own the UMD for) 
 its purely for BACKUPS xD
 also, lots of shittily dumped iso's online, however iso's obtained by the NPS Browser should work fine.
