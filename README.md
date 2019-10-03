@@ -28,3 +28,8 @@ Other indirect help:
 @swarzesherz for sign_np    
 tpunix for kirk_engine libaries.    
 @yifanlu and xyz for psvimgtools .. 
+
+# Building
+In order to build CHOVY.DLL you need [OpenSSL](https://www.npcglib.org/~stathis/downloads/openssl-1.1.0f-vs2017.7z) libary
+Extract to C:/OpenSSL or change linking settings in the solution to match your install location
+Open the SLN in Viual Studio 2017 and press "Build Solution"
