@@ -2,6 +2,7 @@
 // With CBPS help especially: @SiliCart, @nyaaasen, @notzecoxao (and his friends?)
 
 //Check out motoharu's project: https://github.com/motoharu-gosuto/psvcmd56/blob/master/src/CMD56Reversed/F00D/GcAuthMgrService.cpp#L1102
+#define PACK( __Declaration__ ) __pragma( pack(push, 1) ) __Declaration__ __pragma( pack(pop) )
 
 #include <string.h>
 #include <stdio.h>
@@ -15,26 +16,26 @@
 #include <openssl/ec.h>
 
 #include "key_vault.h"
-typedef struct
+PACK(typedef struct
 {
 	uint8_t r[0x1c];
 	uint8_t s[0x1c];
-} __attribute__((packed)) ECDSA_SIG_0x1c;
+}  ECDSA_SIG_0x1c);
 
-typedef struct sce_ebootpbp {
+PACK(typedef struct sce_ebootpbp {
 	uint64_t magic;
 	uint32_t key_type;// set to 1 (maybe keytype?)
 	uint32_t type;// 03 - ps1,  02 - psp
-	char np_title[0x30];
+	uint8_t np_title[0x30];
 	uint64_t aid;
 	uint64_t secure_tick;
 	uint64_t filesz;
 	uint64_t sw_ver;
-	char padding[0xf8];
+	uint8_t padding[0xf8];
 	ECDSA_SIG_0x1c ebootpbp_hdr_sig;
 	ECDSA_SIG_0x1c NPUMDIMG_sig; 
 	ECDSA_SIG_0x1c sceebootpbp_sig;
-} __attribute__((packed)) sce_ebootpbp;
+} sce_ebootpbp);
 
 
 typedef struct pbp_hdr {
@@ -56,7 +57,7 @@ typedef struct pbp_hdr {
 
 
 //based motoharu
-int can_be_reversed_80C17A(const uint8_t* src, int some_size, uint8_t* iv, uint8_t* src_xored_digest)
+__declspec(dllexport) int can_be_reversed_80C17A(const uint8_t* src, int some_size, uint8_t* iv, uint8_t* src_xored_digest)
 {
    unsigned char src_xored[0x20];
 	memcpy(src_xored, iv, 0x20);
@@ -94,7 +95,7 @@ int can_be_reversed_80C17A(const uint8_t* src, int some_size, uint8_t* iv, uint8
 }
 
 
-int f00d_KIRK0x22(const uint8_t *hash, ECDSA_SIG_0x1c *signature, int key_sel) {
+__declspec(dllexport) int f00d_KIRK0x22(const uint8_t *hash, ECDSA_SIG_0x1c *signature, int key_sel) {
 	
     
 	uint8_t hmac_in[0x38];
@@ -151,7 +152,7 @@ int f00d_KIRK0x22(const uint8_t *hash, ECDSA_SIG_0x1c *signature, int key_sel) {
 	//Generate R in order to get custom "random number"
 	BIGNUM *sig_r = BN_new();
 	EC_POINT_mul(curve, generator, m, NULL, NULL, bn_ctx);
-	EC_POINT_get_affine_coordinates(curve, generator, sig_r, NULL, bn_ctx);
+	EC_POINT_get_affine_coordinates_GFp(curve, generator, sig_r, NULL, bn_ctx);
 	BN_nnmod(sig_r, sig_r, order, bn_ctx);
 	
 	//Generate M^-1
@@ -176,7 +177,7 @@ int f00d_KIRK0x22(const uint8_t *hash, ECDSA_SIG_0x1c *signature, int key_sel) {
 	BN_bn2bin(sig_r, &signature->r);
 	BN_bn2bin(sig_s, &signature->s);
 	ECDSA_SIG_free(sig);
-	BN_free(sig_s);
+	//BN_free(sig_s);
 	ret = 1;
 	
 error:
@@ -198,39 +199,27 @@ error:
 
 }
 
-static void usage(char *argv[])
-{
-	printf("Project Chovy - __sce_ebootpbp generator by @dots_tb and motoharu\n");
-	printf("With CBPS help especially: @SiliCart, @nyaaasen, @notzecoxao (and his friends?)\n");
-	printf("%s <aid> <EBOOT.pbp>\n\n",argv[0]);
-}
 
-
-int main(int argc, const char **argv)
+__declspec(dllexport) int chovy_gen(char *ebootpbp, uint64_t signaid, char *outscefile)
 {
 
-
+	int ret  = 1;
 	FILE *fin = 0, *fout = 0;
-	if (argc != 3) {
-		usage(argv);
-		return 1;
-	}
+
 	uint8_t *work_buf = (unsigned char*) calloc (1, WORK_BUF_SZ);
 	sce_ebootpbp *sceebootpbp_file = (unsigned char*) calloc (1, sizeof(sce_ebootpbp));
 	
-	printf("Input: %s\n", argv[2]);
-	fin = fopen(argv[2], "rb");
+	
+	fin = fopen(ebootpbp, "rb");
 	if (!fin) {
-		perror("Failed to open input file");
+
 		goto error;
 	}
-	
 	memcpy(&sceebootpbp_file->magic, "NPUMDSIG", 0x8);
 	sceebootpbp_file->type = 2;
 	sceebootpbp_file->key_type = 1;
-	sceebootpbp_file->aid = __builtin_bswap64(strtoull(argv[1], NULL, 0x10));
+	sceebootpbp_file->aid = _byteswap_uint64(signaid);
 	
-	printf("AID set to: %llx\n", sceebootpbp_file->aid);
 	
 	fseek(fin, 0, SEEK_END);
 	sceebootpbp_file->filesz = ftell(fin);
@@ -243,7 +232,7 @@ int main(int argc, const char **argv)
 	fseek(fin, 0, SEEK_SET);
 	fread(work_buf, hdr.icon0_offset, 1,fin);
 	
-	char work_hash[0x1c]; 
+	uint8_t work_hash[0x1c]; 
 	SHA256_CTX sha256_ctx;
 	SHA224_Init(&sha256_ctx);
 	SHA224_Update(&sha256_ctx, work_buf, hdr.icon0_offset);
@@ -252,11 +241,12 @@ int main(int argc, const char **argv)
 	
 	SHA224_Init(&sha256_ctx);	
 	fseek(fin, hdr.data_psar_offset, SEEK_SET);
-	
+
 	size_t size = PSAR_SZ;
 	int to_read = size > WORK_BUF_SZ ? WORK_BUF_SZ : size;
-	fread(work_buf, to_read, 1,fin);
 	
+	
+	fread(work_buf, to_read, 1,fin);
 	if(memcmp(work_buf, "NPUMDIMG", 0x8) == 0)
 		memcpy(&sceebootpbp_file->np_title, work_buf + 0x10, sizeof(sceebootpbp_file->np_title));
 	else {
@@ -281,14 +271,13 @@ int main(int argc, const char **argv)
 	
 	f00d_KIRK0x22(work_hash, &sceebootpbp_file->sceebootpbp_sig, sceebootpbp_file->key_type);
 	
-	fout = fopen("__sce_ebootpbp", "wb");
+	fout = fopen(outscefile, "wb");
 	if (!fout) {
-		perror("Failed to open output file");
 		goto error;
 	}
 	fwrite(sceebootpbp_file,  1, sizeof(sce_ebootpbp), fout);
-	printf("Written to: __sce_ebootpbp\n");
-
+	
+	ret = 0;
 error:
 	if (fin)
 		fclose(fin);
@@ -296,6 +285,5 @@ error:
 		fclose(fout);	
 	free(work_buf);
 	free(sceebootpbp_file);
-	exit(0);
-	return 0;
+	return ret;
 }

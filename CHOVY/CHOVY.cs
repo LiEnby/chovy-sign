@@ -228,14 +228,11 @@ namespace CHOVY
 
             TotalProgress.Style = ProgressBarStyle.Marquee;
             Status.Text = "Signing the Declaration of Independance";
-            Process ChovyGen = pbp.gen__sce_ebootpbp(EbootFile, Aid);
-            while(!ChovyGen.HasExited)
-            {
-                Application.DoEvents();
-            }
-            if (!File.Exists(EbootSignature) || ChovyGen.ExitCode != 0)
-            {
-                MessageBox.Show("CHOVY-GEN.EXE FAILED!\nArguments:\n" + ChovyGen.StartInfo.Arguments + "\nStdOut:\n" + ChovyGen.StandardOutput.ReadToEnd() + "\nStdErr:\n" + ChovyGen.StandardError.ReadToEnd());
+            UInt64 IntAid = Convert.ToUInt64(Aid,16);
+            int ChovyGenRes = pbp.gen__sce_ebootpbp(EbootFile, IntAid, EbootSignature);
+            if (!File.Exists(EbootSignature) || ChovyGenRes != 0)
+            { 
+                MessageBox.Show("CHOVY-GEN Failed! Please check CHOVY.DLL exists\nand that the Microsoft Visual C++ 2015 Redistributable Update 3 RC is installed");
                 enable();
                 return;
             }

@@ -208,8 +208,8 @@
             this.FREEDOM.TabIndex = 15;
             this.FREEDOM.Text = "FREEDOM";
             this.FREEDOM.UseVisualStyleBackColor = true;
-            this.FREEDOM.Click += new System.EventHandler(this.FREEDOM_Click);
             this.FREEDOM.EnabledChanged += new System.EventHandler(this.FREEDOM_EnabledChanged);
+            this.FREEDOM.Click += new System.EventHandler(this.FREEDOM_Click);
             // 
             // groupBox1
             // 
@@ -281,7 +281,7 @@
             this.Controls.Add(this.PsmChan);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.Name = "CHOVY";
-            this.Text = "CHOVY";
+            this.Text = "CHOVY-SIGN";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.CHOVY_FormClosing);
             this.Load += new System.EventHandler(this.CHOVY_Load);
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).EndInit();

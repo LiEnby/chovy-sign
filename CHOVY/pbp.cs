@@ -27,6 +27,8 @@ namespace CHOVY
         private unsafe static extern int sceDrmBBMacUpdate(MAC_KEY *mkey, byte[] buf, int size);
         [DllImport("KIRK.dll", CallingConvention = CallingConvention.Cdecl)]
         private unsafe static extern int bbmac_getkey(MAC_KEY *mkey, byte[] bbmac, byte[] vkey);
+        [DllImport("CHOVY.dll", CallingConvention = CallingConvention.Cdecl)]
+        private unsafe static extern int chovy_gen(string ebootpbp, UInt64 AID, string outscefile);
 
         public static Process GenPbpFromIso(string ISOPath, string OutputPBP, string ContentId, string VersionKey, bool compress, string bootup="")
         {
@@ -85,19 +87,11 @@ namespace CHOVY
             return VERSION_KEY;
         }
 
-        public static Process gen__sce_ebootpbp(string EbootFile,string AID)
+        public static int gen__sce_ebootpbp(string EbootFile, UInt64 AID, string OutSceebootpbpFile)
         {
-            Process chovygen = new Process();
-            chovygen.StartInfo.FileName = Path.Combine(Application.StartupPath, "tools", "chovy-gen.exe");
-            chovygen.StartInfo.WorkingDirectory = Path.GetDirectoryName(EbootFile);
-            chovygen.StartInfo.Arguments = AID + " \""+EbootFile+"\"";
-            chovygen.StartInfo.CreateNoWindow = true;
-            chovygen.StartInfo.UseShellExecute = false;
-            chovygen.StartInfo.RedirectStandardOutput = true;
-            chovygen.StartInfo.RedirectStandardError = true;
-            chovygen.Start();
-            return chovygen;
+            return chovy_gen(EbootFile, AID, OutSceebootpbpFile);
         }
+
         public static string GetContentId(string pbpfile)
         {
             FileStream pbp = File.OpenRead(pbpfile);

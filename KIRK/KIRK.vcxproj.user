@@ -2,12 +2,12 @@
 <Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
-    <LocalDebuggerCommand>C:\Users\earsy\Documents\Visual Studio 2017\Projects\CHOVEY\CHOVY\bin\Debug\CHOVY.exe</LocalDebuggerCommand>
+    <LocalDebuggerCommand>$(SolutionDir)CHOVY\bin\$(Configuration)\CHOVY-SIGN.EXE</LocalDebuggerCommand>
     <LocalDebuggerDebuggerType>Mixed</LocalDebuggerDebuggerType>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
-    <LocalDebuggerCommand>C:\Users\earsy\Documents\Visual Studio 2017\Projects\CHOVEY\CHOVY\bin\Release\CHOVY-SIGN.exe</LocalDebuggerCommand>
-    <LocalDebuggerDebuggerType>ManagedOnly</LocalDebuggerDebuggerType>
+    <LocalDebuggerCommand>$(SolutionDir)CHOVY\bin\$(Configuration)\CHOVY-SIGN.EXE</LocalDebuggerCommand>
+    <LocalDebuggerDebuggerType>Mixed</LocalDebuggerDebuggerType>
   </PropertyGroup>
 </Project>
