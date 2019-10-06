@@ -1,4 +1,5 @@
-﻿using System;
+﻿using PSVIMGTOOLS;
+using System;
 using System.Diagnostics;
 using System.IO;
 using System.Runtime.InteropServices;
@@ -58,16 +59,20 @@ namespace CHOVY
         }
 
 
-        public unsafe static byte[] GetVersionKey(string pbpfile)
+        private static UInt32 readUInt32(Stream src)
+        {
+            byte[] intBuf = new byte[0x4];
+            src.Read(intBuf, 0x00, 0x04);
+            return BitConverter.ToUInt32(intBuf, 0);
+        }
+        public unsafe static byte[] GetVersionKey(Stream pbp)
         {
             MAC_KEY mkey;
 
             kirk_init();
 
-            FileStream pbp = File.OpenRead(pbpfile);
-            BinaryReader binPBP = new BinaryReader(pbp);
             pbp.Seek(0x24,SeekOrigin.Begin);
-            int NPUMDIMGOffest = binPBP.ReadInt32();
+            Int64 NPUMDIMGOffest = Convert.ToInt64(readUInt32(pbp));
 
             pbp.Seek(NPUMDIMGOffest, SeekOrigin.Begin);
 
@@ -92,12 +97,10 @@ namespace CHOVY
             return chovy_gen(EbootFile, AID, OutSceebootpbpFile);
         }
 
-        public static string GetContentId(string pbpfile)
+        public static string GetContentId(Stream pbp)
         {
-            FileStream pbp = File.OpenRead(pbpfile);
-            BinaryReader binPBP = new BinaryReader(pbp);
             pbp.Seek(0x24, SeekOrigin.Begin);
-            int NPUMDIMGOffest = binPBP.ReadInt32();
+            Int64 NPUMDIMGOffest = Convert.ToInt64(readUInt32(pbp));
             pbp.Seek(NPUMDIMGOffest+0x10, SeekOrigin.Begin);
             byte[] ContentId = new byte[0x24];
             pbp.Read(ContentId, 0x00, 0x24);

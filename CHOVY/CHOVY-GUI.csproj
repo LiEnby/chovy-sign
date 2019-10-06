@@ -77,6 +77,8 @@
     <Compile Include="pbp.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="PSVIMGReader.cs" />
+    <Compile Include="PSVIMGStream.cs" />
     <Compile Include="psvimgtools.cs" />
     <EmbeddedResource Include="CHOVY.resx">
       <DependentUpon>CHOVY.cs</DependentUpon>

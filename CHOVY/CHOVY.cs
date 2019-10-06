@@ -2,6 +2,7 @@
 using DiscUtils.Iso9660;
 using Microsoft.Win32;
 using Param_SFO;
+using PSVIMGTOOLS;
 using System;
 using System.Diagnostics;
 using System.Drawing;
@@ -313,9 +314,6 @@ namespace CHOVY
 
         private void FindFromCMA_Click(object sender, EventArgs e)
         {
-           /* Ccs_FormClosing(null, null);
-            return;*/
-
             this.Hide();
             string cmaDir = "";
             string accountId = "0000000000000000";
@@ -386,86 +384,54 @@ namespace CHOVY
             {
                 return;
             }
-
-            string output = Path.Combine(Application.StartupPath, "_tmp");
-            Directory.CreateDirectory(output);
-
-            string OutputPbp = Path.Combine(output, "ux0_pspemu_temp_game_PSP_GAME_" + Backup, "EBOOT.PBP");
-            string GameFolder = Path.Combine(output, "ux0_pspemu_temp_game_PSP_GAME_" + Backup);
-            string LicenseFolder = Path.Combine(output, "ux0_pspemu_temp_game_PSP_LICENSE");
-
-            Status.Text = "Declaring Independance from the GAME.PSVIMG";
+            
             string BackupPath = Path.Combine(CmaDir, "PGAME", CmaAid, Backup, "game", "game.psvimg");
             if(!File.Exists(BackupPath))
             {
                 return;
             }
-            TotalProgress.Style = ProgressBarStyle.Marquee;
-            Process psvimg = psvimgtools.PSVIMG_EXTRACT(CmaAid, BackupPath, output);
-            while (!psvimg.HasExited)
-            {
-                Application.DoEvents();
-            }
-            if(!Directory.Exists(GameFolder) || psvimg.ExitCode != 0)
-            {
-                MessageBox.Show("PSVIMG-EXTRACT.EXE FAILED!\nArguments:\n" + psvimg.StartInfo.Arguments + "\nStdOut:\n" + psvimg.StandardOutput.ReadToEnd() + "\nStdErr:\n" + psvimg.StandardError.ReadToEnd());
-                return;
-            }
 
-            Status.Text = "Declaring Independance from the LICENSE.PSVIMG";
+            byte[] AID = BitConverter.GetBytes(Convert.ToInt64(CmaAid, 16));
+            Array.Reverse(AID);
+            byte[] Key = CmaKeys.GenerateKey(AID);
+
+            PSVIMGStream GamePsvimg = new PSVIMGStream(File.OpenRead(BackupPath), Key);
+
             BackupPath = Path.Combine(CmaDir, "PGAME", CmaAid, Backup, "license", "license.psvimg");
-            psvimg = psvimgtools.PSVIMG_EXTRACT(CmaAid, BackupPath, output);
-            while(!psvimg.HasExited)
+            if (!File.Exists(BackupPath))
             {
-                Application.DoEvents();
-            }
-            if (!Directory.Exists(LicenseFolder) || psvimg.ExitCode != 0)
-            {
-                MessageBox.Show("PSVIMG-EXTRACT.EXE FAILED!\nArguments:\n" + psvimg.StartInfo.Arguments + "\nStdOut:\n" + psvimg.StandardOutput.ReadToEnd() + "\nStdErr:\n" + psvimg.StandardError.ReadToEnd());
                 return;
             }
 
-            /* -- This was some debug stuff
-            OpenFileDialog Openpbp = new OpenFileDialog();
-            Openpbp.ShowDialog();
-            string OutputPbp = Openpbp.FileName;
+            PSVIMGStream LicensePsvimg = new PSVIMGStream(File.OpenRead(BackupPath), Key);
 
-            OpenFileDialog OpenRif = new OpenFileDialog();
-            OpenRif.ShowDialog();
-            string Rif = OpenRif.FileName;
-            */
+            string Rif = Path.Combine(Application.StartupPath, "GAME.RIF");
 
-            byte[] VersionKey = pbp.GetVersionKey(OutputPbp);
+            PSVIMGFileStream EbootPbp = new PSVIMGFileStream(GamePsvimg, "/EBOOT.PBP");
+            byte[] VersionKey = pbp.GetVersionKey(EbootPbp);
             string VerKey = BitConverter.ToString(VersionKey).Replace("-", "");
             WriteSetting("VersionKey", VerKey);
 
-            string ContentID = pbp.GetContentId(OutputPbp);
-            string Rif = Path.Combine(Application.StartupPath, "GAME.RIF");
-            string LicensePath = Path.Combine(output, "ux0_pspemu_temp_game_PSP_LICENSE", ContentID + ".rif");
-            if(!File.Exists(LicensePath))
-            {
-                MessageBox.Show("Cannot find RIF", "RIF ERROR", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return;
-            }
-            File.Copy(LicensePath, Rif, true);
+            string ContentID = pbp.GetContentId(EbootPbp);
+            PSVIMGFileStream LicenseRif = new PSVIMGFileStream(LicensePsvimg, "/"+ ContentID+ ".rif");
+            byte[] LicenseFile = new byte[LicenseRif.Length];
+            LicenseRif.Read(LicenseFile, 0x00, Convert.ToInt32(LicenseRif.Length));
+            File.WriteAllBytes(Rif, LicenseFile);
+
+            LicenseRif.Close();
+            LicensePsvimg.Close();
+            EbootPbp.Close();
+            GamePsvimg.Close();
+
             WriteSetting("RifPath", Rif);
             WriteSetting("CmaDir", CmaDir);
 
             Versionkey.Text = VerKey;
             RifPath.Text = Rif;
 
-           if (Directory.Exists(output))
-            {
-                try
-                {
-                    Directory.Delete(output, true);
-                }
-                catch (Exception) { }
-
-            } 
-
             Status.Text = "Progress %";
             TotalProgress.Style = ProgressBarStyle.Continuous;
+            MessageBox.Show("KEYS HAVE BEEN EXTRACTED FROM CMA, YOU MAY NOW LIBERATE YOURSELF", "SUCCESS", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
         private void BrowseButton_Click(object sender, EventArgs e)
