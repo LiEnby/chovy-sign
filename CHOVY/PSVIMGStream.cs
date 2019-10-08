@@ -8,19 +8,38 @@ namespace PSVIMGTOOLS
     class PSVIMGStream : Stream
     {
 
-        public int AES_BLOCK_SIZE = 0x10;
-        public int SHA256_BLOCK_SIZE = 0x20;
-        public int PSVIMG_BLOCK_SIZE = 0x8000;
-        public int FULL_PSVIMG_SIZE = 0x8020;
-        public int PSVIMG_ENTRY_ALIGN = 0x400;
         private Stream baseStream;
         private MemoryStream blockStream;
+        private long _position = 0;
         private byte[] key;
         public Stream BaseStream
         {
             get
             {
                 return baseStream;
+            }
+        }
+
+        private long position
+        {
+            get
+            {
+                return _position;
+            }
+            set
+            {
+                if (value > this.Length)
+                {
+                    _position = this.Length;
+                }
+                else if(value < 0)
+                {
+                    _position = 0;
+                }
+                else
+                {
+                    _position = value;
+                }
             }
         }
 
@@ -87,7 +106,7 @@ namespace PSVIMGTOOLS
         {
             get
             {
-                return baseStream.Length - AES_BLOCK_SIZE;
+                return baseStream.Length - PSVIMGConstants.AES_BLOCK_SIZE;
             }
         }
 
@@ -103,7 +122,7 @@ namespace PSVIMGTOOLS
         {
             get
             {
-                return baseStream.Position - AES_BLOCK_SIZE;
+                return position;
             }
             set
             {
@@ -112,61 +131,94 @@ namespace PSVIMGTOOLS
 
         }
 
+        private bool verifyFooter()
+        {
+            byte[] Footer = new byte[0x10];
+            byte[] IV = new byte[PSVIMGConstants.AES_BLOCK_SIZE];
+            
+            baseStream.Seek(baseStream.Length - (Footer.Length + IV.Length), SeekOrigin.Begin);
+            baseStream.Read(IV, 0x00, PSVIMGConstants.AES_BLOCK_SIZE);
+            baseStream.Read(Footer, 0x00, 0x10);
+
+            byte[] FooterDec = aes_ecb_decrypt(Footer, IV);
+            UInt64 FooterLen;
+            using (MemoryStream ms = new MemoryStream(FooterDec))
+            {
+                ms.Seek(0x4, SeekOrigin.Current);
+                ms.Seek(0x4, SeekOrigin.Current);
+                byte[] LenInt = new byte[0x8];
+                ms.Read(LenInt, 0x00, 0x8);
+                FooterLen = BitConverter.ToUInt64(LenInt, 0x00);
+            }
+            if(Convert.ToUInt64(baseStream.Length) == FooterLen)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
         public PSVIMGStream(Stream file, byte[] KEY)
         {
             baseStream = file;
             key = KEY;
+            if(!verifyFooter())
+            {
+                throw new Exception("Invalid KEY!");
+            }
             blockStream = new MemoryStream();
-            baseStream.Seek(AES_BLOCK_SIZE, SeekOrigin.Begin);
+            this.Seek(0x00, SeekOrigin.Begin);
             update();
         }
 
         public override int Read(byte[] buffer, int offset, int count)
         {
-            int remaining = (int)getRemainingBlock();
-            int read = 0;
-
-            if (count < remaining)
+            long totalRead = 0;
+            using (MemoryStream ms = new MemoryStream())
             {
-                read += blockStream.Read(buffer, offset, count);
-                baseStream.Seek(count, SeekOrigin.Current);
-            }
-            else
-            {
-                using (MemoryStream ms = new MemoryStream())
+                while (true)
                 {
-                    while (true)
+                    
+                    if (this.Position >= this.Length)
                     {
-                        update();
-                        remaining = (int)getRemainingBlock();
-                        int curPos = count - read;
-
-                        if (curPos > remaining)
-                        {
-                            read += remaining;
-                            blockStream.CopyTo(ms, remaining);
-                            baseStream.Seek(remaining, SeekOrigin.Current);
-                        }
-                        else
-                        {
-                            read += curPos;
-                            blockStream.CopyTo(ms, curPos);
-                            baseStream.Seek(curPos, SeekOrigin.Current);
-                            break;
-                        }
-
+                        break;
                     }
-                    ms.Seek(0x00, SeekOrigin.Begin);
-                    ms.Read(buffer, offset, count);
-                }
-            }
-            return read;
 
+                    long rem = getRemainingBlock();
+                    long totalLeft = (count - totalRead);
+                    if (rem < totalLeft)
+                    {
+                        byte[] remB = new byte[rem];
+                        long read = blockStream.Read(remB, 0x00, remB.Length);
+                        totalRead += read;
+                        ms.Write(remB, 0x00, remB.Length);
+
+                        long indx = getBlockIndex() + 1;
+                        seekToBlock(indx);
+                        update();
+                    }
+                    else
+                    {
+                        byte[] remB = new byte[totalLeft];
+                        long read = blockStream.Read(remB, 0x00, remB.Length);
+                        totalRead += read;
+                        ms.Write(remB, 0x00, remB.Length);
+                        break;
+                    }
+                   
+
+                }
+                ms.Seek(0x00, SeekOrigin.Begin);
+                totalRead = ms.Read(buffer, offset, count);
+                position += totalRead;
+            }
+            
+            return Convert.ToInt32(totalRead);
         }
 
         public override void Flush()
         {
-            update();
             baseStream.Flush();
             blockStream.Flush();
         }
@@ -174,35 +226,26 @@ namespace PSVIMGTOOLS
         public override long Seek(long offset, SeekOrigin origin)
         {
             long ret = 0;
-            if(origin == SeekOrigin.Begin)
+            if (origin == SeekOrigin.Begin)
             {
-                ret = baseStream.Seek(offset + AES_BLOCK_SIZE, SeekOrigin.Begin);
+                long blockNo = getBlockIndex(offset);
+                seekToBlock(blockNo);
+                update();
+
+                long onwards = offset % blockStream.Length;
+                ret = blockStream.Seek(onwards, SeekOrigin.Begin);
+                position = (baseStream.Position - PSVIMGConstants.AES_BLOCK_SIZE) + BlockPosition;
             }
             else if (origin == SeekOrigin.Current)
             {
-                long pos = baseStream.Position;
-                if ((pos + offset) >= AES_BLOCK_SIZE)
-                {
-                    ret = baseStream.Seek(offset, SeekOrigin.Current);
-                }
-                else
-                {
-                    ret = baseStream.Seek(offset+ AES_BLOCK_SIZE, SeekOrigin.Current);
-                }
+                long currentPos = this.Position;
+                this.Seek(currentPos + offset, SeekOrigin.Begin);
             }
             else if (origin == SeekOrigin.End)
             {
-                long pos = baseStream.Length;
-                if ((pos + offset) >= AES_BLOCK_SIZE)
-                {
-                    ret = baseStream.Seek(offset, SeekOrigin.End);
-                }
-                else
-                {
-                    ret = baseStream.Seek(offset + AES_BLOCK_SIZE, SeekOrigin.End);
-                }
+                long len = this.Length;
+                this.Seek(Length + offset, SeekOrigin.Begin);
             }
-            update();
             return ret;
         }
 
@@ -225,52 +268,44 @@ namespace PSVIMGTOOLS
             baseStream.Dispose();
             this.Dispose();
         }
+
         private void update()
         {
-            long offset = (this.Position % FULL_PSVIMG_SIZE);
             long blockIndex = getBlockIndex();
             byte[] decryptedBlock = getBlock(blockIndex);
-            blockStream.Seek(0x00, SeekOrigin.Begin);
-            blockStream.SetLength(decryptedBlock.Length);
+
+            blockStream.Dispose();
+            blockStream = new MemoryStream(decryptedBlock, 0x00, decryptedBlock.Length);
             blockStream.Write(decryptedBlock, 0x00, decryptedBlock.Length);
+            blockStream.Seek(0x00, SeekOrigin.Begin);
+
             seekToBlock(blockIndex);
-            baseStream.Seek(offset, SeekOrigin.Current);
-            blockStream.Seek(offset, SeekOrigin.Begin);
         }
 
-        private long getBlockIndex()
+        private long getBlockIndex(long pos = -1)
         {
-            long i = 0;
-            long curPos = baseStream.Position;
-            long fullBlock;
-            long blockOffset;
-
-            while (true)
+            long blockOffset = 0;
+            long blockEnd = blockOffset + PSVIMGConstants.FULL_PSVIMG_SIZE;
+            long blockIndex = 0;
+            if (pos < 0)
             {
-                blockOffset = (i * FULL_PSVIMG_SIZE) + AES_BLOCK_SIZE;
-                long remaining = getRemainingBase();
-                if (remaining < FULL_PSVIMG_SIZE)
-                {
-                    fullBlock = blockOffset + remaining;
-                }
-                else
-                {
-                    fullBlock = blockOffset + FULL_PSVIMG_SIZE;
-                }
-                if ((curPos >= blockOffset) && (curPos < fullBlock))
-                {
-                    break;
-                }
-                if (blockOffset > baseStream.Length)
-                {
-                    break;
-                }
-                i++;
+                pos = this.Position;
             }
-            return i;
+            while (blockOffset < this.Length)
+            {
+                blockOffset = (blockIndex * PSVIMGConstants.FULL_PSVIMG_SIZE);
+                blockEnd = blockOffset + PSVIMGConstants.FULL_PSVIMG_SIZE;
 
 
+                if (pos >= blockOffset && pos < blockEnd)
+                {
+                    return blockIndex;
+                }
+                blockIndex++;
+            }
+            throw new Exception("Not found somehow..");
         }
+
         private long getRemainingBase()
         {
             return baseStream.Length - baseStream.Position;
@@ -283,7 +318,7 @@ namespace PSVIMGTOOLS
         {
             byte[] iv = new byte[0x10];
             seekToBlock(blockindex);
-            baseStream.Seek(baseStream.Position - AES_BLOCK_SIZE, SeekOrigin.Begin);
+            baseStream.Seek(baseStream.Position - PSVIMGConstants.AES_BLOCK_SIZE, SeekOrigin.Begin);
             baseStream.Read(iv, 0x00, iv.Length);
             return iv;
         }
@@ -306,15 +341,12 @@ namespace PSVIMGTOOLS
 
         private void seekToBlock(long blockIndex)
         {
-            long blockOffset;
-            blockOffset = (blockIndex * FULL_PSVIMG_SIZE) + AES_BLOCK_SIZE;
+            long blockOffset = (blockIndex * PSVIMGConstants.FULL_PSVIMG_SIZE) + PSVIMGConstants.AES_BLOCK_SIZE;
 
             if (blockOffset > baseStream.Length)
             {
                 blockOffset = baseStream.Length;
             }
-
-
             baseStream.Seek(blockOffset, SeekOrigin.Begin);
         }
         private byte[] getBlock(long blockIndex)
@@ -322,17 +354,15 @@ namespace PSVIMGTOOLS
             byte[] iv = getIV(blockIndex);
             long remaining = getRemainingBase();
             byte[] encryptedBlock;
-            if (FULL_PSVIMG_SIZE < remaining)
+            if (PSVIMGConstants.FULL_PSVIMG_SIZE < remaining)
             {
-                encryptedBlock = new byte[FULL_PSVIMG_SIZE];
+                encryptedBlock = new byte[PSVIMGConstants.FULL_PSVIMG_SIZE];
             }
             else
             {
                 encryptedBlock = new byte[remaining];
             }
-   
-           
-            baseStream.Read(encryptedBlock, 0x00, encryptedBlock.Length);
+            baseStream.Read(encryptedBlock, 0x00, encryptedBlock.Length);            
             byte[] decryptedBlock = aes_ecb_decrypt(encryptedBlock, iv);
             return decryptedBlock;
         }

@@ -5,7 +5,7 @@
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{D46AA2C2-2BDC-45C7-ACA5-D7A2295564E8}</ProjectGuid>
-    <OutputType>WinExe</OutputType>
+    <OutputType>Exe</OutputType>
     <RootNamespace>CHOVY</RootNamespace>
     <AssemblyName>CHOVY-SIGN</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
@@ -34,13 +34,13 @@
     <WarningLevel>4</WarningLevel>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'CHOVY|AnyCPU'">
-    <OutputPath>bin\CHOVY\</OutputPath>
-  </PropertyGroup>
   <PropertyGroup>
     <StartupObject />
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="BouncyCastle.Crypto, Version=1.8.5.0, Culture=neutral, PublicKeyToken=0e99375e54769942">
+      <HintPath>..\packages\BouncyCastle.1.8.5\lib\BouncyCastle.Crypto.dll</HintPath>
+    </Reference>
     <Reference Include="DiscUtils, Version=0.11.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Discutils.0.11.0.2\lib\net40\DiscUtils.dll</HintPath>
     </Reference>
@@ -77,8 +77,10 @@
     <Compile Include="pbp.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="PSVIMGReader.cs" />
+    <Compile Include="PSVIMGBuilder.cs" />
+    <Compile Include="PSVIMGFileStream.cs" />
     <Compile Include="PSVIMGStream.cs" />
+    <Compile Include="PSVIMGStructs.cs" />
     <Compile Include="psvimgtools.cs" />
     <EmbeddedResource Include="CHOVY.resx">
       <DependentUpon>CHOVY.cs</DependentUpon>

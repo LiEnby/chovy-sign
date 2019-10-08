@@ -13,8 +13,6 @@ using System.Windows.Forms;
 
 namespace CHOVY
 {
-
-
     public partial class CHOVY : Form
     {
         bool MutedAudio = false;
@@ -78,7 +76,7 @@ namespace CHOVY
             {
 
                 RegistryKey key;
-                key = Registry.CurrentUser.CreateSubKey(@"Software\CHOVY");
+                key = Registry.CurrentUser.CreateSubKey(@"Software\CHOVYProject\Chovy-Sign");
                 Value = key.GetValue(Setting).ToString();
                 key.Close();
             }
@@ -90,9 +88,8 @@ namespace CHOVY
         {
             try
             {
-
                 RegistryKey key;
-                key = Registry.CurrentUser.CreateSubKey(@"Software\CHOVY");
+                key = Registry.CurrentUser.CreateSubKey(@"Software\CHOVYProject\Chovy-Sign");
                 key.SetValue(Setting, Value);
                 key.Close();
             }
@@ -317,49 +314,44 @@ namespace CHOVY
             this.Hide();
             string cmaDir = "";
             string accountId = "0000000000000000";
+
             try
             {
-                cmaDir = ReadSetting("CmaDir");
+                //try qcma
+                cmaDir = Registry.CurrentUser.OpenSubKey(@"Software\codestation\qcma").GetValue("appsPath").ToString();
+                accountId = Registry.CurrentUser.OpenSubKey(@"Software\codestation\qcma").GetValue("lastAccountId").ToString();
             }
-            catch(Exception)
+            catch (Exception)
             {
                 try
                 {
-                    //try qcma
-                    cmaDir = Registry.CurrentUser.OpenSubKey(@"Software\codestation\qcma").GetValue("appsPath").ToString();
-                    accountId = Registry.CurrentUser.OpenSubKey(@"Software\codestation\qcma").GetValue("lastAccountId").ToString();
+                    //try sony cma
+                    cmaDir = Registry.CurrentUser.OpenSubKey(@"Software\Sony Corporation\Content Manager Assistant\Settings").GetValue("ApplicationHomePath").ToString();
                 }
                 catch (Exception)
                 {
                     try
                     {
-                        //try sony cma
-                        cmaDir = Registry.CurrentUser.OpenSubKey(@"Software\Sony Corporation\Content Manager Assistant\Settings").GetValue("ApplicationHomePath").ToString();
+                        //try devkit cma
+                        cmaDir = Registry.CurrentUser.OpenSubKey(@"Software\SCE\PSP2\Services\Content Manager Assistant for PlayStation(R)Vita DevKit\Settings").GetValue("ApplicationHomePath").ToString();
                     }
                     catch (Exception)
                     {
                         try
                         {
-                            //try devkit cma
-                            cmaDir = Registry.CurrentUser.OpenSubKey(@"Software\SCE\PSP2\Services\Content Manager Assistant for PlayStation(R)Vita DevKit\Settings").GetValue("ApplicationHomePath").ToString();
+                            string DefaultDir = Path.Combine(Environment.GetEnvironmentVariable("HOMEDRIVE"), Environment.GetEnvironmentVariable("HOMEPATH"), "Documents", "PS Vita");
+                            if (Directory.Exists(DefaultDir))
+                            {
+                                cmaDir = DefaultDir;
+                            }
                         }
                         catch (Exception)
                         {
-                            try
-                            {
-                                string DefaultDir = Path.Combine(Environment.GetEnvironmentVariable("HOMEDRIVE"), Environment.GetEnvironmentVariable("HOMEPATH"), "Documents", "PS Vita");
-                                if (Directory.Exists(DefaultDir))
-                                {
-                                    cmaDir = DefaultDir;
-                                }
-                            }
-                            catch (Exception)
-                            {
-                                //Do nothing
-                            }
+                            //Do nothing
                         }
                     }
                 }
+                
             }
             
 
@@ -379,6 +371,7 @@ namespace CHOVY
             ccs.Hide();
             this.Show();
             this.Focus();
+            WriteSetting("CmaDir", CmaDir);
 
             if (Backup == "")
             {
@@ -414,9 +407,7 @@ namespace CHOVY
 
             string ContentID = pbp.GetContentId(EbootPbp);
             PSVIMGFileStream LicenseRif = new PSVIMGFileStream(LicensePsvimg, "/"+ ContentID+ ".rif");
-            byte[] LicenseFile = new byte[LicenseRif.Length];
-            LicenseRif.Read(LicenseFile, 0x00, Convert.ToInt32(LicenseRif.Length));
-            File.WriteAllBytes(Rif, LicenseFile);
+            LicenseRif.WriteToFile(Rif);
 
             LicenseRif.Close();
             LicensePsvimg.Close();
@@ -424,7 +415,6 @@ namespace CHOVY
             GamePsvimg.Close();
 
             WriteSetting("RifPath", Rif);
-            WriteSetting("CmaDir", CmaDir);
 
             Versionkey.Text = VerKey;
             RifPath.Text = Rif;

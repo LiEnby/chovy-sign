@@ -1,122 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using static PSVIMGTOOLS.SceIoStat;
 
 namespace PSVIMGTOOLS
 {
-    internal class strings
-    {
-        internal static string readTerminator(byte[] StringBytes)
-        {
-            string str = "";
-            foreach (byte sByte in StringBytes)
-            {
-                if (sByte != 0x00)
-                {
-                    str += (char)sByte;
-                }
-                else
-                {
-                    return str;
-                }
-            }
-            return str;
-        }
-    }
-    class SceDateTime
-    {
-        public UInt16 Year;
-        public UInt16 Month;
-        public UInt16 Day;
-        public UInt16 Hour;
-        public UInt16 Minute;
-        public UInt16 Second;
-        public UInt32 Microsecond;
-
-        public SceDateTime()
-        {
-
-        }
-    }
-
-    class SceIoStat
-    {
-        public UInt32 Mode;
-        public uint Attributes;
-        /** Size of the file in bytes. */
-        public UInt64 Size;
-        /** Creation time. */
-        public SceDateTime CreationTime;
-        /** Access time. */
-        public SceDateTime AccessTime;
-        /** Modification time. */
-        public SceDateTime ModificaionTime;
-        /** Device-specific data. */
-        public UInt32[] Private = new UInt32[6];
-        public SceIoStat()
-        {
-
-        }
-    };
-
-    class PsvImgTailer
-    {
-        public UInt64 Flags;
-        public Byte[] Padding = new Byte[1004];
-        public Byte[] bEnd = new Byte[12];
-
-        public String End
-        {
-            get
-            {
-                return strings.readTerminator(bEnd);
-            }
-        }
-    }
-    class PsvImgHeader
-    {
-        public UInt64 SysTime;
-        public UInt64 Flags;
-        public SceIoStat Statistics;
-        public Byte[] bParentPath = new Byte[256];
-        public UInt32 unk_16C; // set to 1
-        public Byte[] bPath = new Byte[256];
-        public Byte[] Padding = new Byte[904];
-        public Byte[] bEnd = new Byte[12];
-
-        public String Path
-        {
-            get
-            {
-                return strings.readTerminator(bPath);
-            }
-        }
-
-        public String End
-        {
-            get
-            {
-                return strings.readTerminator(bEnd);
-            }
-        }
-
-        public String ParentPath
-        {
-            get
-            {
-                return strings.readTerminator(bParentPath);
-            }
-        }
-        public PsvImgHeader()
-        {
-
-        }
-    }
-
-
     class PSVIMGFileStream : Stream
     {
         
@@ -130,6 +17,36 @@ namespace PSVIMGTOOLS
         {
             psvStream = psv;
             findFile(Path);
+        }
+
+        public void WriteToFile(string FilePath)
+        {
+            using (FileStream fs = File.OpenWrite(FilePath))
+            {
+                fs.SetLength(0);
+                int written = 0;
+                long left = (length - written);
+                byte[] work_buf;
+                this.Seek(0x00, SeekOrigin.Begin);
+                while (left > 0)
+                {
+                    left = (length - written);
+                    if (left < 0x10000)
+                    {
+                        work_buf = new byte[left];
+                    }
+                    else
+                    {
+                        work_buf = new byte[0x10000];
+                    }
+                    this.Read(work_buf, 0x00, work_buf.Length);
+                    fs.Write(work_buf, 0x00, work_buf.Length);
+                    written += work_buf.Length;
+                }
+
+
+            }
+
         }
         public override bool CanRead
         {
@@ -185,7 +102,7 @@ namespace PSVIMGTOOLS
                 int read = 0;
                 while(true)
                 {
-                    int remainBlock = Convert.ToInt32(psvStream.BlockRemaining - psvStream.SHA256_BLOCK_SIZE);
+                    int remainBlock = Convert.ToInt32(psvStream.BlockRemaining - PSVIMGConstants.SHA256_BLOCK_SIZE);
                     int remainRead = count - read;
 
                     if (remainRead < remainBlock)
@@ -201,7 +118,7 @@ namespace PSVIMGTOOLS
                         byte[] tmp = new byte[remainBlock];
                         psvStream.Read(tmp, 0x00, remainBlock);
                         ms.Write(tmp, 0x00, tmp.Length);
-                        psvStream.Seek(psvStream.SHA256_BLOCK_SIZE, SeekOrigin.Current);
+                        psvStream.Seek(PSVIMGConstants.SHA256_BLOCK_SIZE, SeekOrigin.Current);
                         read += Convert.ToInt32(remainBlock);
                     }
                 }
@@ -215,7 +132,7 @@ namespace PSVIMGTOOLS
         {
             long ToSeek = 0;
             long SeekAdd = 0;
-            long remainBlock = psvStream.BlockRemaining - psvStream.SHA256_BLOCK_SIZE;
+            long remainBlock = psvStream.BlockRemaining - PSVIMGConstants.SHA256_BLOCK_SIZE;
             while (true)
             {
                 long remainSeek = amount - ToSeek;
@@ -228,9 +145,9 @@ namespace PSVIMGTOOLS
                 else
                 {
                     ToSeek += remainBlock;
-                    SeekAdd += psvStream.SHA256_BLOCK_SIZE;
+                    SeekAdd += PSVIMGConstants.SHA256_BLOCK_SIZE;
                 }
-                remainBlock = psvStream.PSVIMG_BLOCK_SIZE;
+                remainBlock = PSVIMGConstants.PSVIMG_BLOCK_SIZE;
             }
             ToSeek += SeekAdd;
             return psvStream.Seek(ToSeek,orig);
@@ -333,8 +250,8 @@ namespace PSVIMGTOOLS
         private SceIoStat readStats()
         {
             SceIoStat stat = new SceIoStat();
-            stat.Mode = readUInt32();
-            stat.Attributes = readUInt32();
+            stat.Mode = (Modes)readUInt32();
+            stat.Attributes = (AttributesEnum)readUInt32();
             stat.Size = readUInt64();
             stat.CreationTime = readDatetime();
             stat.AccessTime = readDatetime();
@@ -374,17 +291,7 @@ namespace PSVIMGTOOLS
             {
                 PsvImgHeader header = readHeader();
                 long size = (long)header.Statistics.Size;
-
-                //Read Padding (if any)
-                int padding;
-                if ((size & (psvStream.PSVIMG_ENTRY_ALIGN - 1))>=1)
-                {
-                    padding = Convert.ToInt32(psvStream.PSVIMG_ENTRY_ALIGN - (size & (psvStream.PSVIMG_ENTRY_ALIGN - 1)));
-                }
-                else
-                {
-                    padding = 0;
-                }
+                long padding = PSVIMGPadding.GetPadding(size);
 
                 if (header.Path == path)
                 {

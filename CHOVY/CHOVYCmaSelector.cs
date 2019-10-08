@@ -7,7 +7,7 @@ namespace CHOVY
 {
     public partial class CHOVYCmaSelector : Form
     {
-        public CHOVYCmaSelector(string CMA="",string AID="")
+        public CHOVYCmaSelector(string CMA = "", string AID = "")
         {
             InitializeComponent();
             CMADir.Text = CMA;
@@ -20,7 +20,7 @@ namespace CHOVY
             {
                 return BackupList.Text.Substring(0, 9);
             }
-            catch(Exception)
+            catch (Exception)
             {
                 return "";
             }
@@ -33,7 +33,7 @@ namespace CHOVY
         {
             return AIDSelector.Text;
         }
-        
+
         private void UpdateAidList()
         {
             AIDSelector.Items.Clear();
@@ -71,7 +71,7 @@ namespace CHOVY
                         string BackupName = (Path.GetFileName(Dir) + " - " + Title);
                         BackupList.Items.Add(BackupName);
                     }
-                    catch(Exception)
+                    catch (Exception)
                     {
                         BackupList.Items.Add(Path.GetFileName(Dir));
                     }
