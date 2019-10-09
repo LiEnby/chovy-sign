@@ -8,7 +8,7 @@
     <OutputType>Exe</OutputType>
     <RootNamespace>CHOVY</RootNamespace>
     <AssemblyName>CHOVY-SIGN</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <TargetFrameworkProfile />
@@ -47,6 +47,9 @@
     <Reference Include="DiscUtils.Common, Version=0.11.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Discutils.0.11.0.2\lib\net40\DiscUtils.Common.dll</HintPath>
     </Reference>
+    <Reference Include="DotNetZip, Version=1.13.4.0, Culture=neutral, PublicKeyToken=6583c7c814667745, processorArchitecture=MSIL">
+      <HintPath>..\packages\DotNetZip.1.13.4\lib\net40\DotNetZip.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -82,6 +85,7 @@
     <Compile Include="PSVIMGStream.cs" />
     <Compile Include="PSVIMGStructs.cs" />
     <Compile Include="psvimgtools.cs" />
+    <Compile Include="PSVMDBuilder.cs" />
     <EmbeddedResource Include="CHOVY.resx">
       <DependentUpon>CHOVY.cs</DependentUpon>
     </EmbeddedResource>

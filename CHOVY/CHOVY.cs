@@ -9,6 +9,7 @@ using System.Drawing;
 using System.IO;
 using System.Media;
 using System.Text;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace CHOVY
@@ -222,11 +223,11 @@ namespace CHOVY
                 
             }
 
-            File.WriteAllText(GamePathFile, "ux0:pspemu/temp/game/PSP/GAME/" + TitleID + "\x00");
+           // File.WriteAllText(GamePathFile, "ux0:pspemu/temp/game/PSP/GAME/" + TitleID + "\x00");
 
-            TotalProgress.Style = ProgressBarStyle.Marquee;
-            Status.Text = "Signing the Declaration of Independance";
-            UInt64 IntAid = Convert.ToUInt64(Aid,16);
+            //TotalProgress.Style = ProgressBarStyle.Marquee;
+            Status.Text = "Signing the Declaration of Independance 0%";
+            UInt64 IntAid = BitConverter.ToUInt64(RifAid,0x00);
             int ChovyGenRes = pbp.gen__sce_ebootpbp(EbootFile, IntAid, EbootSignature);
             if (!File.Exists(EbootSignature) || ChovyGenRes != 0)
             { 
@@ -242,10 +243,68 @@ namespace CHOVY
             // Pacakge GAME
 
 
-            string BackupGameDir = Path.Combine(BackupWorkDir, "game");
-            Directory.CreateDirectory(BackupGameDir);
-            Process psvimg_create = psvimgtools.PSVIMG_CREATE(Aid, "game" ,TmpDir, Path.Combine(BackupWorkDir,"game"));
-            while(!psvimg_create.HasExited)
+            //string BackupGameDir = Path.Combine(BackupWorkDir, "game");
+
+            string[] entrys = Directory.GetFileSystemEntries(GameWorkDir, "*", SearchOption.AllDirectories);
+            long noEntrys = entrys.LongLength;
+            string parentPath = "ux0:pspemu/temp/game/PSP/GAME/" + TitleID;
+            int noBlocks = 0;
+            foreach (string fileName in Directory.GetFiles(GameWorkDir,"*",SearchOption.AllDirectories))
+            {
+                noBlocks += Convert.ToInt32(new FileInfo(fileName).Length / PSVIMGConstants.PSVIMG_BLOCK_SIZE);
+            }
+            TotalProgress.Maximum = noBlocks;
+
+            byte[] CmaKey = CmaKeys.GenerateKey(RifAid);
+
+            string BackupDir = Path.Combine(BackupWorkDir, "game");
+            Directory.CreateDirectory(BackupDir);
+            FileStream psvimg = File.OpenWrite(Path.Combine(BackupDir, "game.psvimg"));
+            psvimg.SetLength(0);
+
+            PSVIMGBuilder builder = new PSVIMGBuilder(psvimg, CmaKey);
+  
+            
+
+            foreach (string entry in entrys)
+            {
+                string relativePath = entry.Remove(0, GameWorkDir.Length);
+                bool isDir = File.GetAttributes(entry).HasFlag(FileAttributes.Directory);
+
+                if (isDir)
+                {
+                    builder.AddDir(entry, parentPath, relativePath);
+                }
+                else
+                {
+                    builder.AddFileAsync(entry, parentPath, relativePath);
+                    while(!builder.HasFinished)
+                    {
+                        try
+                        {
+                            int tBlocks = builder.BlocksWritten;
+                            TotalProgress.Value = tBlocks;
+                            decimal progress = Math.Floor(((decimal)tBlocks / (decimal)noBlocks) * 100);
+                            Status.Text = "Signing the Declaration of Independance " + progress.ToString() + "%";
+                        }
+                        catch (Exception) { }
+ 
+                        Application.DoEvents();
+                    }
+                }
+            }
+
+            long ContentSize = builder.Finish();
+
+            psvimg = File.OpenRead(Path.Combine(BackupDir, "game.psvimg"));
+            FileStream psvmd = File.OpenWrite(Path.Combine(BackupDir, "game.psvmd"));
+            PSVMDBuilder.CreatePsvmd(psvmd, psvimg, ContentSize, "game", CmaKey);
+            psvmd.Close();
+
+           // Directory.CreateDirectory(BackupGameDir);
+            
+            //Process psvimg_create = psvimgtools.PSVIMG_CREATE(Aid, "game" ,TmpDir, Path.Combine(BackupWorkDir,"game"));
+           /* while(!psvimg_create.HasExited)
             {
                 Application.DoEvents();
             }
@@ -255,7 +314,7 @@ namespace CHOVY
                 enable();
                 return;
             }
-
+            */
             // Package LICENSE
             try
             {
@@ -266,8 +325,8 @@ namespace CHOVY
             Directory.CreateDirectory(LicenseWorkDir);
             File.Copy(RifPath.Text, Path.Combine(LicenseWorkDir, ContentID + ".rif"), true);
             File.WriteAllText(LicensePathFile, "ux0:pspemu/temp/game/PSP/LICENSE\x00");
-            Directory.CreateDirectory(BackupGameDir);
-            psvimg_create = psvimgtools.PSVIMG_CREATE(Aid, "license", TmpDir, Path.Combine(BackupWorkDir, "license"));
+            /*Directory.CreateDirectory(BackupGameDir);
+            Process psvimg_create = psvimgtools.PSVIMG_CREATE(Aid, "license", TmpDir, Path.Combine(BackupWorkDir, "license"));
             while (!psvimg_create.HasExited)
             {
                 Application.DoEvents();
@@ -277,7 +336,7 @@ namespace CHOVY
                 MessageBox.Show("PSVIMG-CREATE.EXE FAILED!\nArguments:\n" + psvimg_create.StartInfo.Arguments + "\nStdOut:\n" + psvimg_create.StandardOutput.ReadToEnd() + "\nStdErr:\n" + psvimg_create.StandardError.ReadToEnd());
                 enable();
                 return;
-            }
+            }*/
 
             try
             {
@@ -367,10 +426,7 @@ namespace CHOVY
             string CmaDir = ccs.GetCmaDir();
             string CmaAid = ccs.GetCmaAid();
             string Backup = ccs.GetSelectedBackup();
-
-            ccs.Hide();
-            this.Show();
-            this.Focus();
+            
             WriteSetting("CmaDir", CmaDir);
 
             if (Backup == "")
@@ -381,6 +437,10 @@ namespace CHOVY
             string BackupPath = Path.Combine(CmaDir, "PGAME", CmaAid, Backup, "game", "game.psvimg");
             if(!File.Exists(BackupPath))
             {
+                MessageBox.Show("Could not find \n" + BackupPath + "\n Perhaps backup failed?", "License Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                ccs.Hide();
+                this.Show();
+                this.Focus();
                 return;
             }
 
@@ -393,6 +453,10 @@ namespace CHOVY
             BackupPath = Path.Combine(CmaDir, "PGAME", CmaAid, Backup, "license", "license.psvimg");
             if (!File.Exists(BackupPath))
             {
+                MessageBox.Show("Could not find \n"+BackupPath+"\n Perhaps backup failed?","License Error",MessageBoxButtons.OK,MessageBoxIcon.Error);
+                ccs.Hide();
+                this.Show();
+                this.Focus();
                 return;
             }
 
@@ -419,8 +483,10 @@ namespace CHOVY
             Versionkey.Text = VerKey;
             RifPath.Text = Rif;
 
-            Status.Text = "Progress %";
-            TotalProgress.Style = ProgressBarStyle.Continuous;
+            ccs.Hide();
+            this.Show();
+            this.Focus();
+
             MessageBox.Show("KEYS HAVE BEEN EXTRACTED FROM CMA, YOU MAY NOW LIBERATE YOURSELF", "SUCCESS", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
