@@ -2,7 +2,7 @@
 Created by the CBPS Team!
 https://discord.gg/2nDCbxJ
 
-- chovy-sign is an application to allow you to play PSP ISO's on unmodified PSVita's
+- chovy-sign is an application to allow you to convert PSP ISO's to be playable on unmodified PSVita's
 
 Setups:
 You need a "base" psp game, petz saddle club, locoroco midnight carnival, or ape quest starter pack all work
