@@ -2,9 +2,10 @@
 Created by the CBPS Team!
 https://discord.gg/2nDCbxJ
 
--chovy-sign- 
+- chovy-sign is an application to allow you to play PSP ISO's on unmodified PSVita's
 
-you need a "base" psp game, petz saddle club, locoroco midnight carnival, or ape quest starter pack all work
+Setups:
+You need a "base" psp game, petz saddle club, locoroco midnight carnival, or ape quest starter pack all work
 some games dont work properly (where working on it). just try another if this happens.
 
 as well as "the clone issue" basically games made with this are "clones" of the original "base game" so if u delete any of them it acturlaly deletes the license.rif which breaks all the other "clones", this can be fixed by re-downloading the base game off of the PSN or copying any "clone" over to your psvita again.
