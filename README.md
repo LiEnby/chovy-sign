@@ -27,7 +27,7 @@ Motoharu (For helping dots with __sce_ebootpbp)
 Other indirect help:        
 @swarzesherz for sign_np    
 tpunix for kirk_engine libaries.    
-~~@yifanlu and xyz for psvimgtools .. ~~
+@yifanlu and xyz for psvimgtools .. (beta02 and lower)
 
 # Building
 In order to build CHOVY.DLL you need [OpenSSL](https://www.npcglib.org/~stathis/downloads/openssl-1.1.0f-vs2017.7z) libary
