@@ -79,6 +79,28 @@ namespace PSVIMGTOOLS
             writePadding(dst, padByte, PaddingLen);
         }
 
+        private static byte[] aes_ecb_decrypt(byte[] cipherText, byte[] KEY, int size = -1)
+        {
+            if (size < 0)
+            {
+                size = cipherText.Length;
+            }
+
+            MemoryStream ms = new MemoryStream();
+
+            Aes alg = Aes.Create();
+            alg.Mode = CipherMode.ECB;
+            alg.Padding = PaddingMode.None;
+            alg.KeySize = 256;
+            alg.BlockSize = 128;
+            alg.Key = KEY;
+            CryptoStream cs = new CryptoStream(ms, alg.CreateDecryptor(), CryptoStreamMode.Write);
+            cs.Write(cipherText, 0, size);
+            cs.Close();
+            byte[] plainText = ms.ToArray();
+            return plainText;
+        }
+
         private static byte[] aes_cbc_decrypt(byte[] cipherData, byte[] IV, byte[] Key)
         {
             MemoryStream ms = new MemoryStream();
@@ -124,6 +146,7 @@ namespace PSVIMGTOOLS
             byte[] IV = new byte[PSVIMGConstants.AES_BLOCK_SIZE];
             EncryptedPsvimg.Seek(0x00, SeekOrigin.Begin);
             EncryptedPsvimg.Read(IV, 0x00, IV.Length);
+            IV = aes_ecb_decrypt(IV, Key);
             MemoryStream ms = new MemoryStream();
 
             writeUInt32(ms, 0xFEE1900D); // magic
@@ -132,18 +155,17 @@ namespace PSVIMGTOOLS
             ms.Write(new byte[0x10], 0x00, 0x10); // PSID
             writeStringWithPadding(ms, BackupType, 0x40, 0x00); //backup type
             writeInt64(ms, EncryptedPsvimg.Length); // total size
-            writeUInt32(ms, 0x2); //version
+            writeUInt64(ms, 0x2); //version
             writeInt64(ms, ContentSize); // content size
-            ms.Write(IV, 0x00, IV.Length); // IV
-            writeInt64(ms, 0x00); //ux0 info
-            writeInt64(ms, 0x00); //ur0 info
-            writeInt64(ms, 0x00); //unused 98
-            writeInt64(ms, 0x00); //unused A0
+            ms.Write(IV, 0x00, 0x10); // IV
+            writeUInt64(ms, 0x00); //ux0 info
+            writeUInt64(ms, 0x00); //ur0 info
+            writeUInt64(ms, 0x00); //unused 98
+            writeUInt64(ms, 0x00); //unused A0
             writeUInt32(ms, 0x1); //add data
 
             ms.Seek(0x00, SeekOrigin.Begin);
             byte[] psvMd = ms.ToArray();
-
             ms.Close();
 
             ms = new MemoryStream();
@@ -154,17 +176,20 @@ namespace PSVIMGTOOLS
             SHA256 sha = SHA256.Create();
             byte[] shadata = sha.ComputeHash(psvMdCompressed);
             ms.Write(shadata, 0x00, shadata.Length);
-            
-            writeInt32(ms, 0x00);
+
+            int PaddingLen = Convert.ToInt32(PSVIMGConstants.AES_BLOCK_SIZE - (ms.Length & (PSVIMGConstants.AES_BLOCK_SIZE - 1)));
+            writePadding(ms, 0x00, PaddingLen);
+
+            writeInt32(ms, PaddingLen); //Padding Length
             writeUInt32(ms, 0x00);
-            writeInt64(ms, ms.Length+0x8);
+            writeInt64(ms, (ms.Length+0x8)+IV.Length);
             ms.Seek(0x00, SeekOrigin.Begin);
             byte[] toEncrypt = ms.ToArray();
             ms.Close();
 
             byte[] EncryptedData = aes_cbc_encrypt(toEncrypt, IV, Key);
             OutputStream.Write(IV, 0x00, IV.Length);
-            OutputStream.Write(EncryptedData, 0x00, toEncrypt.Length);
+            OutputStream.Write(EncryptedData, 0x00, EncryptedData.Length);
             return;
         }
 

@@ -218,7 +218,7 @@ __declspec(dllexport) int chovy_gen(char *ebootpbp, uint64_t signaid, char *outs
 	memcpy(&sceebootpbp_file->magic, "NPUMDSIG", 0x8);
 	sceebootpbp_file->type = 2;
 	sceebootpbp_file->key_type = 1;
-	sceebootpbp_file->aid = _byteswap_uint64(signaid);
+	sceebootpbp_file->aid = signaid;
 	
 	
 	fseek(fin, 0, SEEK_END);

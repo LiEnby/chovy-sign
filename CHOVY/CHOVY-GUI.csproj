@@ -5,10 +5,10 @@
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{D46AA2C2-2BDC-45C7-ACA5-D7A2295564E8}</ProjectGuid>
-    <OutputType>Exe</OutputType>
+    <OutputType>WinExe</OutputType>
     <RootNamespace>CHOVY</RootNamespace>
     <AssemblyName>CHOVY-SIGN</AssemblyName>
-    <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <TargetFrameworkProfile />
@@ -36,6 +36,9 @@
   </PropertyGroup>
   <PropertyGroup>
     <StartupObject />
+  </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>Icon.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="BouncyCastle.Crypto, Version=1.8.5.0, Culture=neutral, PublicKeyToken=0e99375e54769942">
@@ -84,7 +87,6 @@
     <Compile Include="PSVIMGFileStream.cs" />
     <Compile Include="PSVIMGStream.cs" />
     <Compile Include="PSVIMGStructs.cs" />
-    <Compile Include="psvimgtools.cs" />
     <Compile Include="PSVMDBuilder.cs" />
     <EmbeddedResource Include="CHOVY.resx">
       <DependentUpon>CHOVY.cs</DependentUpon>
@@ -127,6 +129,12 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\MINIS.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\ChovyLogo.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Icon.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

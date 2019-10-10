@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(CHOVY));
             this.label1 = new System.Windows.Forms.Label();
             this.RifPath = new System.Windows.Forms.TextBox();
             this.Versionkey = new System.Windows.Forms.TextBox();
@@ -280,6 +281,7 @@
             this.Controls.Add(this.label4);
             this.Controls.Add(this.PsmChan);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "CHOVY";
             this.Text = "CHOVY-SIGN";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.CHOVY_FormClosing);

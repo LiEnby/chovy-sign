@@ -58,6 +58,11 @@ namespace PSVIMGTOOLS
             }
 
             MemoryStream ms = new MemoryStream();
+           /*
+            *- DEBUG Disable Encryption
+            ms.Write(plainText, 0x00, size);
+            ms.Seek(0x00,SeekOrigin.Begin);
+            return ms.ToArray();*/
 
             Aes alg = Aes.Create();
             alg.Mode = CipherMode.CBC;
@@ -66,6 +71,33 @@ namespace PSVIMGTOOLS
             alg.BlockSize = 128;
             alg.Key = KEY;
             alg.IV = IV;
+            CryptoStream cs = new CryptoStream(ms, alg.CreateEncryptor(), CryptoStreamMode.Write);
+            cs.Write(plainText, 0, size);
+            cs.Close();
+            byte[] cipherText = ms.ToArray();
+            return cipherText;
+        }
+
+        private byte[] aes_ecb_encrypt(byte[] plainText, byte[] KEY, int size = -1)
+        {
+            if (size < 0)
+            {
+                size = plainText.Length;
+            }
+
+            MemoryStream ms = new MemoryStream();
+            /*
+             *- DEBUG Disable Encryption
+             ms.Write(plainText, 0x00, size);
+             ms.Seek(0x00,SeekOrigin.Begin);
+             return ms.ToArray();*/
+
+            Aes alg = Aes.Create();
+            alg.Mode = CipherMode.ECB;
+            alg.Padding = PaddingMode.None;
+            alg.KeySize = 256;
+            alg.BlockSize = 128;
+            alg.Key = KEY;
             CryptoStream cs = new CryptoStream(ms, alg.CreateEncryptor(), CryptoStreamMode.Write);
             cs.Write(plainText, 0, size);
             cs.Close();
@@ -128,13 +160,11 @@ namespace PSVIMGTOOLS
             if (attrbutes.HasFlag(FileAttributes.Directory))
             {
                 stats.Mode |= Modes.Directory;
-                stats.Attributes |= AttributesEnum.Directory;
                 stats.Size = 0;
             }
             else
             {
                 stats.Mode |= Modes.File;
-                stats.Attributes |= AttributesEnum.File;
                 stats.Size = Convert.ToUInt64(new FileInfo(path).Length);
                 
             }
@@ -142,34 +172,21 @@ namespace PSVIMGTOOLS
             if(attrbutes.HasFlag(FileAttributes.ReadOnly))
             {
                 stats.Mode |= Modes.GroupRead;
-                stats.Mode |= Modes.GroupExecute;
-
-                stats.Mode |= Modes.OthersExecute;
+                
                 stats.Mode |= Modes.OthersRead;
 
                 stats.Mode |= Modes.UserRead;
-                stats.Mode |= Modes.UserExecute;
-
-                stats.Attributes |= AttributesEnum.Read;
-                stats.Attributes |= AttributesEnum.Execute;
             }
             else
             {
                 stats.Mode |= Modes.GroupRead;
-                stats.Mode |= Modes.GroupExecute;
                 stats.Mode |= Modes.GroupWrite;
-
-                stats.Mode |= Modes.OthersExecute;
+                
                 stats.Mode |= Modes.OthersRead;
                 stats.Mode |= Modes.OthersWrite;
 
                 stats.Mode |= Modes.UserRead;
-                stats.Mode |= Modes.UserExecute;
                 stats.Mode |= Modes.UserWrite;
-
-                stats.Attributes |= AttributesEnum.Read;
-                stats.Attributes |= AttributesEnum.Write;
-                stats.Attributes |= AttributesEnum.Execute;
             }
 
             stats.CreationTime = dateTimeToSceDateTime(File.GetCreationTimeUtc(path));
@@ -282,7 +299,6 @@ namespace PSVIMGTOOLS
             int len = Convert.ToInt32(blockStream.Position);
             byte[] shaBytes = shaBlock(len, final);
             blockStream.Write(shaBytes, 0x00, PSVIMGConstants.SHA256_BLOCK_SIZE);
-            blockStream.Close();
             len += PSVIMGConstants.SHA256_BLOCK_SIZE;
             
             //Get next IV
@@ -295,6 +311,8 @@ namespace PSVIMGTOOLS
 
             mainStream.Write(encryptedBlock, 0x00, encryptedBlock.Length);
             totalBytes += encryptedBlock.Length;
+
+            blockStream.Dispose();
         }
 
         private int remainingBlockSize()
@@ -305,28 +323,38 @@ namespace PSVIMGTOOLS
         private void writeBlock(byte[] data, bool update=false)
         {
             long dLen = data.Length;
+            long writeTotal = 0;
             while (dLen > 0)
             {
                 int remaining = remainingBlockSize();
 
                 if (dLen > remaining)
                 {
-                    blockStream.Write(data, 0x00, remaining);
+                    byte[] dataRemains = new byte[remaining];
+                    Array.Copy(data, writeTotal, dataRemains, 0, remaining);
+                    blockStream.Write(dataRemains, 0x00, remaining);
+
+                    writeTotal += remaining;
                     dLen -= remaining;
+                    
+
                     finishBlock();
                     startNewBlock();
-                    if(update)
+                    if (update)
                     {
                         blocksWritten += 1;
                     }
                 }
                 else
                 {
-                    blockStream.Write(data, 0x00, Convert.ToInt32(dLen));
-                    dLen = 0;
+                    byte[] dataRemains = new byte[dLen];
+                    Array.Copy(data, writeTotal, dataRemains, 0, dLen);
+                    blockStream.Write(dataRemains, 0x00, Convert.ToInt32(dLen));
+                    
+                    writeTotal += dLen;
+                    dLen -= dLen;
                 }
             }
-
         }
         private byte[] getPadding(long size)
         {
@@ -362,30 +390,9 @@ namespace PSVIMGTOOLS
             {
                 byte[] work_buf;
                 Int64 bytes_remain = (dst.Length - dst.Position);
-                if (bytes_remain > 0x8388608)
+                if (bytes_remain > 0x33554432)
                 {
-                    work_buf = new byte[0x8388608];
-                }
-                else
-                {
-                    work_buf = new byte[bytes_remain];
-                }
-                dst.Read(work_buf, 0x00, work_buf.Length);
-                writeBlock(work_buf);
-            }
-        }
-
-        private void writeStreamAsync(Stream dst)
-        {
-            long numberOfBlocks = dst.Length / PSVIMGConstants.PSVIMG_BLOCK_SIZE;
-
-            while (dst.Position < dst.Length)
-            {
-                byte[] work_buf;
-                Int64 bytes_remain = (dst.Length - dst.Position);
-                if (bytes_remain > 0x10485760)
-                {
-                    work_buf = new byte[0x10485760];
+                    work_buf = new byte[0x33554432];
                 }
                 else
                 {
@@ -393,17 +400,13 @@ namespace PSVIMGTOOLS
                 }
                 dst.Read(work_buf, 0x00, work_buf.Length);
                 writeBlock(work_buf, true);
-
             }
         }
-
+        
         private byte[] getFooter()
         {
             using (MemoryStream ms = new MemoryStream())
             {
-               // uint sz = Convert.ToUInt32(totalBytes & (PSVIMGConstants.AES_BLOCK_SIZE - 1));
-               // int paddingInt = Convert.ToInt32(PSVIMGConstants.AES_BLOCK_SIZE - (sz & (PSVIMGConstants.AES_BLOCK_SIZE - 1)));
-
                 totalBytes += 0x10; //number of bytes used by this footer.
                 
                 writeInt32(ms, 0x00); // int padding (idk wht this is)
@@ -422,7 +425,10 @@ namespace PSVIMGTOOLS
             {
                 long sz = Convert.ToInt64(sceIoStat(FilePath).Size);
                 writeBlock(getHeader(FilePath, ParentPath, PathRel));
-                writeStreamAsync(File.OpenRead(FilePath));
+                using (FileStream fs = File.OpenRead(FilePath))
+                {
+                    writeStream(fs);
+                }
                 writeBlock(getPadding(sz));
                 writeBlock(getTailer());
                 contentSize += sz;
@@ -432,9 +438,13 @@ namespace PSVIMGTOOLS
         }
         public void AddFile(string FilePath, string ParentPath, string PathRel)
         {
+
             long sz = Convert.ToInt64(sceIoStat(FilePath).Size);
             writeBlock(getHeader(FilePath, ParentPath, PathRel));
-            writeStream(File.OpenRead(FilePath));
+            using (FileStream fs = File.OpenRead(FilePath))
+            {
+                writeStream(fs);
+            }
             writeBlock(getPadding(sz));
             writeBlock(getTailer());
             contentSize += sz;
@@ -452,10 +462,11 @@ namespace PSVIMGTOOLS
             byte[] footer = getFooter();
             mainStream.Write(footer, 0x00, footer.Length);
 
-            blockStream.Close();
-            mainStream.Close();
+            blockStream.Dispose();
+            mainStream.Dispose();
             return contentSize;
         }
+
 
         public PSVIMGBuilder(Stream dst, byte[] Key)
         {
@@ -466,6 +477,8 @@ namespace PSVIMGTOOLS
             KEY = Key;
 
             rnd.NextBytes(IV);
+            IV = aes_ecb_encrypt(IV, Key);
+
             mainStream.Write(IV, 0x00, IV.Length);
             totalBytes += IV.Length;
 

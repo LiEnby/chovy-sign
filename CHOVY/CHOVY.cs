@@ -9,7 +9,7 @@ using System.Drawing;
 using System.IO;
 using System.Media;
 using System.Text;
-using System.Threading.Tasks;
+using System.Threading;
 using System.Windows.Forms;
 
 namespace CHOVY
@@ -156,20 +156,10 @@ namespace CHOVY
             string TitleID = GetTitleID(ISOPath.Text);
 
             string TmpDir = Path.Combine(Application.StartupPath, "_tmp");
-             string GameWorkDir = Path.Combine(TmpDir, "ux0_pspemu_temp_game_PSP_GAME_"+ TitleID);
-           // string GameWorkDir = Path.Combine(TmpDir, TitleID);
-            string LicenseWorkDir = Path.Combine(TmpDir, "ux0_pspemu_temp_game_PSP_LICENSE");
+            string GameWorkDir = Path.Combine(TmpDir, TitleID);
             string EbootFile = Path.Combine(GameWorkDir, "EBOOT.PBP");
             string EbootSignature = Path.Combine(GameWorkDir, "__sce_ebootpbp");
-            string GamePathFile = Path.Combine(GameWorkDir, "VITA_PATH.TXT");
-            string LicensePathFile = Path.Combine(LicenseWorkDir, "VITA_PATH.TXT");
 
-
-            try
-            {
-                Directory.Delete(TmpDir, true);
-            }
-            catch (Exception) { };
             Directory.CreateDirectory(TmpDir);
             Directory.CreateDirectory(GameWorkDir);
            
@@ -188,14 +178,19 @@ namespace CHOVY
             string Aid = BitConverter.ToString(RifAid).Replace("-", "").ToLower();
             string BackupWorkDir = Path.Combine(CmaDir, "PGAME", Aid, TitleID);
 
-            TotalProgress.Style = ProgressBarStyle.Continuous;
-            Status.Text = "Overthrowing The PSPEMU Monarchy 00%";
+            TotalProgress.Maximum = 100;
+            Status.Text = "Overthrowing The PSPEMU Monarchy 0%";
 
             string BootupImage = "";
             if (isMini(ISOPath.Text))
             {
                 BootupImage = Path.Combine(Application.StartupPath, "_tmp", "minis.png");
                 Resources.MINIS.Save(BootupImage);
+            }
+            else
+            {
+                BootupImage = Path.Combine(Application.StartupPath, "_tmp", "chovy.png");
+                Resources.ChovyLogo.Save(BootupImage);
             }
 
             Process signnp = pbp.GenPbpFromIso(ISOPath.Text, EbootFile, ContentID, Versionkey.Text, CompressPBP.Checked, BootupImage);
@@ -207,33 +202,29 @@ namespace CHOVY
                     Progress = Progress.Remove(0,19);
                     int ProgressInt = int.Parse(Progress.Substring(0,3));
                     TotalProgress.Value = ProgressInt;
-                    Status.Text = "Overthrowing The PSPEMU Monarchy " + Progress;
+                    Status.Text = "Overthrowing The PSPEMU Monarchy " + ProgressInt.ToString() + "%";
                 }
                 Application.DoEvents();
             }
-            TotalProgress.Value = 100;
+            TotalProgress.Value = 0;
 
-            if (isMini(ISOPath.Text))
-            {
-                try
-                {
-                    File.Delete(BootupImage);
-                }
-                catch (Exception) { };
-                
-            }
-
-           // File.WriteAllText(GamePathFile, "ux0:pspemu/temp/game/PSP/GAME/" + TitleID + "\x00");
-
-            //TotalProgress.Style = ProgressBarStyle.Marquee;
             Status.Text = "Signing the Declaration of Independance 0%";
             UInt64 IntAid = BitConverter.ToUInt64(RifAid,0x00);
-            int ChovyGenRes = pbp.gen__sce_ebootpbp(EbootFile, IntAid, EbootSignature);
-            if (!File.Exists(EbootSignature) || ChovyGenRes != 0)
-            { 
-                MessageBox.Show("CHOVY-GEN Failed! Please check CHOVY.DLL exists\nand that the Microsoft Visual C++ 2015 Redistributable Update 3 RC is installed");
-                enable();
-                return;
+            Thread thrd = new Thread(() =>
+            {
+
+                int ChovyGenRes = pbp.gen__sce_ebootpbp(EbootFile, IntAid, EbootSignature);
+                if (!File.Exists(EbootSignature) || ChovyGenRes != 0)
+                {
+                    MessageBox.Show("CHOVY-GEN Failed! Please check CHOVY.DLL exists\nand that the Microsoft Visual C++ 2015 Redistributable Update 3 RC is installed");
+                    enable();
+                    return;
+                }
+            });
+            thrd.Start();
+            while(thrd.IsAlive)
+            {
+                Application.DoEvents();
             }
 
             /*
@@ -242,8 +233,7 @@ namespace CHOVY
 
             // Pacakge GAME
 
-
-            //string BackupGameDir = Path.Combine(BackupWorkDir, "game");
+            byte[] CmaKey = CmaKeys.GenerateKey(RifAid);
 
             string[] entrys = Directory.GetFileSystemEntries(GameWorkDir, "*", SearchOption.AllDirectories);
             long noEntrys = entrys.LongLength;
@@ -255,20 +245,19 @@ namespace CHOVY
             }
             TotalProgress.Maximum = noBlocks;
 
-            byte[] CmaKey = CmaKeys.GenerateKey(RifAid);
 
             string BackupDir = Path.Combine(BackupWorkDir, "game");
             Directory.CreateDirectory(BackupDir);
-            FileStream psvimg = File.OpenWrite(Path.Combine(BackupDir, "game.psvimg"));
-            psvimg.SetLength(0);
-
-            PSVIMGBuilder builder = new PSVIMGBuilder(psvimg, CmaKey);
-  
-            
+            string psvimgFilepath = Path.Combine(BackupDir, "game.psvimg");
+            FileStream gamePsvimg = File.OpenWrite(psvimgFilepath);
+            gamePsvimg.SetLength(0);
+            PSVIMGBuilder builder = new PSVIMGBuilder(gamePsvimg, CmaKey);
 
             foreach (string entry in entrys)
             {
                 string relativePath = entry.Remove(0, GameWorkDir.Length);
+                relativePath = relativePath.Replace('\\', '/');
+
                 bool isDir = File.GetAttributes(entry).HasFlag(FileAttributes.Directory);
 
                 if (isDir)
@@ -295,54 +284,29 @@ namespace CHOVY
             }
 
             long ContentSize = builder.Finish();
+            gamePsvimg = File.OpenRead(psvimgFilepath);
+            FileStream gamePsvmd = File.OpenWrite(Path.Combine(BackupDir, "game.psvmd"));
+            PSVMDBuilder.CreatePsvmd(gamePsvmd, gamePsvimg, ContentSize, "game", CmaKey);
+            gamePsvmd.Close();
+            gamePsvimg.Close();
 
-            psvimg = File.OpenRead(Path.Combine(BackupDir, "game.psvimg"));
-            FileStream psvmd = File.OpenWrite(Path.Combine(BackupDir, "game.psvmd"));
-            PSVMDBuilder.CreatePsvmd(psvmd, psvimg, ContentSize, "game", CmaKey);
-            psvmd.Close();
-
-           // Directory.CreateDirectory(BackupGameDir);
-            
-            //Process psvimg_create = psvimgtools.PSVIMG_CREATE(Aid, "game" ,TmpDir, Path.Combine(BackupWorkDir,"game"));
-           /* while(!psvimg_create.HasExited)
-            {
-                Application.DoEvents();
-            }
-            if (psvimg_create.ExitCode != 0)
-            {
-                MessageBox.Show("PSVIMG-CREATE.EXE FAILED!\nArguments:\n" + psvimg_create.StartInfo.Arguments + "\nStdOut:\n" + psvimg_create.StandardOutput.ReadToEnd() + "\nStdErr:\n" + psvimg_create.StandardError.ReadToEnd());
-                enable();
-                return;
-            }
-            */
             // Package LICENSE
-            try
-            {
-                Directory.Delete(TmpDir, true);
-            }
-            catch (Exception) { };
-            Directory.CreateDirectory(TmpDir);
-            Directory.CreateDirectory(LicenseWorkDir);
-            File.Copy(RifPath.Text, Path.Combine(LicenseWorkDir, ContentID + ".rif"), true);
-            File.WriteAllText(LicensePathFile, "ux0:pspemu/temp/game/PSP/LICENSE\x00");
-            /*Directory.CreateDirectory(BackupGameDir);
-            Process psvimg_create = psvimgtools.PSVIMG_CREATE(Aid, "license", TmpDir, Path.Combine(BackupWorkDir, "license"));
-            while (!psvimg_create.HasExited)
-            {
-                Application.DoEvents();
-            }
-            if(psvimg_create.ExitCode != 0)
-            {
-                MessageBox.Show("PSVIMG-CREATE.EXE FAILED!\nArguments:\n" + psvimg_create.StartInfo.Arguments + "\nStdOut:\n" + psvimg_create.StandardOutput.ReadToEnd() + "\nStdErr:\n" + psvimg_create.StandardError.ReadToEnd());
-                enable();
-                return;
-            }*/
 
-            try
-            {
-                Directory.Delete(TmpDir, true);
-            }
-            catch (Exception) { };
+            BackupDir = Path.Combine(BackupWorkDir, "license");
+            psvimgFilepath = Path.Combine(BackupDir, "license.psvimg");
+
+            Directory.CreateDirectory(BackupDir);
+            FileStream licensePsvimg = File.OpenWrite(psvimgFilepath);
+            licensePsvimg.SetLength(0);
+            builder = new PSVIMGBuilder(licensePsvimg, CmaKey);
+            builder.AddFile(RifPath.Text, "ux0:pspemu/temp/game/PSP/LICENSE", "/"+ContentID + ".rif");
+            ContentSize = builder.Finish();
+
+            licensePsvimg = File.OpenRead(psvimgFilepath);
+            FileStream licensePsvmd = File.OpenWrite(Path.Combine(BackupDir, "license.psvmd"));
+            PSVMDBuilder.CreatePsvmd(licensePsvmd, licensePsvimg, ContentSize, "license", CmaKey);
+            licensePsvmd.Close();
+            licensePsvimg.Close();
 
             // Write PARAM.SFO & ICON0.PNG
             string SceSysWorkDir = Path.Combine(BackupWorkDir, "sce_sys");
@@ -355,9 +319,14 @@ namespace CHOVY
 
             Status.Text = "YOU HAVE MADE A SOCIAL CONTRACT WITH FREEDOM!";
             TotalProgress.Value = 0;
-            TotalProgress.Style = ProgressBarStyle.Continuous;
-            
-            if(!MutedAudio)
+
+            try
+            {
+                Directory.Delete(TmpDir, true);
+            }
+            catch (Exception) { };
+
+            if (!MutedAudio)
             {
                 Stream str = Resources.Murica;
                 SoundPlayer snd = new SoundPlayer(str);

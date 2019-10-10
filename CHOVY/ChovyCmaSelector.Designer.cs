@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(CHOVYCmaSelector));
             this.BackupList = new System.Windows.Forms.ListBox();
             this.label1 = new System.Windows.Forms.Label();
             this.CMADir = new System.Windows.Forms.TextBox();
@@ -130,8 +131,9 @@
             this.Controls.Add(this.label1);
             this.Controls.Add(this.BackupList);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "CHOVYCmaSelector";
-            this.Text = "CHOVYCmaSelectorForm";
+            this.Text = "Chovy-Sign - Find Keys";
             this.ResumeLayout(false);
             this.PerformLayout();
 
