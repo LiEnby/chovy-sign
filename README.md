@@ -22,8 +22,8 @@ if you want to dump your own ISO's use UMD Dumper  or something that isnt ftp-in
 
 Credits:    
 @dots-tb (__sce_ebootpbp signing)    
-SilicaAndPina(me) Developing GUI and finding the psp bubbles method and psvimgtools rewrite
-Motoharu (For helping dots with __sce_ebootpbp)   
+SilicaAndPina(me) Developing GUI and finding the psp bubbles method and psvimgtools rewrite        
+Motoharu (For helping dots with __sce_ebootpbp)          
 
 Other indirect help:        
 @swarzesherz for sign_np    
