@@ -97,6 +97,23 @@ namespace CHOVY
             catch (Exception) { }
         }
 
+        public bool IsDexAidSet()
+        {
+            string isDex = ReadSetting("DexAid");
+            if (isDex == "0")
+            {
+                return false;
+            }
+            else if(isDex == "1")
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
         public CHOVY()
         {
             InitializeComponent();
@@ -174,9 +191,14 @@ namespace CHOVY
             rif.Read(RifAid, 0x00, 0x08);
             rif.Close();
 
+
             string ContentID = Encoding.UTF8.GetString(ContentId);
-            string Aid = BitConverter.ToString(RifAid).Replace("-", "").ToLower();
-            string BackupWorkDir = Path.Combine(CmaDir, "PGAME", Aid, TitleID);
+            string AidStr = BitConverter.ToString(RifAid).Replace("-", "").ToLower();
+            if(IsDexAidSet())
+            {
+                AidStr = "0000000000000000";
+            }
+            string BackupWorkDir = Path.Combine(CmaDir, "PGAME", AidStr, TitleID);
 
             TotalProgress.Maximum = 100;
             Status.Text = "Overthrowing The PSPEMU Monarchy 0%";
@@ -232,8 +254,17 @@ namespace CHOVY
              */
 
             // Pacakge GAME
+            byte[] CmaKey;
+            if (IsDexAidSet())
+            {
+                CmaKey = CmaKeys.GenerateKey(new byte[0x8] { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }); 
+            }
+            else
+            {
+                CmaKey = CmaKeys.GenerateKey(RifAid);
+            }
 
-            byte[] CmaKey = CmaKeys.GenerateKey(RifAid);
+            
 
             string[] entrys = Directory.GetFileSystemEntries(GameWorkDir, "*", SearchOption.AllDirectories);
             long noEntrys = entrys.LongLength;
@@ -484,6 +515,20 @@ namespace CHOVY
             {
                 MutedAudio = false;
                 WriteSetting("MuteAudio", "0");
+            }
+        }
+
+        private void DexAidEnabler_Click(object sender, EventArgs e)
+        {
+            if (!IsDexAidSet())
+            {
+                WriteSetting("DexAid", "1");
+                MessageBox.Show("Enabled DEX Aid\n(0x0000000000000000) will be used for CMA Backups.", "Dex Aid", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+            else
+            {
+                WriteSetting("DexAid", "0");
+                MessageBox.Show("Enabled Retail Aid,\nAid From RIF Will be used for CMA Backups.", "Dex Aid", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
         }
     }

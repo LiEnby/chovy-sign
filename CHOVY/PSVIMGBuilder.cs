@@ -59,10 +59,11 @@ namespace PSVIMGTOOLS
 
             MemoryStream ms = new MemoryStream();
            /*
-            *- DEBUG Disable Encryption
+            // - DEBUG Disable Encryption
             ms.Write(plainText, 0x00, size);
             ms.Seek(0x00,SeekOrigin.Begin);
-            return ms.ToArray();*/
+            return ms.ToArray();
+           */
 
             Aes alg = Aes.Create();
             alg.Mode = CipherMode.CBC;
@@ -87,10 +88,11 @@ namespace PSVIMGTOOLS
 
             MemoryStream ms = new MemoryStream();
             /*
-             *- DEBUG Disable Encryption
+             // - DEBUG Disable Encryption
              ms.Write(plainText, 0x00, size);
              ms.Seek(0x00,SeekOrigin.Begin);
-             return ms.ToArray();*/
+             return ms.ToArray();
+            */
 
             Aes alg = Aes.Create();
             alg.Mode = CipherMode.ECB;

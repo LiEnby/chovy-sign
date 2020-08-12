@@ -48,10 +48,12 @@
             this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.CompressPBP = new System.Windows.Forms.CheckBox();
             this.label6 = new System.Windows.Forms.Label();
+            this.DexAidEnabler = new System.Windows.Forms.PictureBox();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.PsmChan)).BeginInit();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.DexAidEnabler)).BeginInit();
             this.SuspendLayout();
             // 
             // label1
@@ -265,12 +267,23 @@
             this.label6.TabIndex = 18;
             this.label6.Text = "100% percent free!\r\n";
             // 
+            // DexAidEnabler
+            // 
+            this.DexAidEnabler.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.DexAidEnabler.Location = new System.Drawing.Point(829, 1);
+            this.DexAidEnabler.Name = "DexAidEnabler";
+            this.DexAidEnabler.Size = new System.Drawing.Size(15, 15);
+            this.DexAidEnabler.TabIndex = 19;
+            this.DexAidEnabler.TabStop = false;
+            this.DexAidEnabler.Click += new System.EventHandler(this.DexAidEnabler_Click);
+            // 
             // CHOVY
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.Black;
             this.ClientSize = new System.Drawing.Size(843, 302);
+            this.Controls.Add(this.DexAidEnabler);
             this.Controls.Add(this.label6);
             this.Controls.Add(this.groupBox2);
             this.Controls.Add(this.groupBox1);
@@ -292,6 +305,7 @@
             this.groupBox1.PerformLayout();
             this.groupBox2.ResumeLayout(false);
             this.groupBox2.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.DexAidEnabler)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -318,6 +332,7 @@
         private System.Windows.Forms.GroupBox groupBox2;
         private System.Windows.Forms.CheckBox CompressPBP;
         private System.Windows.Forms.Label label6;
+        private System.Windows.Forms.PictureBox DexAidEnabler;
     }
 }
 
