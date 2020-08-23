@@ -1,5 +1,6 @@
 ﻿using CHOVY.Properties;
 using DiscUtils.Iso9660;
+using Ionic.Zlib;
 using Microsoft.Win32;
 using Param_SFO;
 using PSVIMGTOOLS;
@@ -120,8 +121,7 @@ namespace CHOVY
         }
         private void CHOVY_Load(object sender, EventArgs e)
         {
-
-            if(ReadSetting("MuteAudio") == "1")
+            if (ReadSetting("MuteAudio") == "1")
             {
                 MutedAudio = true;
             }
@@ -145,10 +145,21 @@ namespace CHOVY
                 this.FREEDOM.Enabled = true;
             };
 
+            bool isZrif = false;
             if(RifPath.Text == "" || !File.Exists(RifPath.Text))
             {
-                MessageBox.Show("INVALID RIF PATH!\nPlease try \"Find from CMA\"", "RIF ERROR", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return;
+                // Check if valid 'zRIF'
+                try
+                {
+                    ZlibStream.UncompressBuffer(Convert.FromBase64String(RifPath.Text));
+                    isZrif = true;
+                }
+                catch(Exception)
+                {
+                    MessageBox.Show("INVALID RIF!\nPlease try \"Find from CMA\"", "RIF ERROR", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+                
             }
             if(Versionkey.Text.Length != 32)
             {
@@ -184,12 +195,16 @@ namespace CHOVY
             //Read RIF data
             byte[] ContentId = new byte[0x24];
             byte[] RifAid = new byte[0x08];
-            FileStream rif = File.OpenRead(RifPath.Text);
+            Stream rif = null; 
+            if (!isZrif)
+                rif = File.OpenRead(RifPath.Text);
+            else
+                rif = new MemoryStream(ZlibStream.UncompressBuffer(Convert.FromBase64String(RifPath.Text)));
+
             rif.Seek(0x10, SeekOrigin.Begin);
             rif.Read(ContentId, 0x00, 0x24);
             rif.Seek(0x08, SeekOrigin.Begin);
             rif.Read(RifAid, 0x00, 0x08);
-            rif.Close();
 
 
             string ContentID = Encoding.UTF8.GetString(ContentId);
@@ -329,8 +344,19 @@ namespace CHOVY
             Directory.CreateDirectory(BackupDir);
             FileStream licensePsvimg = File.OpenWrite(psvimgFilepath);
             licensePsvimg.SetLength(0);
+
             builder = new PSVIMGBuilder(licensePsvimg, CmaKey);
-            builder.AddFile(RifPath.Text, "ux0:pspemu/temp/game/PSP/LICENSE", "/"+ContentID + ".rif");
+            if (!isZrif)
+            {
+                builder.AddFile(RifPath.Text, "ux0:pspemu/temp/game/PSP/LICENSE", "/" + ContentID + ".rif");
+            }
+            else
+            { 
+                rif.Seek(0x00, SeekOrigin.Begin);
+                builder.AddFileFromStream(rif, "ux0:pspemu/temp/game/PSP/LICENSE", "/" + ContentID + ".rif");
+            }
+
+            rif.Close();
             ContentSize = builder.Finish();
 
             licensePsvimg = File.OpenRead(psvimgFilepath);
@@ -471,13 +497,16 @@ namespace CHOVY
 
             string ContentID = pbp.GetContentId(EbootPbp);
             PSVIMGFileStream LicenseRif = new PSVIMGFileStream(LicensePsvimg, "/"+ ContentID+ ".rif");
-            LicenseRif.WriteToFile(Rif);
+            byte[] LicenseRifBytes = new byte[LicenseRif.Length];
+            LicenseRif.Read(LicenseRifBytes, 0x00, LicenseRifBytes.Length);
 
             LicenseRif.Close();
             LicensePsvimg.Close();
             EbootPbp.Close();
             GamePsvimg.Close();
 
+            byte[] zRifBytes = ZlibStream.CompressBuffer(LicenseRifBytes);
+            Rif = Convert.ToBase64String(zRifBytes);
             WriteSetting("RifPath", Rif);
 
             Versionkey.Text = VerKey;
@@ -530,6 +559,27 @@ namespace CHOVY
                 WriteSetting("DexAid", "0");
                 MessageBox.Show("Enabled Retail Aid,\nAid From RIF Will be used for CMA Backups.", "Dex Aid", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
+        }
+
+        private void Ps1Menu_Click(object sender, EventArgs e)
+        {
+
+            if (!MutedAudio)
+            {
+                Stream str = Resources.POPS;
+                SoundPlayer snd = new  SoundPlayer(str);
+                snd.Play();
+            }
+            CHOVYPopsBuilder pops = new CHOVYPopsBuilder();
+            this.Hide();
+            pops.Show();
+            pops.FormClosing += Pops_FormClosing;
+            
+        }
+
+        private void Pops_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            this.Show();
         }
     }
 }

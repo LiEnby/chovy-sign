@@ -54,16 +54,24 @@ typedef struct
     u32 data_size;             //0     
 } KIRK_SHA1_HEADER;            //4
 
-//mode passed to sceUtilsBufferCopyWithRange
+// sceUtilsBufferCopyWithRange modes
 #define KIRK_CMD_DECRYPT_PRIVATE 1
+#define KIRK_CMD_2 2
+#define KIRK_CMD_3 3
 #define KIRK_CMD_ENCRYPT_IV_0 4
 #define KIRK_CMD_ENCRYPT_IV_FUSE 5
 #define KIRK_CMD_ENCRYPT_IV_USER 6
 #define KIRK_CMD_DECRYPT_IV_0 7
 #define KIRK_CMD_DECRYPT_IV_FUSE 8
 #define KIRK_CMD_DECRYPT_IV_USER 9
-#define KIRK_CMD_PRIV_SIG_CHECK 10
+#define KIRK_CMD_PRIV_SIGN_CHECK 10
 #define KIRK_CMD_SHA1_HASH 11
+#define KIRK_CMD_ECDSA_GEN_KEYS 12
+#define KIRK_CMD_ECDSA_MULTIPLY_POINT 13
+#define KIRK_CMD_PRNG 14
+#define KIRK_CMD_15 15
+#define KIRK_CMD_ECDSA_SIGN 16
+#define KIRK_CMD_ECDSA_VERIFY 17
 
 //"mode" in header
 #define KIRK_MODE_CMD1 1

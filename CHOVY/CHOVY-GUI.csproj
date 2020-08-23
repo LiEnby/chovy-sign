@@ -78,6 +78,12 @@
     <Compile Include="CHOVYCmaSelector.Designer.cs">
       <DependentUpon>CHOVYCmaSelector.cs</DependentUpon>
     </Compile>
+    <Compile Include="CHOVYPopsBuilder.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="CHOVYPopsBuilder.Designer.cs">
+      <DependentUpon>CHOVYPopsBuilder.cs</DependentUpon>
+    </Compile>
     <Compile Include="cmakeys.cs" />
     <Compile Include="param.cs" />
     <Compile Include="pbp.cs" />
@@ -93,6 +99,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="CHOVYCmaSelector.resx">
       <DependentUpon>CHOVYCmaSelector.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="CHOVYPopsBuilder.resx">
+      <DependentUpon>CHOVYPopsBuilder.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
@@ -135,6 +144,10 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Icon.ico" />
+    <None Include="Resources\PopsDefaultIcon.png" />
+    <None Include="Resources\does_not_protect_from_illegal_copies.gif" />
+    <None Include="Resources\ps1.gif" />
+    <None Include="Resources\POPS.wav" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

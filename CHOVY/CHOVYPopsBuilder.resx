@@ -117,32 +117,4 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
-  <data name="does_not_protect_from_illegal_copies" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\does_not_protect_from_illegal_copies.gif;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="UMD" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\umd.gif;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="ps1" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\ps1.gif;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="POPS" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\POPS.wav;System.IO.MemoryStream, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="MINIS" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\MINIS.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="ChovyLogo" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\ChovyLogo.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="idkbackground" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\idkbackground.gif;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="Murica" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\Murica.wav;System.IO.MemoryStream, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="PopsDefaultIcon" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\PopsDefaultIcon.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
 </root>

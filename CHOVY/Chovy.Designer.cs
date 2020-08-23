@@ -36,8 +36,6 @@
             this.FindFromCMA = new System.Windows.Forms.Button();
             this.ISOPath = new System.Windows.Forms.TextBox();
             this.label3 = new System.Windows.Forms.Label();
-            this.pictureBox2 = new System.Windows.Forms.PictureBox();
-            this.PsmChan = new System.Windows.Forms.PictureBox();
             this.label4 = new System.Windows.Forms.Label();
             this.label5 = new System.Windows.Forms.Label();
             this.BrowseButton = new System.Windows.Forms.Button();
@@ -47,19 +45,22 @@
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.CompressPBP = new System.Windows.Forms.CheckBox();
+            this.pictureBox2 = new System.Windows.Forms.PictureBox();
             this.label6 = new System.Windows.Forms.Label();
+            this.Ps1Menu = new System.Windows.Forms.Button();
             this.DexAidEnabler = new System.Windows.Forms.PictureBox();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.PsmChan)).BeginInit();
+            this.PsmChan = new System.Windows.Forms.PictureBox();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.DexAidEnabler)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.PsmChan)).BeginInit();
             this.SuspendLayout();
             // 
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.ForeColor = System.Drawing.Color.Chartreuse;
+            this.label1.ForeColor = System.Drawing.Color.Lime;
             this.label1.Location = new System.Drawing.Point(6, 19);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(27, 13);
@@ -90,7 +91,7 @@
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.ForeColor = System.Drawing.Color.Chartreuse;
+            this.label2.ForeColor = System.Drawing.Color.Lime;
             this.label2.Location = new System.Drawing.Point(268, 19);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(63, 13);
@@ -122,33 +123,12 @@
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.ForeColor = System.Drawing.Color.Chartreuse;
+            this.label3.ForeColor = System.Drawing.Color.Lime;
             this.label3.Location = new System.Drawing.Point(74, 38);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(60, 13);
             this.label3.TabIndex = 8;
             this.label3.Text = "ISO Image:";
-            // 
-            // pictureBox2
-            // 
-            this.pictureBox2.BackgroundImage = global::CHOVY.Properties.Resources.UMD;
-            this.pictureBox2.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
-            this.pictureBox2.Location = new System.Drawing.Point(15, 31);
-            this.pictureBox2.Name = "pictureBox2";
-            this.pictureBox2.Size = new System.Drawing.Size(53, 43);
-            this.pictureBox2.TabIndex = 9;
-            this.pictureBox2.TabStop = false;
-            // 
-            // PsmChan
-            // 
-            this.PsmChan.BackgroundImage = global::CHOVY.Properties.Resources.idkbackground;
-            this.PsmChan.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
-            this.PsmChan.Location = new System.Drawing.Point(3, 3);
-            this.PsmChan.Name = "PsmChan";
-            this.PsmChan.Size = new System.Drawing.Size(123, 297);
-            this.PsmChan.TabIndex = 5;
-            this.PsmChan.TabStop = false;
-            this.PsmChan.Click += new System.EventHandler(this.PsmChan_Click);
             // 
             // label4
             // 
@@ -257,6 +237,16 @@
             this.CompressPBP.Text = "Compress PBP";
             this.CompressPBP.UseVisualStyleBackColor = true;
             // 
+            // pictureBox2
+            // 
+            this.pictureBox2.BackgroundImage = global::CHOVY.Properties.Resources.UMD;
+            this.pictureBox2.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
+            this.pictureBox2.Location = new System.Drawing.Point(15, 31);
+            this.pictureBox2.Name = "pictureBox2";
+            this.pictureBox2.Size = new System.Drawing.Size(53, 43);
+            this.pictureBox2.TabIndex = 9;
+            this.pictureBox2.TabStop = false;
+            // 
             // label6
             // 
             this.label6.AutoSize = true;
@@ -266,6 +256,19 @@
             this.label6.Size = new System.Drawing.Size(96, 13);
             this.label6.TabIndex = 18;
             this.label6.Text = "100% percent free!\r\n";
+            // 
+            // Ps1Menu
+            // 
+            this.Ps1Menu.BackgroundImage = global::CHOVY.Properties.Resources.ps1;
+            this.Ps1Menu.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
+            this.Ps1Menu.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.Ps1Menu.ForeColor = System.Drawing.Color.Lime;
+            this.Ps1Menu.Location = new System.Drawing.Point(748, 95);
+            this.Ps1Menu.Name = "Ps1Menu";
+            this.Ps1Menu.Size = new System.Drawing.Size(75, 71);
+            this.Ps1Menu.TabIndex = 20;
+            this.Ps1Menu.UseVisualStyleBackColor = true;
+            this.Ps1Menu.Click += new System.EventHandler(this.Ps1Menu_Click);
             // 
             // DexAidEnabler
             // 
@@ -277,12 +280,24 @@
             this.DexAidEnabler.TabStop = false;
             this.DexAidEnabler.Click += new System.EventHandler(this.DexAidEnabler_Click);
             // 
+            // PsmChan
+            // 
+            this.PsmChan.BackgroundImage = global::CHOVY.Properties.Resources.idkbackground;
+            this.PsmChan.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
+            this.PsmChan.Location = new System.Drawing.Point(3, 3);
+            this.PsmChan.Name = "PsmChan";
+            this.PsmChan.Size = new System.Drawing.Size(123, 297);
+            this.PsmChan.TabIndex = 5;
+            this.PsmChan.TabStop = false;
+            this.PsmChan.Click += new System.EventHandler(this.PsmChan_Click);
+            // 
             // CHOVY
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.Black;
             this.ClientSize = new System.Drawing.Size(843, 302);
+            this.Controls.Add(this.Ps1Menu);
             this.Controls.Add(this.DexAidEnabler);
             this.Controls.Add(this.label6);
             this.Controls.Add(this.groupBox2);
@@ -299,13 +314,13 @@
             this.Text = "CHOVY-SIGN";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.CHOVY_FormClosing);
             this.Load += new System.EventHandler(this.CHOVY_Load);
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.PsmChan)).EndInit();
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
             this.groupBox2.ResumeLayout(false);
             this.groupBox2.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.DexAidEnabler)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.PsmChan)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -333,6 +348,7 @@
         private System.Windows.Forms.CheckBox CompressPBP;
         private System.Windows.Forms.Label label6;
         private System.Windows.Forms.PictureBox DexAidEnabler;
+        private System.Windows.Forms.Button Ps1Menu;
     }
 }
 

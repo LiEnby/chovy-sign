@@ -7,6 +7,7 @@ namespace CHOVY
 {
     public partial class CHOVYCmaSelector : Form
     {
+        public bool PSGame = false;
         public CHOVYCmaSelector(string CMA = "", string AID = "")
         {
             InitializeComponent();
@@ -58,12 +59,16 @@ namespace CHOVY
             {
                 string CmaDir = CMADir.Text;
                 string Aid = AIDSelector.Text;
-                string BackupuPath = Path.Combine(CmaDir, "PGAME", Aid);
-                foreach (string Dir in Directory.GetDirectories(BackupuPath))
+                string BackupPath;
+                if(!PSGame)
+                    BackupPath = Path.Combine(CmaDir, "PGAME", Aid);
+                else
+                    BackupPath = Path.Combine(CmaDir, "PSGAME", Aid);
+                foreach (string Dir in Directory.GetDirectories(BackupPath))
                 {
                     try
                     {
-                        string SfoPath = Path.Combine(BackupuPath, Dir, "sce_sys", "param.sfo");
+                        string SfoPath = Path.Combine(BackupPath, Dir, "sce_sys", "param.sfo");
                         FileStream SfoStream = File.OpenRead(SfoPath);
                         PARAM_SFO sfo = new PARAM_SFO(SfoStream);
                         string Title = sfo.Title;

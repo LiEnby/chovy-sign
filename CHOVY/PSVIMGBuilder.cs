@@ -263,6 +263,23 @@ namespace PSVIMGTOOLS
             memset(paddingData, paddingByte, paddingLen);
             dst.Write(paddingData, 0x00, paddingData.Length);
         }
+
+        private byte[] getHeader(SceIoStat stats, string ParentPath, string PathRel)
+        {
+            using (MemoryStream Header = new MemoryStream())
+            {
+                writeInt64(Header, DateTime.UtcNow.Ticks); // SysTime
+                writeInt64(Header, 0); // Flags
+                writeSceIoStat(Header, stats);
+                writeStringWithPadding(Header, ParentPath, 256); // Parent Path
+                writeUInt32(Header, 1); //unk_16C
+                writeStringWithPadding(Header, PathRel, 256); //Relative Path
+                writePadding(Header, 0x78, 904); //'x'
+                writeString(Header, PSVIMGConstants.PSVIMG_HEADER_END); //EndOfHeader
+                Header.Seek(0x00, SeekOrigin.Begin);
+                return Header.ToArray();
+            }
+        }
         private byte[] getHeader(string FilePath, string ParentPath, string PathRel)
         {
             using (MemoryStream Header = new MemoryStream())
@@ -437,6 +454,33 @@ namespace PSVIMGTOOLS
                 finished = true;
             }).Start();
 
+        }
+
+        public void AddFileFromStream(Stream FileData, string ParentPath, string PathRel)
+        {
+
+            long sz = Convert.ToInt64(FileData.Length);
+            SceIoStat stats = new SceIoStat();
+            stats.Mode |= Modes.File;
+            stats.Size = Convert.ToUInt64(FileData.Length);
+            stats.Mode |= Modes.GroupRead;
+            stats.Mode |= Modes.GroupWrite;
+
+            stats.Mode |= Modes.OthersRead;
+            stats.Mode |= Modes.OthersWrite;
+
+            stats.Mode |= Modes.UserRead;
+            stats.Mode |= Modes.UserWrite;
+
+            stats.CreationTime = dateTimeToSceDateTime(DateTime.Now);
+            stats.AccessTime = dateTimeToSceDateTime(DateTime.Now);
+            stats.ModificaionTime = dateTimeToSceDateTime(DateTime.Now);
+
+            writeBlock(getHeader(stats, ParentPath, PathRel));
+            writeStream(FileData);
+            writeBlock(getPadding(sz));
+            writeBlock(getTailer());
+            contentSize += sz;
         }
         public void AddFile(string FilePath, string ParentPath, string PathRel)
         {

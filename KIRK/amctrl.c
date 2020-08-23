@@ -322,7 +322,7 @@ __declspec(dllexport) int sceDrmBBMacFinal2(MAC_KEY *mkey, u8 *out, u8 *vkey)
 		memcpy(kirk_buf, out, 0x10);
 	}
 
-	retv = 0;
+	retv = 0;	
 	for(i=0; i<0x10; i++){
 		if(kirk_buf[i]!=tmp[i]){
 			retv = 0x80510300;
