@@ -22,17 +22,27 @@ if you want to dump your own ISO's use UMD Dumper  or something that isnt ftp-in
 
 Credits:    
 dots-tb (for [chovy-gen](https://github.com/dots-tb/chovy-gen) (\_\_sce_ebootpbp signing)         
+
 SilicaAndPina: DLL fork of [chovy-gen](https://github.com/KuromeSan/chovy-gen)            
-               Developing GUI, finding the psp bubbles method and [psvimgtools](https://github.com/yifanlu/psvimgtools) .NET port and         
-               [Sfo.NET](https://github.com/KuromeSan/Sfo.NET/blob/master/README.md) A Simple SFO Parser.             
+                Developing GUI, finding the psp bubbles method and [psvimgtools](https://github.com/yifanlu/psvimgtools) .NET port and         
+                [Sfo.NET](https://github.com/KuromeSan/Sfo.NET/blob/master/README.md) A Simple SFO Parser.             
+
 Motoharu (For helping dots with \_\_sce_ebootpbp)                 
+
 xXxTheDarkprogramerxXx (For [PSPTools](https://github.com/xXxTheDarkprogramerxXx/PSPTools))               
+
 RupertAvery (For [PSXPackager](https://github.com/RupertAvery/PSXPackager) and his fork of DiscUtils)                  
+
 Dark_Alex (For [POPStation](https://aur.archlinux.org/packages/popstation_md/))                  
+
 swarzesherz (For [sign_np](https://github.com/swarzesherz/sign_np))             
+
 tpunix (For [kirk_engine](https://github.com/tpunix/kirk_engine))             
+
 yifanlu & xyz for [psvimgtools](https://github.com/yifanlu/psvimgtools). (Chovy-Sign beta02 and lower)           
+
 Mathieulh (Found psp signing keys?)            
+
 MobyGames ([mobygames.com](https://www.mobygames.com/) for PS1 Cover Art)              
 
 # What are the files
