@@ -34,4 +34,4 @@ Mathieulh (Found psp signing keys?)
 # Building
 In order to build CHOVY.DLL you need [OpenSSL](https://www.npcglib.org/~stathis/downloads/openssl-1.1.0f-vs2017.7z) libary    
 Extract to C:/OpenSSL or change linking settings in the solution to match your install location   
-Open the SLN in Viual Studio 2017 and press "Build Solution"    
+Open the SLN in Viual Studio 2019 and press "Build Solution"    
