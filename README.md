@@ -23,13 +23,13 @@ if you want to dump your own ISO's use UMD Dumper  or something that isnt ftp-in
 Credits:    
 @dots-tb (__sce_ebootpbp signing)    
 SilicaAndPina(me) Developing GUI and finding the psp bubbles method and psvimgtools rewrite        
-Motoharu (For helping dots with __sce_ebootpbp)  
-@RupertAvery (For PSXPackager) https://github.com/RupertAvery/PSXPackager
-Dark_Alex (For POPStation)
-@swarzesherz (For Sign_Np)
-@tpunix (For kirk_engine)
-@yifanlu & xyz for psvimgtools. (beta02 and lower)
-Mathieulh (Found psp signing keys?)
+Motoharu (For helping dots with __sce_ebootpbp)                 
+@RupertAvery (For PSXPackager) https://github.com/RupertAvery/PSXPackager                  
+Dark_Alex (For POPStation)                  
+@swarzesherz (For Sign_Np)             
+@tpunix (For kirk_engine)             
+@yifanlu & xyz for psvimgtools. (beta02 and lower)           
+Mathieulh (Found psp signing keys?)            
 
 # Building
 In order to build CHOVY.DLL you need [OpenSSL](https://www.npcglib.org/~stathis/downloads/openssl-1.1.0f-vs2017.7z) libary    
