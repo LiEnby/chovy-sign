@@ -30,6 +30,7 @@ swarzesherz (For Sign_Np)
 tpunix (For kirk_engine)             
 yifanlu & xyz for psvimgtools. (beta02 and lower)           
 Mathieulh (Found psp signing keys?)            
+MobyGames (mobygames.com for PS1 Cover Art)
 
 # Building
 In order to build CHOVY.DLL you need [OpenSSL](https://www.npcglib.org/~stathis/downloads/openssl-1.1.0f-vs2017.7z) libary    
