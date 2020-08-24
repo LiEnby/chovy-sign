@@ -49,7 +49,7 @@ MobyGames ([mobygames.com](https://www.mobygames.com/) for PS1 Cover Art)
   +   CHOVY-GEN is a fork of dots_tb's [chovy-gen](https://github.com/dots-tb/chovy-gen) to MSVC as a DLL
   +   CHOVY-KIRK parts of [kirk_engine](https://github.com/tpunix/kirk_engine) and [sign_np](https://github.com/swarzesherz/sign_np) code. ported to MSVC as a DLL.
   +   CHOVY-SIGN Main GUI code, also statically includes some code from [PSXPackager](https://github.com/RupertAvery/PSXPackager) for POPS.
-      It also handles .psvimg / psvmd creation, CMA Key derivation and SFO Parsing (edited (Sfo.NET)[https://github.com/KuromeSan/Sfo.NET]
+      It also handles .psvimg / psvmd creation, CMA Key derivation and SFO Parsing (edited [Sfo.NET](https://github.com/KuromeSan/Sfo.NET)
       It also contains a fork of DiscUtils to add support for reading PS1 Disc Images.
 # Building
 In order to build CHOVY-SIGN.DLL you need [OpenSSL](https://www.npcglib.org/~stathis/downloads/openssl-1.1.0f-vs2017.7z) libary    
