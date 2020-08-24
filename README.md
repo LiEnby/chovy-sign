@@ -21,18 +21,18 @@ also, lots of shittily dumped iso's online, however iso's obtained by the NPS Br
 if you want to dump your own ISO's use UMD Dumper  or something that isnt ftp-ing over all the files and building it into an ISO with UMDgen or some other tool
 
 Credits:    
-dots-tb (\_\_sce_ebootpbp signing)    
-SilicaAndPina(me) Developing GUI and finding the psp bubbles method and psvimgtools C# port        
+dots-tb (for [chovy-gen](https://github.com/dots-tb/chovy-gen) (\_\_sce_ebootpbp signing)         
+SilicaAndPina(me) DLL fork of [chovy-gen](https://github.com/KuromeSan/chovy-gen) Developing GUI, finding the psp bubbles method and [psvimgtools](https://github.com/yifanlu/psvimgtools) .NET port        
 Motoharu (For helping dots with \_\_sce_ebootpbp)                 
-RupertAvery (For PSXPackager and his fork of DiscUtils)                  
-Dark_Alex (For POPStation)                  
-swarzesherz (For Sign_Np)             
-tpunix (For kirk_engine)             
-yifanlu & xyz for psvimgtools. (beta02 and lower)           
+RupertAvery (For [PSXPackager](https://github.com/RupertAvery/PSXPackager) and his fork of DiscUtils)                  
+Dark_Alex (For [POPStation](https://aur.archlinux.org/packages/popstation_md/))                  
+swarzesherz (For [sign_np](https://github.com/swarzesherz/sign_np))             
+tpunix (For [kirk_engine](https://github.com/tpunix/kirk_engine))             
+yifanlu & xyz for [psvimgtools](https://github.com/yifanlu/psvimgtools). (Chovy-Sign beta02 and lower)           
 Mathieulh (Found psp signing keys?)            
-MobyGames (mobygames.com for PS1 Cover Art)
+MobyGames ([mobygames.com](https://www.mobygames.com/) for PS1 Cover Art)              
 
 # Building
-In order to build CHOVY.DLL you need [OpenSSL](https://www.npcglib.org/~stathis/downloads/openssl-1.1.0f-vs2017.7z) libary    
+In order to build CHOVY-SIGN.DLL you need [OpenSSL](https://www.npcglib.org/~stathis/downloads/openssl-1.1.0f-vs2017.7z) libary    
 Extract to C:/OpenSSL or change linking settings in the solution to match your install location   
 Open the SLN in Viual Studio 2019 and press "Build Solution"    
