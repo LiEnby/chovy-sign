@@ -23,7 +23,8 @@ if you want to dump your own ISO's use UMD Dumper  or something that isnt ftp-in
 Credits:    
 dots-tb (for [chovy-gen](https://github.com/dots-tb/chovy-gen) (\_\_sce_ebootpbp signing)         
 SilicaAndPina: DLL fork of [chovy-gen](https://github.com/KuromeSan/chovy-gen)
-               Developing GUI, finding the psp bubbles method and [psvimgtools](https://github.com/yifanlu/psvimgtools) .NET port        
+               Developing GUI, finding the psp bubbles method and [psvimgtools](https://github.com/yifanlu/psvimgtools) .NET port  
+               [Sfo.NET](https://github.com/KuromeSan/Sfo.NET/blob/master/README.md) SFO Parser Code..
 Motoharu (For helping dots with \_\_sce_ebootpbp)                 
 xXxTheDarkprogramerxXx (For [PSPTools](https://github.com/xXxTheDarkprogramerxXx/PSPTools))               
 RupertAvery (For [PSXPackager](https://github.com/RupertAvery/PSXPackager) and his fork of DiscUtils)                  
@@ -37,9 +38,9 @@ MobyGames ([mobygames.com](https://www.mobygames.com/) for PS1 Cover Art)
 # What are the files
   +   CHOVY-GEN is a fork of dots_tb's [chovy-gen](https://github.com/dots-tb/chovy-gen) to MSVC as a DLL
   +   CHOVY-KIRK parts of [kirk_engine](https://github.com/tpunix/kirk_engine) and [sign_np](https://github.com/swarzesherz/sign_np) code. ported to MSVC as a DLL.
-  +   CHOVY-JUAN a fork of of [DiscUtils](https://github.com/DiscUtils/DiscUtils) to add PS1 support mostly taken from [PSXPackager](https://github.com/RupertAvery/PSXPackager)
   +   CHOVY-SIGN Main GUI code, also statically includes some code from [PSXPackager](https://github.com/RupertAvery/PSXPackager) for POPS.
-      It also handles .psvimg / psvmd creation, CMA Key derivation and SFO Parsing (edited parts of (PSPTools)[https://github.com/xXxTheDarkprogramerxXx/PSPTools]
+      It also handles .psvimg / psvmd creation, CMA Key derivation and SFO Parsing (edited (Sfo.NET)[https://github.com/KuromeSan/Sfo.NET]
+      It also contains a fork of DiscUtils to add support for reading PS1 Disc Images.
 # Building
 In order to build CHOVY-SIGN.DLL you need [OpenSSL](https://www.npcglib.org/~stathis/downloads/openssl-1.1.0f-vs2017.7z) libary    
 Extract to C:/OpenSSL or change linking settings in the solution to match your install location   
