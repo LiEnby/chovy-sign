@@ -1,0 +1,190 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{D46AA2C2-2BDC-45C7-ACA5-D7A2295564E8}</ProjectGuid>
+    <OutputType>WinExe</OutputType>
+    <RootNamespace>CHOVY</RootNamespace>
+    <AssemblyName>CHOVY-SIGN</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject />
+  </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>Icon.ico</ApplicationIcon>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <LangVersion>7.3</LangVersion>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
+    <OutputPath>bin\x86\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <LangVersion>7.3</LangVersion>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="BouncyCastle.Crypto, Version=1.8.6.0, Culture=neutral, PublicKeyToken=0e99375e54769942">
+      <HintPath>..\packages\BouncyCastle.1.8.6.1\lib\BouncyCastle.Crypto.dll</HintPath>
+    </Reference>
+    <Reference Include="DotNetZip, Version=1.13.8.0, Culture=neutral, PublicKeyToken=6583c7c814667745, processorArchitecture=MSIL">
+      <HintPath>..\packages\DotNetZip.1.13.8\lib\net40\DotNetZip.dll</HintPath>
+    </Reference>
+    <Reference Include="HtmlAgilityPack, Version=1.11.24.0, Culture=neutral, PublicKeyToken=bd319b19eaf3b43a, processorArchitecture=MSIL">
+      <HintPath>..\packages\HtmlAgilityPack.1.11.24\lib\Net45\HtmlAgilityPack.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Deployment" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="CHOVY.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="CHOVY.Designer.cs">
+      <DependentUpon>CHOVY.cs</DependentUpon>
+    </Compile>
+    <Compile Include="CHOVYCmaSelector.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="CHOVYCmaSelector.Designer.cs">
+      <DependentUpon>CHOVYCmaSelector.cs</DependentUpon>
+    </Compile>
+    <Compile Include="CHOVYPopsBuilder.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="CHOVYPopsBuilder.Designer.cs">
+      <DependentUpon>CHOVYPopsBuilder.cs</DependentUpon>
+    </Compile>
+    <Compile Include="cmakeys.cs" />
+    <Compile Include="MobyGamesDB.cs" />
+    <Compile Include="param.cs" />
+    <Compile Include="pbp.cs" />
+    <Compile Include="PSXPackager\ApplicationInfo.cs" />
+    <Compile Include="PSXPackager\FileExtensionHelper.cs" />
+    <Compile Include="PSXPackager\GameEntry.cs" />
+    <Compile Include="PSXPackager\MergedBin.cs" />
+    <Compile Include="PSXPackager\PackagePsx.cs" />
+    <Compile Include="POPS\Compression.cs" />
+    <Compile Include="POPS\ConvertIsoInfo.cs" />
+    <Compile Include="POPS\CueFile.cs" />
+    <Compile Include="POPS\CueIndex.cs" />
+    <Compile Include="POPS\CueReader.cs" />
+    <Compile Include="POPS\CueTrack.cs" />
+    <Compile Include="POPS\CueWriter.cs" />
+    <Compile Include="POPS\DiscInfo.cs" />
+    <Compile Include="POPS\ExtractIsoInfo.cs" />
+    <Compile Include="POPS\Helper.cs" />
+    <Compile Include="POPS\IndexPosition.cs" />
+    <Compile Include="POPS\IndexPosition.Operators.cs" />
+    <Compile Include="POPS\IsoIndex.cs" />
+    <Compile Include="POPS\IsoIndexLite.cs" />
+    <Compile Include="POPS\PatchData.cs" />
+    <Compile Include="POPS\PbpStream.cs" />
+    <Compile Include="POPS\Popstation.cs" />
+    <Compile Include="POPS\Popstation.Data.cs" />
+    <Compile Include="POPS\Popstation.Extract.cs" />
+    <Compile Include="POPS\PopstationEventEnum.cs" />
+    <Compile Include="POPS\SFOBuilder.cs" />
+    <Compile Include="POPS\SFOData.cs" />
+    <Compile Include="POPS\SFODir.cs" />
+    <Compile Include="POPS\SFOEntry.cs" />
+    <Compile Include="POPS\SFOKeys.cs" />
+    <Compile Include="POPS\SFOValues.cs" />
+    <Compile Include="POPS\StreamExtensions.cs" />
+    <Compile Include="Program.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="PSVIMGBuilder.cs" />
+    <Compile Include="PSVIMGFileStream.cs" />
+    <Compile Include="PSVIMGStream.cs" />
+    <Compile Include="PSVIMGStructs.cs" />
+    <Compile Include="PSVMDBuilder.cs" />
+    <EmbeddedResource Include="CHOVY.resx">
+      <DependentUpon>CHOVY.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="CHOVYCmaSelector.resx">
+      <DependentUpon>CHOVYCmaSelector.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="CHOVYPopsBuilder.resx">
+      <DependentUpon>CHOVYPopsBuilder.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+      <DesignTime>True</DesignTime>
+    </Compile>
+    <None Include="packages.config" />
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\idkbackground.gif" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\umd.gif" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Murica.wav" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\MINIS.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\ChovyLogo.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Icon.ico" />
+    <None Include="Resources\PopsDefaultIcon.png" />
+    <None Include="Resources\does_not_protect_from_illegal_copies.gif" />
+    <None Include="Resources\ps1.gif" />
+    <None Include="Resources\POPS.wav" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\CHOVY-JUAN\CHOVY-JUAN.csproj">
+      <Project>{78933b2f-c754-4904-804e-d3932536471c}</Project>
+      <Name>CHOVY-JUAN</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>
