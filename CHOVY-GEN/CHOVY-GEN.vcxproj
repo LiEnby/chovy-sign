@@ -78,7 +78,7 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <OutDir>$(SolutionDir)CHOVY\bin\$(Configuration)</OutDir>
+    <OutDir>$(SolutionDir)CHOVY-SIGN\bin\$(Configuration)</OutDir>
     <TargetName>$(ProjectName)</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -88,7 +88,7 @@
     <LinkIncremental>false</LinkIncremental>
     <IgnoreImportLibrary />
     <TargetName>CHOVY</TargetName>
-    <OutDir>$(SolutionDir)CHOVY\bin\$(Configuration)</OutDir>
+    <OutDir>$(SolutionDir)CHOVY-SIGN\bin\$(Configuration)</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
