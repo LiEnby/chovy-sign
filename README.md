@@ -32,7 +32,7 @@ yifanlu & xyz for [psvimgtools](https://github.com/yifanlu/psvimgtools). (Chovy-
 Mathieulh (Found psp signing keys?)            
 MobyGames ([mobygames.com](https://www.mobygames.com/) for PS1 Cover Art)              
 
-# What are the file
+# What are the files
   +   CHOVY-GEN is a fork of dots_tb's [chovy-gen](https://github.com/dots-tb/chovy-gen) to MSVC as a DLL
   +   CHOVY-KIRK parts of [kirk_engine](https://github.com/tpunix/kirk_engine) and [sign_np](https://github.com/swarzesherz/sign_np) code. ported to MSVC as a DLL.
   +   CHOVY-JUAN a fork of of [DiscUtils](https://github.com/DiscUtils/DiscUtils) to add PS1 support mostly taken from [PSXPackager](https://github.com/RupertAvery/PSXPackager)
