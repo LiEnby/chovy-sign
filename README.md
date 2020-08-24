@@ -22,9 +22,9 @@ if you want to dump your own ISO's use UMD Dumper  or something that isnt ftp-in
 
 Credits:    
 dots-tb (for [chovy-gen](https://github.com/dots-tb/chovy-gen) (\_\_sce_ebootpbp signing)         
-SilicaAndPina: DLL fork of [chovy-gen](https://github.com/KuromeSan/chovy-gen)
-               Developing GUI, finding the psp bubbles method and [psvimgtools](https://github.com/yifanlu/psvimgtools) .NET port  
-               [Sfo.NET](https://github.com/KuromeSan/Sfo.NET/blob/master/README.md) SFO Parser Code..
+SilicaAndPina: DLL fork of [chovy-gen](https://github.com/KuromeSan/chovy-gen)            
+               Developing GUI, finding the psp bubbles method and [psvimgtools](https://github.com/yifanlu/psvimgtools) .NET port and         
+               [Sfo.NET](https://github.com/KuromeSan/Sfo.NET/blob/master/README.md) A Simple SFO Parser.             
 Motoharu (For helping dots with \_\_sce_ebootpbp)                 
 xXxTheDarkprogramerxXx (For [PSPTools](https://github.com/xXxTheDarkprogramerxXx/PSPTools))               
 RupertAvery (For [PSXPackager](https://github.com/RupertAvery/PSXPackager) and his fork of DiscUtils)                  
