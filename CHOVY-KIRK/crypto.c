@@ -951,7 +951,7 @@ static void rijndaelDecrypt(const u32 rk[/*4*(Nr + 1)*/], int Nr, const u8 ct[16
 }
 
 /* setup key context for both encryption and decryption */
-static int rijndael_set_key(AES_ctx *ctx, const u8 *key, int bits)
+int rijndael_set_key(AES_ctx *ctx, const u8 *key, int bits)
 {
 	int rounds;
 
@@ -983,6 +983,17 @@ int AES_set_key(AES_ctx *ctx, const u8 *key, int bits)
 {
 	return rijndael_set_key(ctx, key, bits);
 }
+
+void rijndael_encrypt(AES_ctx* ctx, const u8* src, u8* dst)
+{
+    rijndaelEncrypt(ctx->ek, ctx->Nr, src, dst);
+}
+
+void rijndael_decrypt(AES_ctx* ctx, const u8* src, u8* dst)
+{
+    rijndaelDecrypt(ctx->dk, ctx->Nr, src, dst);
+}
+
 
 void AES_decrypt(AES_ctx *ctx, const u8 *src, u8 *dst)
 {

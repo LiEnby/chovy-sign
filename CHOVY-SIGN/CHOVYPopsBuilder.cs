@@ -13,7 +13,7 @@ using System.Net;
 using System.Threading;
 using System.Windows.Forms;
 
-namespace CHOVY
+namespace CHOVY_SIGN
 {
     public partial class CHOVYPopsBuilder : Form
     {

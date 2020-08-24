@@ -3,7 +3,7 @@ using System.IO;
 using System.Security.Cryptography;
 using System.Text;
 
-namespace CHOVY
+namespace CHOVY_SIGN
 {
     class CmaKeys
     {

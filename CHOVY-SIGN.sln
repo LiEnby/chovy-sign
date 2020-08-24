@@ -9,8 +9,6 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CHOVY-KIRK", "CHOVY-KIRK\CH
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CHOVY-GEN", "CHOVY-GEN\CHOVY-GEN.vcxproj", "{DCDBF747-DFB6-450E-A403-1C592D20EAEB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CHOVY-JUAN", "CHOVY-JUAN\CHOVY-JUAN.csproj", "{78933B2F-C754-4904-804E-D3932536471C}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x86 = Debug|x86
@@ -29,10 +27,6 @@ Global
 		{DCDBF747-DFB6-450E-A403-1C592D20EAEB}.Debug|x86.Build.0 = Debug|Win32
 		{DCDBF747-DFB6-450E-A403-1C592D20EAEB}.Release|x86.ActiveCfg = Release|Win32
 		{DCDBF747-DFB6-450E-A403-1C592D20EAEB}.Release|x86.Build.0 = Release|Win32
-		{78933B2F-C754-4904-804E-D3932536471C}.Debug|x86.ActiveCfg = Debug|x86
-		{78933B2F-C754-4904-804E-D3932536471C}.Debug|x86.Build.0 = Debug|x86
-		{78933B2F-C754-4904-804E-D3932536471C}.Release|x86.ActiveCfg = Release|x86
-		{78933B2F-C754-4904-804E-D3932536471C}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

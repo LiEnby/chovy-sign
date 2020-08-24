@@ -21,6 +21,7 @@ void ecdsa_set_pub(u8 *Qx, u8 *Qy);
 void ecdsa_set_priv(u8 *k);
 int  ecdsa_verify(u8 *hash, u8 *R, u8 *S);
 void ecdsa_sign(u8 *hash, u8 *R, u8 *S, u8 *random);
+void ecdsa_sign_norandom(u8* hash, u8* R, u8* S);
 void ecdsa_sign_fixed(u8 *hash, u8 *fixed_m, u8 *fixed_r, u8 *S);
 void ecdsa_find_m_k(u8 *sig_r, u8 *sig_s1, u8 *hash1, u8 *sig_s2, u8 *hash2, u8 *N, u8 *ret_m, u8 *ret_k);
 

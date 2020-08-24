@@ -1,14 +1,15 @@
-﻿using Org.BouncyCastle.Bcpg.OpenPgp;
-using Org.BouncyCastle.Crypto.Paddings;
-using PSVIMGTOOLS;
+﻿using BasicDataTypes;
+using ParamSfo;
 using System;
 using System.Diagnostics;
+using System.Drawing;
+using System.Drawing.Imaging;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Windows.Forms;
 
-namespace CHOVY
+namespace CHOVY_SIGN
 {
     class pbp
     {
@@ -21,6 +22,27 @@ namespace CHOVY
             int pad_size;
         }
 
+        const int KIRK_CMD_DECRYPT_PRIVATE = 1;
+        const int KIRK_CMD_2 = 2;
+        const int KIRK_CMD_3 = 3;
+        const int KIRK_CMD_ENCRYPT_IV_0 = 4;
+        const int KIRK_CMD_ENCRYPT_IV_FUSE = 5;
+        const int KIRK_CMD_ENCRYPT_IV_USER = 6;
+        const int KIRK_CMD_DECRYPT_IV_0 = 7;
+        const int KIRK_CMD_DECRYPT_IV_FUSE = 8;
+        const int KIRK_CMD_DECRYPT_IV_USER = 9;
+        const int KIRK_CMD_PRIV_SIGN_CHECK = 10;
+        const int KIRK_CMD_SHA1_HASH = 11;
+        const int KIRK_CMD_ECDSA_GEN_KEYS = 12;
+        const int KIRK_CMD_ECDSA_MULTIPLY_POINT = 13;
+        const int KIRK_CMD_PRNG = 14;
+        const int KIRK_CMD_15 = 15;
+        const int KIRK_CMD_ECDSA_SIGN = 16;
+        const int KIRK_CMD_ECDSA_VERIFY = 17;
+
+        static byte[] npumdimg_private_key = new byte[0x14] { 0x14, 0xB0, 0x22, 0xE8, 0x92, 0xCF, 0x86, 0x14, 0xA4, 0x45, 0x57, 0xDB, 0x09, 0x5C, 0x92, 0x8D, 0xE9, 0xB8, 0x99, 0x70 };
+        static byte[] npumdimg_public_key = new byte[0x28] {0x01, 0x21, 0xEA, 0x6E, 0xCD, 0xB2, 0x3A, 0x3E,0x23, 0x75, 0x67, 0x1C, 0x53, 0x62, 0xE8, 0xE2,0x8B, 0x1E, 0x78, 0x3B, 0x1A, 0x27, 0x32, 0x15,0x8B, 0x8C, 0xED, 0x98, 0x46, 0x6C, 0x18, 0xA3, 0xAC, 0x3B, 0x11, 0x06, 0xAF, 0xB4, 0xEC, 0x3B};
+
         // PSP
         [DllImport("CHOVY-KIRK.dll", CallingConvention = CallingConvention.Cdecl)]
         private static extern int kirk_init();
@@ -32,6 +54,13 @@ namespace CHOVY
         private unsafe static extern int sceDrmBBMacFinal2(MAC_KEY* mkey, byte[] outp, byte[] vkey);
         [DllImport("CHOVY-KIRK.dll", CallingConvention = CallingConvention.Cdecl)]
         private unsafe static extern int bbmac_getkey(MAC_KEY *mkey, byte[] bbmac, byte[] vkey);
+        [DllImport("CHOVY-KIRK.dll", CallingConvention = CallingConvention.Cdecl)]
+        private unsafe static extern int sceUtilsBufferCopyWithRange(byte[] outbuff, int outsize, byte[] inbuff, int insize, int cmd);
+        [DllImport("CHOVY-KIRK.dll", CallingConvention = CallingConvention.Cdecl)]
+        private unsafe static extern void encrypt_kirk16_private(byte[] dA_out, byte[] dA_dec);
+        [DllImport("CHOVY-KIRK.dll", CallingConvention = CallingConvention.Cdecl)]
+        private unsafe static extern void decrypt_kirk16_private(byte[] dA_out, byte[] dA_dec);
+
         // PS1
         [DllImport("CHOVY-KIRK.dll", CallingConvention = CallingConvention.Cdecl)]
         private unsafe static extern int process_pgd(byte[] pgd_buf, int pgd_size, int pgd_flag);
@@ -183,6 +212,136 @@ namespace CHOVY
             return VERSION_KEY;
         }
 
+        public static byte[] HashSfo(byte[] DataPspBytes, byte[] SfoBytes)
+        {
+            int SfoSize = SfoBytes.Length + 0x30;
+            byte[] SfoData = new byte[SfoSize];
+            Array.ConstrainedCopy(SfoBytes, 0, SfoData, 0, SfoBytes.Length);
+            Array.ConstrainedCopy(DataPspBytes, 0, SfoData, SfoBytes.Length, DataPspBytes.Length);
+
+            byte[] SfoHashIn = new byte[SfoSize + 0x4];
+            byte[] SfoHashOut = new byte[0x14];
+
+            byte[] SizeBytes = BitConverter.GetBytes(SfoSize);
+
+            Array.ConstrainedCopy(SizeBytes, 0, SfoHashIn, 0, SizeBytes.Length);
+            Array.ConstrainedCopy(SfoData, 0, SfoHashIn, 0x4, SfoSize);
+
+            if (sceUtilsBufferCopyWithRange(SfoHashOut, SfoHashOut.Length, SfoHashIn, SfoHashIn.Length, KIRK_CMD_SHA1_HASH) != 0)
+            {
+                throw new Exception("Failed to generate SHA1 hash for DATA.PSP!");
+            }
+
+            return SfoHashOut;
+        }
+        public static byte[] SignSfo(bool PS1,byte[] DataToSign)
+        {
+            byte[] DataPspSignBufIn = new byte[0x34];
+            byte[] DataPspSignBufOut = new byte[0x28];
+
+            byte[] DataPspKeyPair = new byte[npumdimg_private_key.Length + npumdimg_public_key.Length];
+
+            Array.ConstrainedCopy(npumdimg_private_key, 0, DataPspKeyPair, 0, npumdimg_private_key.Length);
+            Array.ConstrainedCopy(npumdimg_public_key, 0, DataPspKeyPair, npumdimg_private_key.Length, npumdimg_public_key.Length);
+
+            byte[] DataPspPrivateKeyEnc = new byte[0x20];
+            encrypt_kirk16_private(DataPspPrivateKeyEnc, DataPspKeyPair);
+
+            // Generate ECDSA signature.
+            Array.ConstrainedCopy(DataPspPrivateKeyEnc, 0, DataPspSignBufIn, 0, DataPspPrivateKeyEnc.Length);
+            Array.ConstrainedCopy(DataToSign, 0, DataPspSignBufIn, DataPspPrivateKeyEnc.Length, DataToSign.Length);
+
+            if (sceUtilsBufferCopyWithRange(DataPspSignBufOut, DataPspSignBufOut.Length, DataPspSignBufIn, DataPspSignBufIn.Length, KIRK_CMD_ECDSA_SIGN) != 0)
+            {
+                throw new Exception("Failed to generate ECDSA signature for DATA.PSP!\n");
+            }
+            return DataPspSignBufOut;
+        }
+
+        public static void VerifySignature(bool PS1,byte[] Hash, byte[] Signature)
+        {
+            byte[] TestData = new byte[0x64];
+            Array.ConstrainedCopy(npumdimg_public_key, 0, TestData, 0, npumdimg_public_key.Length);
+            Array.ConstrainedCopy(Hash, 0, TestData, npumdimg_public_key.Length, Hash.Length);
+            Array.ConstrainedCopy(Signature, 0, TestData, npumdimg_public_key.Length + Hash.Length, Signature.Length);
+            if (sceUtilsBufferCopyWithRange(null, 0, TestData, 0x64, KIRK_CMD_ECDSA_VERIFY) != 0)
+            {
+                throw new Exception("ECDSA signature for DATA.PSP is invalid!\n");
+            }
+        }
+
+        public static byte[] BuildDataPsp(byte[] Startdat, string ContentId, byte[] SfoBytes)
+        {
+            int NP_FLAGS = 0x2; 
+            // Normally this is dependant on if a version key is used (and thus the app is npdrm_free)
+            // Howevver vita does not accept npdrm_free PSP apps
+            int DataPspSize = 0x594;
+            if (Startdat.Length != 0)
+                DataPspSize += Convert.ToInt32(Startdat.Length + 0xC);
+
+            byte[] DataPspFile = new byte[DataPspSize];
+
+            DataUtils.CopyString(DataPspFile, ContentId, 0x560);
+            DataUtils.CopyInt32BE(DataPspFile, NP_FLAGS, 0x590);
+
+            byte[] PspData = new byte[0x30];
+            Array.ConstrainedCopy(DataPspFile, 0x560, PspData, 0, PspData.Length);
+
+            byte[] SfoHash = HashSfo(PspData, SfoBytes);
+            byte[] SfoSignature = SignSfo(false, SfoHash);
+            VerifySignature(false, SfoHash, SfoSignature);
+
+            Array.ConstrainedCopy(SfoSignature, 0, DataPspFile, 0, SfoSignature.Length);
+
+            if(Startdat.Length != 0)
+            {
+                Array.ConstrainedCopy(Startdat, 0, DataPspFile, 0x5A0, Startdat.Length);
+            }
+
+            return DataPspFile;
+        }
+
+        public static byte[] BuildStartData(Bitmap bmp)
+        {
+            MemoryStream ImageData = new MemoryStream();
+            bmp.Save(ImageData, ImageFormat.Png);
+            byte[] PngBytes = ImageData.ToArray();
+            ImageData.Dispose();
+
+            int HeaderSize = 0x50;
+            int StartDatSize = Convert.ToInt32(PngBytes.Length + HeaderSize);
+
+            byte[] StartDat = new byte[StartDatSize];
+            DataUtils.CopyString(StartDat, "STARTDAT",0x0);
+            DataUtils.CopyInt32(StartDat, 0x1, 0x8);
+            DataUtils.CopyInt32(StartDat, 0x1, 0xC);
+            DataUtils.CopyInt32(StartDat, HeaderSize, 0x10);
+            DataUtils.CopyInt32(StartDat, PngBytes.Length, 0x14);
+
+            Array.ConstrainedCopy(PngBytes, 0, StartDat, 0x50, PngBytes.Length);
+            return StartDat;
+        }
+
+        public static byte[] PatchSfo(byte[] SfoBytes, string ContentId)
+        {
+            MemoryStream SfoStream = new MemoryStream(SfoBytes);
+            String TitleId = ContentId.Substring(0x7, 0x9);
+            Sfo.WriteSfoString(SfoStream, "DISC_ID", TitleId);
+            SfoStream.Seek(0x00, SeekOrigin.Begin);
+            Sfo.WriteSfoString(SfoStream, "CATEGORY", "EG");
+            SfoStream.Seek(0x00, SeekOrigin.Begin);
+            byte[] OutputBytes = SfoStream.ToArray();
+            SfoStream.Dispose();
+            return OutputBytes;
+        }
+        public static void BuildPbp(Stream str, Bitmap start_image, string content_id, byte[] param_sfo,byte[] icon0, byte[] icon1pmf, byte[] pic0, byte[] pic1, byte[] sndat3)
+        {
+            kirk_init();
+            byte[] NewSfo = PatchSfo(param_sfo, content_id);
+            byte[] StartData = BuildStartData(start_image);
+            byte[] DataPsp = BuildDataPsp(StartData, content_id, NewSfo);
+            
+        }
         public static int gen__sce_ebootpbp(string EbootFile, UInt64 AID, string OutSceebootpbpFile)
         {
             return chovy_gen(EbootFile, AID, OutSceebootpbpFile);

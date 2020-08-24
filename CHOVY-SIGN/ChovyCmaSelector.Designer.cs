@@ -1,4 +1,4 @@
-﻿namespace CHOVY
+﻿namespace CHOVY_SIGN
 {
     partial class CHOVYCmaSelector
     {

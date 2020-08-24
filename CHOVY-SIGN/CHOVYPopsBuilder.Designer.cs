@@ -1,4 +1,4 @@
-﻿namespace CHOVY
+﻿namespace CHOVY_SIGN
 {
     partial class CHOVYPopsBuilder
     {
@@ -547,7 +547,7 @@
             // 
             // BubbleIcon
             // 
-            this.BubbleIcon.BackgroundImage = global::CHOVY.Properties.Resources.PopsDefaultIcon;
+            this.BubbleIcon.BackgroundImage = global::CHOVY_SIGN.Properties.Resources.PopsDefaultIcon;
             this.BubbleIcon.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None;
             this.BubbleIcon.Location = new System.Drawing.Point(18, 37);
             this.BubbleIcon.Name = "BubbleIcon";
@@ -566,7 +566,7 @@
             // 
             // pictureBox1
             // 
-            this.pictureBox1.BackgroundImage = global::CHOVY.Properties.Resources.does_not_protect_from_illegal_copies;
+            this.pictureBox1.BackgroundImage = global::CHOVY_SIGN.Properties.Resources.does_not_protect_from_illegal_copies;
             this.pictureBox1.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
             this.pictureBox1.Location = new System.Drawing.Point(7, 79);
             this.pictureBox1.Name = "pictureBox1";

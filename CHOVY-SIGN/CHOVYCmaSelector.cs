@@ -1,9 +1,10 @@
-﻿using Param_SFO;
+﻿using ParamSfo;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Windows.Forms;
 
-namespace CHOVY
+namespace CHOVY_SIGN
 {
     public partial class CHOVYCmaSelector : Form
     {
@@ -75,8 +76,8 @@ namespace CHOVY
                     {
                         string SfoPath = Path.Combine(BackupPath, Dir, "sce_sys", "param.sfo");
                         FileStream SfoStream = File.OpenRead(SfoPath);
-                        PARAM_SFO sfo = new PARAM_SFO(SfoStream);
-                        string Title = sfo.Title;
+                        Dictionary<string,object> SfoKeys = Sfo.ReadSfo(SfoStream);
+                        string Title = (string)SfoKeys["Title"];
                         SfoStream.Close();
                         string BackupName = (Path.GetFileName(Dir) + " - " + Title);
                         BackupList.Items.Add(BackupName);

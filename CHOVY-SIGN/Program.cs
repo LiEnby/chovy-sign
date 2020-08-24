@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Windows.Forms;
 
-namespace CHOVY
+namespace CHOVY_SIGN
 {
     static class Program
     {
@@ -13,7 +13,7 @@ namespace CHOVY
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new CHOVY());
+            Application.Run(new CHOVYPspBuilder());
         }
     }
 }

@@ -196,6 +196,46 @@ static void point_mul(struct point *d, u8 *a, struct point *b)
 		}
 }
 
+static void generate_ecdsa_norandom(u8* outR, u8* outS, u8* k, u8* hash)
+{
+	u8 e[21];
+	u8 kk[21];
+	u8 m[21];
+	u8 R[21];
+	u8 S[21];
+	u8 minv[21];
+	struct point mG;
+
+	e[0] = 0; R[0] = 0; S[0] = 0;
+	memcpy(e + 1, hash, 20);
+	bn_reduce(e, ec_N, 21);
+
+	kirk_CMD14(m + 1, 20);
+	m[0] = 0;
+
+	point_mul(&mG, m, &ec_G);
+	point_from_mon(&mG);
+	R[0] = 0;
+	elt_copy(R + 1, mG.x);
+
+	bn_copy(kk, k, 21);
+	bn_reduce(kk, ec_N, 21);
+	bn_to_mon(m, ec_N, 21);
+	bn_to_mon(e, ec_N, 21);
+	bn_to_mon(R, ec_N, 21);
+	bn_to_mon(kk, ec_N, 21);
+
+	bn_mon_mul(S, R, kk, ec_N, 21);
+	bn_add(kk, S, e, ec_N, 21);
+	bn_mon_inv(minv, m, ec_N, 21);
+	bn_mon_mul(S, minv, kk, ec_N, 21);
+
+	bn_from_mon(R, ec_N, 21);
+	bn_from_mon(S, ec_N, 21);
+	memcpy(outR, R + 1, 0x20);
+	memcpy(outS, S + 1, 0x20);
+}
+
 static void generate_ecdsa(u8 *R, u8 *S, u8 *k, u8 *hash, u8 *random)
 {
 	u8 e[20];
@@ -337,10 +377,23 @@ int ecdsa_verify(u8 *hash, u8 *R, u8 *S)
 {
 	return check_ecdsa(&ec_Q, R, S, hash);
 }
+void ecdsa_sign_norandom(u8* hash, u8* R, u8* S)
+{
+	generate_ecdsa_norandom(R, S, ec_k, hash);
+}
 
 void ecdsa_sign(u8 *hash, u8 *R, u8 *S, u8 *random)
 {
 	generate_ecdsa(R, S, ec_k, hash, random);
+}
+
+void ec_pub_mult(u8* k, u8* Q)
+{
+	struct point ec_temp;
+	point_mul(&ec_temp, k, &ec_Q);
+	point_from_mon(&ec_temp);
+	memcpy(Q, ec_temp.x, 20);
+	memcpy(Q + 20, ec_temp.y, 20);
 }
 
 /*************************************************************/

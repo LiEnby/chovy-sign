@@ -51,8 +51,47 @@ typedef struct
 
 typedef struct
 {
+	u8 r[0x14];
+	u8 s[0x14];
+} ECDSA_SIG;
+
+typedef struct
+{
+	u8 x[0x14];
+	u8 y[0x14];
+} ECDSA_POINT;
+
+
+typedef struct
+{
     u32 data_size;             //0     
 } KIRK_SHA1_HEADER;            //4
+
+typedef struct
+{
+	u8 private_key[0x14];
+	ECDSA_POINT public_key;
+} KIRK_CMD12_BUFFER;
+
+typedef struct
+{
+	u8 multiplier[0x14];
+	ECDSA_POINT public_key;
+} KIRK_CMD13_BUFFER;
+
+typedef struct
+{
+	u8 enc_private[0x20];
+	u8 message_hash[0x14];
+} KIRK_CMD16_BUFFER;
+
+typedef struct
+{
+	ECDSA_POINT public_key;
+	u8 message_hash[0x14];
+	ECDSA_SIG signature;
+} KIRK_CMD17_BUFFER;
+
 
 // sceUtilsBufferCopyWithRange modes
 #define KIRK_CMD_DECRYPT_PRIVATE 1
@@ -130,6 +169,6 @@ int kirk_CMD1_ex(void* outbuff, void* inbuff, int size, KIRK_CMD1_HEADER* header
 
 //sce-like funcs
 int sceUtilsSetFuseID(void*fuse);
-int sceUtilsBufferCopyWithRange(void* outbuff, int outsize, void* inbuff, int insize, int cmd);
+__declspec(dllexport) int sceUtilsBufferCopyWithRange(void* outbuff, int outsize, void* inbuff, int insize, int cmd);
 
 #endif

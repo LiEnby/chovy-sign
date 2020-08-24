@@ -1,4 +1,4 @@
-﻿using DiscUtils.Iso9660;
+﻿using DiscUtils.Iso9660Ps1;
 using Popstation;
 using System;
 using System.Collections.Generic;
@@ -91,7 +91,7 @@ namespace PSXPackager
             args.Cancel = true;
         }
 
-        public static async Task ProcessFile(string file, string outPath, string tempPath, int compressionLevel, CancellationToken cancellationToken)
+        public static async Task ProcessFile(string file, string outPath, string tempPath, int compressionLevel, CancellationToken cancellationToken,string savedesc = "PS1 Game - Saved Data", string name = "PS1 Game", string pic0 = "PIC0.PNG", string pic1 = "PIC1.PNG", string icon0 = "ICON0.PNG", string basePbp = "BASE.PBP")
         {
             Console.WriteLine($"Converting {file}...");
 
@@ -133,7 +133,7 @@ namespace PSXPackager
                             }
                         }
 
-                        await ConvertIso(file, srcToc, outPath, compressionLevel, cancellationToken);
+                        await ConvertIso(file, srcToc, outPath, compressionLevel, cancellationToken, savedesc , name, pic0, pic1, icon0, basePbp);
                     }
 
 
@@ -155,7 +155,7 @@ namespace PSXPackager
                 {
                     foreach (var tempFile in tempFiles)
                     {
-                        File.Delete(tempFile);
+                        System.IO.File.Delete(tempFile);
                     }
                 }
             }
@@ -221,7 +221,7 @@ namespace PSXPackager
         }
 
 
-        public static GameEntry FindGameInfo(string srcIso)
+        public static GameEntry FindGameInfo(string srcIso,string name = "PS1 Game")
         {
             var regex = new Regex("(S[LC]\\w{2})[_-](\\d{3})\\.(\\d{2})");
             var bootRegex = new Regex("BOOT\\s*=\\s*cdrom:\\\\?(?:.*?\\\\)?(S[LC]\\w{2}[_-]?\\d{3}\\.\\d{2});1");
@@ -292,9 +292,9 @@ namespace PSXPackager
             return game;
         }
 
-        static Task ConvertIso(string srcIso, string srcToc, string outpath, int compressionLevel, CancellationToken cancellationToken, string name = "PS1 Game", string pic0 = "PIC0.PNG", string pic1 = "PIC1.PNG", string icon0 = "ICON0.PNG", string basePbp = "BASE.PBP")
+        static Task ConvertIso(string srcIso, string srcToc, string outpath, int compressionLevel, CancellationToken cancellationToken, string savedesc = "PS1 Game - Save Data", string name = "PS1 Game", string pic0 = "PIC0.PNG", string pic1 = "PIC1.PNG", string icon0 = "ICON0.PNG", string basePbp = "BASE.PBP")
         {
-            var game = FindGameInfo(srcIso);
+            var game = FindGameInfo(srcIso, name);
             var appPath = ApplicationInfo.AppPath;
 
             var info = new ConvertIsoInfo()
@@ -314,10 +314,10 @@ namespace PSXPackager
                 MainGameID = game.SaveFolderName,
                 SaveTitle = game.SaveDescription,
                 SaveID = game.SaveFolderName,
-                Pic0 = Path.Combine(appPath, "Resources", "PIC0.PNG"),
-                Pic1 = Path.Combine(appPath, "Resources", "PIC1.PNG"),
-                Icon0 = Path.Combine(appPath, "Resources", "ICON0.PNG"),
-                BasePbp = Path.Combine(appPath, "Resources", "BASE.PBP"),
+                Pic0 = pic0,
+                Pic1 = pic1,
+                Icon0 = icon0,
+                BasePbp = basePbp,
                 CompressionLevel = compressionLevel
             };
 
