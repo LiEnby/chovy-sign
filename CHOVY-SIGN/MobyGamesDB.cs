@@ -7,7 +7,7 @@ namespace CHOVY_SIGN
     class MobyGamesDB
     {
        
-        // Scraping there site because there API requires auth and API keys,
+        // Scraping there site because there API requires auth and keys,
         // And fuck that lol
         // Freedom for ALL!
         
