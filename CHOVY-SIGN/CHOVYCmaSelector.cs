@@ -77,7 +77,7 @@ namespace CHOVY_SIGN
                         string SfoPath = Path.Combine(BackupPath, Dir, "sce_sys", "param.sfo");
                         FileStream SfoStream = File.OpenRead(SfoPath);
                         Dictionary<string,object> SfoKeys = Sfo.ReadSfo(SfoStream);
-                        string Title = (string)SfoKeys["Title"];
+                        string Title = (string)SfoKeys["TITLE"];
                         SfoStream.Close();
                         string BackupName = (Path.GetFileName(Dir) + " - " + Title);
                         BackupList.Items.Add(BackupName);

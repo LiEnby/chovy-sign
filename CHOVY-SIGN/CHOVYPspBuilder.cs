@@ -145,7 +145,6 @@ namespace CHOVY_SIGN
             this.FREEDOM.ForeColor = enabled ? red : black;
             this.FREEDOM.BackColor = enabled ? black : red;
         }
-
         private void FREEDOM_Click(object sender, EventArgs e)
         {
             Action enable = () => {
@@ -227,23 +226,55 @@ namespace CHOVY_SIGN
 
 
 
-            // Try New System
-            FileStream EbootStream = File.OpenWrite(EbootFile);
-            FileStream IsoStream = File.OpenRead(ISOPath.Text);
-            Bitmap BootupImage;
-            if (isMini(ISOPath.Text))
-                BootupImage = Resources.MINIS;
-            else
-                BootupImage = Resources.ChovyLogo;
 
-            byte[] ParamSfo = ReadFileFromISO(ISOPath.Text, @"PSP_GAME\PARAM.SFO");
-            byte[] Icon0 = ReadFileFromISO(ISOPath.Text, @"PSP_GAME\ICON0.PNG");
-            byte[] Icon1 = ReadFileFromISO(ISOPath.Text, @"PSP_GAME\ICON1.PMF");
-            byte[] Pic0 = ReadFileFromISO(ISOPath.Text, @"PSP_GAME\PIC0.PNG");
-            byte[] Pic1 = ReadFileFromISO(ISOPath.Text, @"PSP_GAME\PIC1.PNG");
-            byte[] Snd0 = ReadFileFromISO(ISOPath.Text, @"PSP_GAME\SND0.AT3");
+            
+            Thread BuildPbpThread = new Thread(() =>
+            {
+                // Try New System
+                try
+                {
+                    FileStream EbootStream = File.OpenWrite(EbootFile);
+                    FileStream IsoStream = File.OpenRead(ISOPath.Text);
+                    Bitmap BootupImage;
+                    if (isMini(ISOPath.Text))
+                        BootupImage = Resources.MINIS;
+                    else
+                        BootupImage = Resources.ChovyLogo;
 
-            Pbp.BuildPbp(EbootStream, IsoStream, CompressPBP.Checked, FromHex(Versionkey.Text), BootupImage, ContentID, ParamSfo, Icon0, Icon1, Pic0, Pic1, Snd0);
+                    byte[] Sfo = ReadFileFromISO(ISOPath.Text, @"PSP_GAME\PARAM.SFO");
+                    byte[] Icon0Png = ReadFileFromISO(ISOPath.Text, @"PSP_GAME\ICON0.PNG");
+                    byte[] Icon1 = ReadFileFromISO(ISOPath.Text, @"PSP_GAME\ICON1.PMF");
+                    byte[] Pic0 = ReadFileFromISO(ISOPath.Text, @"PSP_GAME\PIC0.PNG");
+                    byte[] Pic1 = ReadFileFromISO(ISOPath.Text, @"PSP_GAME\PIC1.PNG");
+                    byte[] Snd0 = ReadFileFromISO(ISOPath.Text, @"PSP_GAME\SND0.AT3");
+
+                    Pbp.BuildPbp(EbootStream, IsoStream, CompressPBP.Checked, FromHex(Versionkey.Text), BootupImage, ContentID, Sfo, Icon0Png, Icon1, Pic0, Pic1, Snd0);
+                    IsoStream.Close();
+                    EbootStream.Close();
+                }
+                catch (Exception exp)
+                {
+                    MessageBox.Show(exp.Message, "Error.", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+
+            });
+            BuildPbpThread.Start();
+            while(BuildPbpThread.IsAlive)
+            {
+                if(!Pbp.HasFinished)
+                {
+                    TotalProgress.Maximum = Pbp.NumberOfSectors;
+                    TotalProgress.Value = Pbp.SectorsDone;
+                    if (Pbp.SectorsDone != 0 && Pbp.NumberOfSectors != 0)
+                    {
+                        decimal progress = Math.Floor(((decimal)Pbp.SectorsDone / (decimal)Pbp.NumberOfSectors) * 100);
+                        Status.Text = "Overthrowing The PSPEMU Monarchy " + progress.ToString() + "%";
+                    }
+                    else
+                        Status.Text = "Overthrowing The PSPEMU Monarchy 0%";
+                    Application.DoEvents();
+                }
+            }
 
             /*Process signnp = pbp.GenPbpFromIso(ISOPath.Text, EbootFile, ContentID, Versionkey.Text, CompressPBP.Checked, BootupImage);
             while (!signnp.HasExited)
@@ -262,19 +293,19 @@ namespace CHOVY_SIGN
 
             Status.Text = "Signing the Declaration of Independance 0%";
             UInt64 IntAid = BitConverter.ToUInt64(RifAid,0x00);
-            Thread thrd = new Thread(() =>
+            Thread ChovyGenThread = new Thread(() =>
             {
 
                 int ChovyGenRes = Pbp.gen__sce_ebootpbp(EbootFile, IntAid, EbootSignature);
                 if (!File.Exists(EbootSignature) || ChovyGenRes != 0)
                 {
-                    MessageBox.Show("CHOVY-GEN Failed! Please check CHOVY.DLL exists\nand that the Microsoft Visual C++ 2015 Redistributable Update 3 RC is installed");
+                    MessageBox.Show("CHOVY-GEN Failed! Please check CHOVY-KIRK.DLL exists");
                     enable();
                     return;
                 }
             });
-            thrd.Start();
-            while(thrd.IsAlive)
+            ChovyGenThread.Start();
+            while(ChovyGenThread.IsAlive)
             {
                 Application.DoEvents();
             }
@@ -384,6 +415,8 @@ namespace CHOVY_SIGN
             string SceSysWorkDir = Path.Combine(BackupWorkDir, "sce_sys");
             Directory.CreateDirectory(SceSysWorkDir);
 
+            byte[] ParamSfo = ReadFileFromISO(ISOPath.Text, @"PSP_GAME\PARAM.SFO");
+            byte[] Icon0 = ReadFileFromISO(ISOPath.Text, @"PSP_GAME\ICON0.PNG");
             File.WriteAllBytes(Path.Combine(SceSysWorkDir, "param.sfo"), ParamSfo);
             File.WriteAllBytes(Path.Combine(SceSysWorkDir, "icon0.png"), Icon0);
 

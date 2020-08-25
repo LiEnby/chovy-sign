@@ -177,6 +177,24 @@ namespace BasicDataTypes
             WriteString(Str,Text);
             Str.Seek(oldPos, SeekOrigin.Begin);
         }
+        public static void WriteBytes(Stream Str, byte[] Bytes, Int64 Size)
+        {
+            Int64 Written = 0;
+            while (Written < Size)
+            {
+                if ((Size - Written) > 2000000000)
+                {
+                    Str.Write(Bytes, 0x00, 2000000000);
+                    Written += 2000000000;
+                }
+                else
+                {
+                    Str.Write(Bytes, 0x00, Convert.ToInt32(Size - Written));
+                    Written += (Size - Written);
+                    break;
+                }
+            }
+        }
         public static void WriteString(Stream Str, String Text, int len = -1)
         {
             if (len < 0)

@@ -1,5 +1,4 @@
 ﻿using BasicDataTypes;
-using DiscUtils.Streams;
 using ParamSfo;
 using System;
 using System.Diagnostics;
@@ -7,7 +6,6 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Runtime.InteropServices;
-using System.Runtime.Remoting.Messaging;
 using System.Text;
 using System.Windows.Forms;
 
@@ -125,6 +123,9 @@ namespace CHOVY_SIGN
             return signnp;
         }
 
+        public static int NumberOfSectors = 0;
+        public static int SectorsDone = 0;
+        public static bool HasFinished = false;
 
         private static UInt32 readUInt32(Stream src)
         {
@@ -436,6 +437,9 @@ namespace CHOVY_SIGN
             sceDrmBBCipherFinal(&bck);
 
 
+            Array.ConstrainedCopy(ToEncrypt, 0x00, NpumdimgHeader, 0x40, ToEncrypt.Length);
+
+
             // Generate header hash.
             byte[] header_hash = new byte[0x10];
 
@@ -483,71 +487,67 @@ namespace CHOVY_SIGN
             }
 
             // Verify the generated ECDSA signature.
-            byte[] TestSignature = new byte[0x64];
-            Array.ConstrainedCopy(npumdimg_public_key, 0, TestSignature, 0, npumdimg_public_key.Length);
-            Array.ConstrainedCopy(NpuimgHash, 0, TestSignature, npumdimg_public_key.Length, NpuimgHash.Length);
-            Array.ConstrainedCopy(NpumdimgSignature, 0, TestSignature, npumdimg_public_key.Length + NpuimgHash.Length, NpumdimgSignature.Length);
-            if (sceUtilsBufferCopyWithRange(null, 0, TestSignature, 0x64, KIRK_CMD_ECDSA_VERIFY) != 0)
-            {
-                throw new Exception("ECDSA signature for NPUMDIMG header is invalid!");
-            }
+            VerifySignature(false, NpuimgHash, NpumdimgSignature);
 
             // Finally put ECDSA signature into header.
             Array.ConstrainedCopy(NpumdimgSignature, 0, NpumdimgHeader, 0xD8, NpumdimgSignature.Length);
 
-            return NpumdimgSignature;
+            return NpumdimgHeader;
         }
-        unsafe public static void SignIso(Stream BaseStr, Stream Iso, string ContentId, byte[] VersionKey, bool Compress)
+        unsafe public static void SignIso(int HeaderOffset, Stream BaseStr, Stream Iso, string ContentId, byte[] VersionKey, bool Compress)
         {
             MAC_KEY MKey;
             CIPHER_KEY CKey;
 
             Int64 IsoSize = Iso.Length;
-            Int64 TableOffset = Convert.ToInt64(BaseStr.Position);
+            Int64 TableOffset = Convert.ToInt64(HeaderOffset);
             int BlockBasis = 0x10;
             int BlockSize = BlockBasis * 2048;
+            
             Int64 IsoBlocks = (IsoSize + BlockSize - 1) / BlockSize;
+            NumberOfSectors = Convert.ToInt32(IsoBlocks);
+
             Int64 TableSize = IsoBlocks * 0x20;
             Int64 NpOffset = TableOffset - 0x100;
-
+            int NpSize = 0x100;
 
             // Generate Random Header Key
             byte[] HeaderKey = new byte[0x10];
             sceUtilsBufferCopyWithRange(HeaderKey, HeaderKey.Length, null, 0, KIRK_CMD_PRNG);
 
             byte[] TableBuffer = new byte[TableSize];
-            BaseStr.Write(TableBuffer, 0x00, TableBuffer.Length);
+            DataUtils.WriteBytes(BaseStr, TableBuffer, TableSize);
 
             // Write ISO Blocks
             byte[] IsoBuffer = new byte[BlockSize * 2];
             byte[] LZRCBuffer = new byte[BlockSize * 2];
             byte[] Tb = new byte[0x20];
-            byte[] WBuf;
             Int64 IsoOffset = 0x100 + TableSize;
-            int WSize, LZRCSize, Ratio;
+            int LZRCSize, Ratio;
             int TbOffset = 0;
+            int WSize = 0;
             for (int i = 0; i < IsoBlocks; i++)
             {
+                SectorsDone = i;
                 Array.Clear(IsoBuffer, 0, IsoBuffer.Length);
-                Array.Clear(LZRCBuffer, 0, IsoBuffer.Length);
+                Array.Clear(LZRCBuffer, 0, LZRCBuffer.Length);
                 Array.Clear(Tb, 0, Tb.Length);
 
                 TbOffset = i * 0x20;
                 Array.ConstrainedCopy(TableBuffer, TbOffset, Tb, 0, Tb.Length);
 
-                if ((Iso.Length + BlockSize) > IsoSize)
+                if ((Iso.Position + BlockSize) > IsoSize)
                 {
-                    int Remaining = Convert.ToInt32(IsoSize - Iso.Length);
-                    Iso.Read(IsoBuffer, 0x00, Remaining);
-                    WSize = Remaining;
+                    Int64 Remaining = IsoSize - Iso.Position;
+                    Iso.Read(IsoBuffer, 0x00, Convert.ToInt32(Remaining));
+                    WSize = Convert.ToInt32(Remaining);
                 }
                 else
                 {
-                    Iso.Read(IsoBuffer, 0x01, BlockSize);
+                    Iso.Read(IsoBuffer, 0x00, BlockSize);
                     WSize = BlockSize;
                 }
 
-                WBuf = IsoBuffer;
 
                 if (Compress)
                 {
@@ -556,7 +556,6 @@ namespace CHOVY_SIGN
 
                     if (Ratio < RATIO_LIMIT)
                     {
-                        WBuf = LZRCBuffer;
                         WSize = (LZRCSize + 15) & ~15;
                     }
                 }
@@ -569,12 +568,18 @@ namespace CHOVY_SIGN
 
                 // Encrypt Block
                 sceDrmBBCipherInit(&CKey, 1, 2, HeaderKey, VersionKey, Convert.ToUInt32((IsoOffset >> 4)));
-                sceDrmBBCipherUpdate(&CKey, WBuf, WSize);
+                if(!Compress)
+                    sceDrmBBCipherUpdate(&CKey, IsoBuffer, WSize);
+                else
+                    sceDrmBBCipherUpdate(&CKey, LZRCBuffer, WSize);
                 sceDrmBBCipherFinal(&CKey);
 
                 // Build MAC.
                 sceDrmBBMacInit(&MKey, 3);
-                sceDrmBBMacUpdate(&MKey, WBuf, WSize);
+                if (!Compress)
+                    sceDrmBBMacUpdate(&MKey, IsoBuffer, WSize);
+                else
+                    sceDrmBBMacUpdate(&MKey, LZRCBuffer, WSize);
                 sceDrmBBMacFinal(&MKey, Tb, VersionKey);
 
                 bbmac_build_final2(3, Tb);
@@ -584,7 +589,10 @@ namespace CHOVY_SIGN
 
                 // Write ISO data.
                 WSize = (WSize + 15) & ~15;
-                BaseStr.Write(WBuf, 0x00, WSize);
+                if (!Compress)
+                    BaseStr.Write(IsoBuffer, 0x00, WSize);
+                else
+                    BaseStr.Write(LZRCBuffer, 0x00, WSize);
 
                 // Update offset.
                 IsoOffset += WSize;
@@ -593,7 +601,7 @@ namespace CHOVY_SIGN
                 Array.ConstrainedCopy(EncTb, 0, TableBuffer, TbOffset, EncTb.Length);
 
             }
-
+            HasFinished = true;
             // Generate data key.
             byte[] DataKey = new byte[0x10];
             sceDrmBBMacInit(&MKey, 3);
@@ -603,11 +611,9 @@ namespace CHOVY_SIGN
 
             byte[] NpumdimgHeader = BuildNpumdimgHeader(Convert.ToInt32(IsoSize), Convert.ToInt32(IsoBlocks), BlockBasis, ContentId, NP_FLAGS, VersionKey, HeaderKey, DataKey);
             BaseStr.Seek(NpOffset, SeekOrigin.Begin);
-            BaseStr.Write(NpumdimgHeader, 0x00, NpumdimgHeader.Length);
+            BaseStr.Write(NpumdimgHeader, 0x00, NpSize);
             BaseStr.Seek(TableOffset, SeekOrigin.Begin);
-            BaseStr.Write(TableBuffer, 0x00, TableBuffer.Length);
-
-            return;
+            DataUtils.WriteBytes(BaseStr, TableBuffer, TableSize);
         }
 
         public static UInt32[] ByteArrayToUint32Array(byte[] ByteArray)
@@ -619,7 +625,7 @@ namespace CHOVY_SIGN
         public static byte[] UInt32ArrayToByteArray(UInt32[] Uint32Array)
         {
             byte[] decode = new byte[Uint32Array.Length * 4];
-            System.Buffer.BlockCopy(Uint32Array, 0, decode, 0, Uint32Array.Length);
+            System.Buffer.BlockCopy(Uint32Array, 0, decode, 0, Uint32Array.Length * 4);
             return decode;
         }
         public static byte[] encrypt_table(byte[] table)
@@ -686,6 +692,13 @@ namespace CHOVY_SIGN
             Str.Seek(OffsetToWrite, SeekOrigin.Begin);
             Str.Write(pic0, 0x00, pic0.Length);
             OffsetToWrite += pic0.Length;
+            
+            //Write Pic1
+            Str.Seek(0x18, SeekOrigin.Begin); // Pic0 Offset
+            DataUtils.WriteInt32(Str, OffsetToWrite);
+            Str.Seek(OffsetToWrite, SeekOrigin.Begin);
+            Str.Write(pic1, 0x00, pic1.Length);
+            OffsetToWrite += pic1.Length;
 
             //Write SND0
             Str.Seek(0x1C, SeekOrigin.Begin); // SND0 Offset
@@ -714,7 +727,11 @@ namespace CHOVY_SIGN
             OffsetToWrite += DataPsar.Length;
 
             // Sign ISO Contents.
-            SignIso(Str, Iso, content_id, VersionKey, Compress);
+            SignIso(OffsetToWrite, Str, Iso, content_id, VersionKey, Compress);
+
+            NumberOfSectors = 0;
+            SectorsDone = 0;
+            HasFinished = false;
         }
         public static int gen__sce_ebootpbp(string EbootFile, UInt64 AID, string OutSceebootpbpFile)
         {

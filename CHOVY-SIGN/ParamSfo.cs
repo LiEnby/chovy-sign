@@ -49,10 +49,10 @@ namespace ParamSfo
 
                     if(KeyName == replaceOption)
                     {
-                        int padLen = Convert.ToInt32(TotalSize - replaceValue.Length);
+                       // int padLen = Convert.ToInt32(TotalSize - replaceValue.Length);
                         DataUtils.WriteStringAt(Sfo, replaceValue, ValueLocation);
 
-                        int newSz = replaceValue.Length + 1;
+                        /*int newSz = replaceValue.Length + 1;
                         if(newSz > TotalSize)
                         {
                             throw new Exception("New Value is larger than Total Size.");
@@ -63,6 +63,7 @@ namespace ParamSfo
 
                         byte[] zeros = new byte[padLen];
                         Sfo.Write(zeros, 0x00, zeros.Length);
+                        */
                         return SfoValues;
                     }
 
