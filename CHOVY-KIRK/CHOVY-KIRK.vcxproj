@@ -163,6 +163,7 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\..\Downloads\sign_np-master\tlzrc.c" />
     <ClCompile Include="amctrl.c" />
     <ClCompile Include="bn.c" />
     <ClCompile Include="crypto.c" />
@@ -174,6 +175,7 @@
     <ClCompile Include="utils.c" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\..\Downloads\sign_np-master\tlzrc.h" />
     <ClInclude Include="amctrl.h" />
     <ClInclude Include="crypto.h" />
     <ClInclude Include="ecdsa.h" />

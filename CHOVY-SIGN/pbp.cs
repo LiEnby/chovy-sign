@@ -1,4 +1,5 @@
 ﻿using BasicDataTypes;
+using DiscUtils.Streams;
 using ParamSfo;
 using System;
 using System.Diagnostics;
@@ -6,12 +7,13 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Runtime.InteropServices;
+using System.Runtime.Remoting.Messaging;
 using System.Text;
 using System.Windows.Forms;
 
 namespace CHOVY_SIGN
 {
-    class pbp
+    class Pbp
     {
 
         unsafe struct MAC_KEY
@@ -21,7 +23,13 @@ namespace CHOVY_SIGN
             fixed byte pad[0xF];
             int pad_size;
         }
-
+        unsafe struct CIPHER_KEY
+        {
+            UInt32 type;
+            UInt32 seed;
+            fixed byte key[16];
+        }
+        
         const int KIRK_CMD_DECRYPT_PRIVATE = 1;
         const int KIRK_CMD_2 = 2;
         const int KIRK_CMD_3 = 3;
@@ -45,21 +53,33 @@ namespace CHOVY_SIGN
 
         // PSP
         [DllImport("CHOVY-KIRK.dll", CallingConvention = CallingConvention.Cdecl)]
+        private unsafe static extern int lzrc_compress(byte[] outData, int out_len, byte[] inData, int in_len);
+        [DllImport("CHOVY-KIRK.dll", CallingConvention = CallingConvention.Cdecl)]
         private static extern int kirk_init();
+        [DllImport("CHOVY-KIRK.dll", CallingConvention = CallingConvention.Cdecl)]
+        private unsafe static extern void encrypt_kirk16_private(byte[] dA_out, byte[] dA_dec);
+        [DllImport("CHOVY-KIRK.dll", CallingConvention = CallingConvention.Cdecl)]
+        private unsafe static extern void decrypt_kirk16_private(byte[] dA_out, byte[] dA_dec);
+        [DllImport("CHOVY-KIRK.dll", CallingConvention = CallingConvention.Cdecl)]
+        private unsafe static extern int bbmac_build_final2(int type, byte[] mac);
+        [DllImport("CHOVY-KIRK.dll", CallingConvention = CallingConvention.Cdecl)]
+        private unsafe static extern int bbmac_getkey(MAC_KEY* mkey, byte[] bbmac, byte[] vkey);
         [DllImport("CHOVY-KIRK.dll", CallingConvention = CallingConvention.Cdecl)]
         private unsafe static extern int sceDrmBBMacInit(MAC_KEY *mkey, int type);
         [DllImport("CHOVY-KIRK.dll", CallingConvention = CallingConvention.Cdecl)]
         private unsafe static extern int sceDrmBBMacUpdate(MAC_KEY *mkey, byte[] buf, int size);
         [DllImport("CHOVY-KIRK.dll", CallingConvention = CallingConvention.Cdecl)]
-        private unsafe static extern int sceDrmBBMacFinal2(MAC_KEY* mkey, byte[] outp, byte[] vkey);
+        private unsafe static extern int sceDrmBBMacFinal(MAC_KEY* mkey, byte[] outp, byte[] vkey);
         [DllImport("CHOVY-KIRK.dll", CallingConvention = CallingConvention.Cdecl)]
-        private unsafe static extern int bbmac_getkey(MAC_KEY *mkey, byte[] bbmac, byte[] vkey);
+        private unsafe static extern int sceDrmBBMacFinal2(MAC_KEY* mkey, byte[] outp, byte[] vkey);
         [DllImport("CHOVY-KIRK.dll", CallingConvention = CallingConvention.Cdecl)]
         private unsafe static extern int sceUtilsBufferCopyWithRange(byte[] outbuff, int outsize, byte[] inbuff, int insize, int cmd);
         [DllImport("CHOVY-KIRK.dll", CallingConvention = CallingConvention.Cdecl)]
-        private unsafe static extern void encrypt_kirk16_private(byte[] dA_out, byte[] dA_dec);
+        private unsafe static extern int sceDrmBBCipherInit(CIPHER_KEY* ckey, int type, int mode, byte[] header_key, byte[] version_key, UInt32 seed);
         [DllImport("CHOVY-KIRK.dll", CallingConvention = CallingConvention.Cdecl)]
-        private unsafe static extern void decrypt_kirk16_private(byte[] dA_out, byte[] dA_dec);
+        private unsafe static extern int sceDrmBBCipherUpdate(CIPHER_KEY* ckey, byte[] data, int size);
+        [DllImport("CHOVY-KIRK.dll", CallingConvention = CallingConvention.Cdecl)]
+        private unsafe static extern int sceDrmBBCipherFinal(CIPHER_KEY* ckey);
 
         // PS1
         [DllImport("CHOVY-KIRK.dll", CallingConvention = CallingConvention.Cdecl)]
@@ -212,6 +232,10 @@ namespace CHOVY_SIGN
             return VERSION_KEY;
         }
 
+        // Normally this is dependant on if a version key is used (and thus the app is npdrm_free)
+        // Howevver vita does not accept npdrm_free PSP apps
+        const int NP_FLAGS = 0x2;
+        const int RATIO_LIMIT = 90;
         public static byte[] HashSfo(byte[] DataPspBytes, byte[] SfoBytes)
         {
             int SfoSize = SfoBytes.Length + 0x30;
@@ -272,9 +296,6 @@ namespace CHOVY_SIGN
 
         public static byte[] BuildDataPsp(byte[] Startdat, string ContentId, byte[] SfoBytes)
         {
-            int NP_FLAGS = 0x2; 
-            // Normally this is dependant on if a version key is used (and thus the app is npdrm_free)
-            // Howevver vita does not accept npdrm_free PSP apps
             int DataPspSize = 0x594;
             if (Startdat.Length != 0)
                 DataPspSize += Convert.ToInt32(Startdat.Length + 0xC);
@@ -334,13 +355,366 @@ namespace CHOVY_SIGN
             SfoStream.Dispose();
             return OutputBytes;
         }
-        public static void BuildPbp(Stream str, Bitmap start_image, string content_id, byte[] param_sfo,byte[] icon0, byte[] icon1pmf, byte[] pic0, byte[] pic1, byte[] sndat3)
+
+        public static byte[] BuildDataPsar()
+        {
+            int DataPsarSize = 0x100;
+            byte[] DataPsar = new byte[DataPsarSize];
+            return DataPsar;
+        }
+
+        unsafe public static byte[] BuildNpumdimgHeader(int iso_size, int iso_blocks, int block_basis, string content_id, int np_flags, byte[] version_key, byte[] header_key, byte[] data_key)
+        {
+            byte[] NpumdimgHeader = new byte[0x100]; // Header Size
+
+            DataUtils.CopyString(NpumdimgHeader, "NPUMDIMG", 0);
+
+            DataUtils.CopyInt32(NpumdimgHeader, np_flags, 0x8);
+            DataUtils.CopyInt32(NpumdimgHeader, block_basis, 0xC);
+
+            DataUtils.CopyString(NpumdimgHeader, content_id, 0x10);
+
+            // NpuimgBody
+            DataUtils.CopyInt16(NpumdimgHeader, 0x800, 0x40); // Sector Size
+
+            if (iso_size > 0x40000000)
+                DataUtils.CopyUInt16(NpumdimgHeader, 0xE001, 0x42);
+            else
+                DataUtils.CopyUInt16(NpumdimgHeader, 0xE000, 0x42);
+            
+            DataUtils.CopyUInt32(NpumdimgHeader, 0, 0x44);
+            DataUtils.CopyUInt32(NpumdimgHeader, 0x1010, 0x48);
+            DataUtils.CopyUInt32(NpumdimgHeader, 0x0, 0x4C);
+            DataUtils.CopyUInt32(NpumdimgHeader, 0x0, 0x50);
+            DataUtils.CopyUInt32(NpumdimgHeader, 0x0, 0x54); // LBA Start
+            DataUtils.CopyUInt32(NpumdimgHeader, 0x0, 0x58);
+
+            if (((iso_blocks * block_basis) - 1) > 0x6C0BF)
+                DataUtils.CopyInt32(NpumdimgHeader, 0x6C0BF, 0x5C); // Number of Sectors
+            else
+                DataUtils.CopyInt32(NpumdimgHeader, (iso_blocks * block_basis) - 1, 0x5C); // Number of Sectors
+            
+            DataUtils.CopyInt32(NpumdimgHeader, 0x00, 0x60);
+            DataUtils.CopyInt32(NpumdimgHeader, (iso_blocks * block_basis) - 1, 0x64); // LBA End
+            DataUtils.CopyInt32(NpumdimgHeader, 0x01003FFE, 0x68);
+            DataUtils.CopyInt32(NpumdimgHeader, 0x100, 0x6C); // Block Entry Offset
+
+            String DiscId = content_id.Substring(7, 4) + "-" + content_id.Substring(11, 5);
+            DataUtils.CopyString(NpumdimgHeader, DiscId, 0x70); // Disc Id
+
+            DataUtils.CopyInt32(NpumdimgHeader, 0x00, 0x80); // Header Start Offset
+            DataUtils.CopyInt32(NpumdimgHeader, 0x00, 0x84);
+            NpumdimgHeader[0x88] = 0;
+            NpumdimgHeader[0x89] = 0; // bbmac param
+            NpumdimgHeader[0x8A] = 0;
+            NpumdimgHeader[0x8C] = 0;
+            DataUtils.CopyInt32(NpumdimgHeader, 0x00, 0x8C);
+            DataUtils.CopyInt32(NpumdimgHeader, 0x00, 0x90);
+            DataUtils.CopyInt32(NpumdimgHeader, 0x00, 0x94);
+            DataUtils.CopyInt32(NpumdimgHeader, 0x00, 0x98);
+            DataUtils.CopyInt32(NpumdimgHeader, 0x00, 0x9C);
+
+            // NpuimgBody
+
+            Array.ConstrainedCopy(header_key, 0, NpumdimgHeader, 0xA0, header_key.Length);
+            Array.ConstrainedCopy(data_key, 0, NpumdimgHeader, 0xB0, data_key.Length);
+
+            // Generate Padding
+            byte[] PaddingBytes = new byte[0x8];
+            sceUtilsBufferCopyWithRange(PaddingBytes, PaddingBytes.Length, null, 0, KIRK_CMD_PRNG);
+            Array.ConstrainedCopy(PaddingBytes, 0, NpumdimgHeader, 0xD0, PaddingBytes.Length); // Padding Area
+
+            // Prepare buffers to encrypt the NPUMDIMG body.
+            MAC_KEY mck;
+            CIPHER_KEY bck;
+
+            // Encrypt NPUMDIMG body.
+            byte[] ToEncrypt = new byte[0x60];
+            Array.ConstrainedCopy(NpumdimgHeader, 0x40, ToEncrypt, 0, ToEncrypt.Length);
+            sceDrmBBCipherInit(&bck, 1, 2, header_key, version_key, 0);
+            sceDrmBBCipherUpdate(&bck, ToEncrypt, 0x60);
+            sceDrmBBCipherFinal(&bck);
+
+
+            // Generate header hash.
+            byte[] header_hash = new byte[0x10];
+
+            sceDrmBBMacInit(&mck, 3);
+            sceDrmBBMacUpdate(&mck, NpumdimgHeader, 0xC0);
+            sceDrmBBMacFinal(&mck, header_hash, version_key);
+            bbmac_build_final2(3, header_hash);
+
+            Array.ConstrainedCopy(header_hash, 0, NpumdimgHeader, 0xC0, header_hash.Length);
+
+            // Prepare the signature hash input buffer.
+            byte[] NpumdimgSha1InBuf = new byte[0xD8 + 0x4];
+            byte[] NpuimgHash = new byte[0x14];
+
+            // Setup Hash
+            DataUtils.CopyInt32(NpumdimgSha1InBuf, 0xD8, 0);
+            Array.ConstrainedCopy(NpumdimgHeader, 0x00, NpumdimgSha1InBuf, 0x04, NpumdimgSha1InBuf.Length - 0x4);
+
+            // Hash the input buffer.
+            if (sceUtilsBufferCopyWithRange(NpuimgHash, NpuimgHash.Length, NpumdimgSha1InBuf, NpumdimgSha1InBuf.Length, KIRK_CMD_SHA1_HASH) != 0)
+            {
+                throw new Exception("Failed to generate SHA1 hash for NPUMDIMG header!");
+            }
+
+
+            byte[] NpumdimgSignInBuf = new byte[0x34];
+            byte[] NpumdimgSignature = new byte[0x28];
+
+            // Create ECDSA key pair.
+            byte[] NpumdimgKeypair = new byte[0x3C];
+
+            Array.ConstrainedCopy(npumdimg_private_key, 0, NpumdimgKeypair, 0, npumdimg_private_key.Length);
+            Array.ConstrainedCopy(npumdimg_public_key, 0, NpumdimgKeypair, npumdimg_private_key.Length, npumdimg_public_key.Length);
+           
+            // Encrypt NPUMDIMG private key.
+            byte[] NpumdimgPrivateKeyEnc = new byte[0x20];
+            encrypt_kirk16_private(NpumdimgPrivateKeyEnc, NpumdimgKeypair);
+
+            // Generate ECDSA signature.
+            Array.ConstrainedCopy(NpumdimgPrivateKeyEnc, 0x00, NpumdimgSignInBuf, 0, NpumdimgPrivateKeyEnc.Length);
+            Array.ConstrainedCopy(NpuimgHash, 0x00, NpumdimgSignInBuf, NpumdimgPrivateKeyEnc.Length, NpuimgHash.Length);
+            if (sceUtilsBufferCopyWithRange(NpumdimgSignature, NpumdimgSignature.Length, NpumdimgSignInBuf, NpumdimgSignInBuf.Length, KIRK_CMD_ECDSA_SIGN) != 0)
+            {
+                throw new Exception("ERROR: Failed to generate ECDSA signature for NPUMDIMG header!");
+            }
+
+            // Verify the generated ECDSA signature.
+            byte[] TestSignature = new byte[0x64];
+            Array.ConstrainedCopy(npumdimg_public_key, 0, TestSignature, 0, npumdimg_public_key.Length);
+            Array.ConstrainedCopy(NpuimgHash, 0, TestSignature, npumdimg_public_key.Length, NpuimgHash.Length);
+            Array.ConstrainedCopy(NpumdimgSignature, 0, TestSignature, npumdimg_public_key.Length + NpuimgHash.Length, NpumdimgSignature.Length);
+            if (sceUtilsBufferCopyWithRange(null, 0, TestSignature, 0x64, KIRK_CMD_ECDSA_VERIFY) != 0)
+            {
+                throw new Exception("ECDSA signature for NPUMDIMG header is invalid!");
+            }
+
+            // Finally put ECDSA signature into header.
+            Array.ConstrainedCopy(NpumdimgSignature, 0, NpumdimgHeader, 0xD8, NpumdimgSignature.Length);
+
+            return NpumdimgSignature;
+        }
+        unsafe public static void SignIso(Stream BaseStr, Stream Iso, string ContentId, byte[] VersionKey, bool Compress)
+        {
+            MAC_KEY MKey;
+            CIPHER_KEY CKey;
+
+            Int64 IsoSize = Iso.Length;
+            Int64 TableOffset = Convert.ToInt64(BaseStr.Position);
+            int BlockBasis = 0x10;
+            int BlockSize = BlockBasis * 2048;
+            Int64 IsoBlocks = (IsoSize + BlockSize - 1) / BlockSize;
+            Int64 TableSize = IsoBlocks * 0x20;
+            Int64 NpOffset = TableOffset - 0x100;
+
+
+            // Generate Random Header Key
+            byte[] HeaderKey = new byte[0x10];
+            sceUtilsBufferCopyWithRange(HeaderKey, HeaderKey.Length, null, 0, KIRK_CMD_PRNG);
+
+            byte[] TableBuffer = new byte[TableSize];
+            BaseStr.Write(TableBuffer, 0x00, TableBuffer.Length);
+
+            // Write ISO Blocks
+            byte[] IsoBuffer = new byte[BlockSize * 2];
+            byte[] LZRCBuffer = new byte[BlockSize * 2];
+            byte[] Tb = new byte[0x20];
+            byte[] WBuf;
+            Int64 IsoOffset = 0x100 + TableSize;
+            int WSize, LZRCSize, Ratio;
+            int TbOffset = 0;
+            for (int i = 0; i < IsoBlocks; i++)
+            {
+                Array.Clear(IsoBuffer, 0, IsoBuffer.Length);
+                Array.Clear(LZRCBuffer, 0, IsoBuffer.Length);
+                Array.Clear(Tb, 0, Tb.Length);
+
+                TbOffset = i * 0x20;
+                Array.ConstrainedCopy(TableBuffer, TbOffset, Tb, 0, Tb.Length);
+
+                if ((Iso.Length + BlockSize) > IsoSize)
+                {
+                    int Remaining = Convert.ToInt32(IsoSize - Iso.Length);
+                    Iso.Read(IsoBuffer, 0x00, Remaining);
+                    WSize = Remaining;
+                }
+                else
+                {
+                    Iso.Read(IsoBuffer, 0x01, BlockSize);
+                    WSize = BlockSize;
+                }
+
+                WBuf = IsoBuffer;
+
+                if (Compress)
+                {
+                    LZRCSize = lzrc_compress(LZRCBuffer, BlockSize * 2, IsoBuffer, BlockSize);
+                    Ratio = (LZRCSize * 100) / BlockSize;
+
+                    if (Ratio < RATIO_LIMIT)
+                    {
+                        WBuf = LZRCBuffer;
+                        WSize = (LZRCSize + 15) & ~15;
+                    }
+                }
+
+                // Set table entry.
+                DataUtils.CopyInt32(Tb, Convert.ToInt32(IsoOffset), 0x10);
+                DataUtils.CopyInt32(Tb, WSize, 0x14);
+                DataUtils.CopyInt32(Tb, 0, 0x18);
+                DataUtils.CopyInt32(Tb, 0, 0x1C);
+
+                // Encrypt Block
+                sceDrmBBCipherInit(&CKey, 1, 2, HeaderKey, VersionKey, Convert.ToUInt32((IsoOffset >> 4)));
+                sceDrmBBCipherUpdate(&CKey, WBuf, WSize);
+                sceDrmBBCipherFinal(&CKey);
+
+                // Build MAC.
+                sceDrmBBMacInit(&MKey, 3);
+                sceDrmBBMacUpdate(&MKey, WBuf, WSize);
+                sceDrmBBMacFinal(&MKey, Tb, VersionKey);
+
+                bbmac_build_final2(3, Tb);
+
+                // Encrypt table.
+                byte[] EncTb = encrypt_table(Tb);
+
+                // Write ISO data.
+                WSize = (WSize + 15) & ~15;
+                BaseStr.Write(WBuf, 0x00, WSize);
+
+                // Update offset.
+                IsoOffset += WSize;
+
+                // Copy TB Back
+                Array.ConstrainedCopy(EncTb, 0, TableBuffer, TbOffset, EncTb.Length);
+
+            }
+
+            // Generate data key.
+            byte[] DataKey = new byte[0x10];
+            sceDrmBBMacInit(&MKey, 3);
+            sceDrmBBMacUpdate(&MKey, TableBuffer, Convert.ToInt32(TableSize));
+            sceDrmBBMacFinal(&MKey, DataKey, VersionKey);
+            bbmac_build_final2(3, DataKey);
+
+            byte[] NpumdimgHeader = BuildNpumdimgHeader(Convert.ToInt32(IsoSize), Convert.ToInt32(IsoBlocks), BlockBasis, ContentId, NP_FLAGS, VersionKey, HeaderKey, DataKey);
+            BaseStr.Seek(NpOffset, SeekOrigin.Begin);
+            BaseStr.Write(NpumdimgHeader, 0x00, NpumdimgHeader.Length);
+            BaseStr.Seek(TableOffset, SeekOrigin.Begin);
+            BaseStr.Write(TableBuffer, 0x00, TableBuffer.Length);
+
+            return;
+        }
+
+        public static UInt32[] ByteArrayToUint32Array(byte[] ByteArray)
+        {
+            UInt32[] decode = new UInt32[ByteArray.Length / 4];
+            System.Buffer.BlockCopy(ByteArray, 0, decode, 0, ByteArray.Length);
+            return decode;
+        }
+        public static byte[] UInt32ArrayToByteArray(UInt32[] Uint32Array)
+        {
+            byte[] decode = new byte[Uint32Array.Length * 4];
+            System.Buffer.BlockCopy(Uint32Array, 0, decode, 0, Uint32Array.Length);
+            return decode;
+        }
+        public static byte[] encrypt_table(byte[] table)
+        {
+
+            UInt32[] p = ByteArrayToUint32Array(table);
+            UInt32 k0, k1, k2, k3;
+
+            k0 = p[0] ^ p[1];
+            k1 = p[1] ^ p[2];
+            k2 = p[0] ^ p[3];
+            k3 = p[2] ^ p[3];
+
+            p[4] ^= k3;
+            p[5] ^= k1;
+            p[6] ^= k2;
+            p[7] ^= k0;
+
+            return UInt32ArrayToByteArray(p);
+        }
+        public static void BuildPbp(Stream Str, Stream Iso, bool Compress, byte[] VersionKey, Bitmap start_image, string content_id, byte[] param_sfo,byte[] icon0, byte[] icon1pmf, byte[] pic0, byte[] pic1, byte[] sndat3)
         {
             kirk_init();
+
             byte[] NewSfo = PatchSfo(param_sfo, content_id);
             byte[] StartData = BuildStartData(start_image);
             byte[] DataPsp = BuildDataPsp(StartData, content_id, NewSfo);
+            byte[] DataPsar = BuildDataPsar();
+
+            // Build Header
+            int PbpHeaderSize = icon0.Length + icon1pmf.Length + pic0.Length + pic1.Length + sndat3.Length + param_sfo.Length + DataPsp.Length;
+            Str.Seek(0x00, SeekOrigin.Begin);
+            Str.SetLength(PbpHeaderSize + 4096);
             
+            DataUtils.WriteInt32(Str, 0x50425000);
+            DataUtils.WriteInt32(Str, 0x00010001);
+
+            int OffsetToWrite = 0x28;
+            // Write Sfo
+            Str.Seek(0x08, SeekOrigin.Begin); // SFO Offset
+            DataUtils.WriteInt32(Str, OffsetToWrite);
+            Str.Seek(OffsetToWrite, SeekOrigin.Begin);
+            Str.Write(NewSfo, 0x00, NewSfo.Length);
+            OffsetToWrite += NewSfo.Length;
+
+            //Write Icon0
+            Str.Seek(0x0C, SeekOrigin.Begin); // Icon0 Offset
+            DataUtils.WriteInt32(Str, OffsetToWrite);
+            Str.Seek(OffsetToWrite, SeekOrigin.Begin);
+            Str.Write(icon0, 0x00, icon0.Length);
+            OffsetToWrite += icon0.Length;
+
+
+            //Write Icon1
+            Str.Seek(0x10, SeekOrigin.Begin); // Icon1 Offset
+            DataUtils.WriteInt32(Str, OffsetToWrite);
+            Str.Seek(OffsetToWrite, SeekOrigin.Begin);
+            Str.Write(icon1pmf, 0x00, icon1pmf.Length);
+            OffsetToWrite += icon1pmf.Length;
+
+            //Write Pic0
+            Str.Seek(0x14, SeekOrigin.Begin); // Pic0 Offset
+            DataUtils.WriteInt32(Str, OffsetToWrite);
+            Str.Seek(OffsetToWrite, SeekOrigin.Begin);
+            Str.Write(pic0, 0x00, pic0.Length);
+            OffsetToWrite += pic0.Length;
+
+            //Write SND0
+            Str.Seek(0x1C, SeekOrigin.Begin); // SND0 Offset
+            DataUtils.WriteInt32(Str, OffsetToWrite);
+            Str.Seek(OffsetToWrite, SeekOrigin.Begin);
+            Str.Write(sndat3, 0x00, sndat3.Length);
+            OffsetToWrite += sndat3.Length;
+
+            //Write DATAPSP
+            Str.Seek(0x20, SeekOrigin.Begin); // DATAPSP Offset
+            DataUtils.WriteInt32(Str, OffsetToWrite);
+            Str.Seek(OffsetToWrite, SeekOrigin.Begin);
+            Str.Write(DataPsp, 0x00, DataPsp.Length);
+            OffsetToWrite += DataPsp.Length;
+
+            // DATA.PSAR is 0x100 aligned.
+            OffsetToWrite = (OffsetToWrite + 15) & ~15;
+            while ((OffsetToWrite % 0x100) != 0)
+                OffsetToWrite += 0x10;
+
+            // Write DaTAPSAR
+            Str.Seek(0x24, SeekOrigin.Begin); // DATAPSAR Offset
+            DataUtils.WriteInt32(Str, OffsetToWrite);
+            Str.Seek(OffsetToWrite, SeekOrigin.Begin);
+            Str.Write(DataPsar, 0x00, DataPsar.Length);
+            OffsetToWrite += DataPsar.Length;
+
+            // Sign ISO Contents.
+            SignIso(Str, Iso, content_id, VersionKey, Compress);
         }
         public static int gen__sce_ebootpbp(string EbootFile, UInt64 AID, string OutSceebootpbpFile)
         {

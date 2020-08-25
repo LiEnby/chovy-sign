@@ -12,7 +12,31 @@ namespace BasicDataTypes
             byte[] TextBytes = Encoding.UTF8.GetBytes(Text);
             Array.ConstrainedCopy(TextBytes, 0, str, Index, TextBytes.Length);
         }
-
+        public static void CopyUInt16(byte[] str, UInt16 Value, int Index)
+        {
+            byte[] ValueBytes = BitConverter.GetBytes(Value);
+            Array.ConstrainedCopy(ValueBytes, 0, str, Index, ValueBytes.Length);
+        }
+        public static void CopyInt16(byte[] str, Int16 Value, int Index)
+        {
+            byte[] ValueBytes = BitConverter.GetBytes(Value);
+            Array.ConstrainedCopy(ValueBytes, 0, str, Index, ValueBytes.Length);
+        }
+        public static void CopyUInt64(byte[] str, UInt64 Value, int Index)
+        {
+            byte[] ValueBytes = BitConverter.GetBytes(Value);
+            Array.ConstrainedCopy(ValueBytes, 0, str, Index, ValueBytes.Length);
+        }
+        public static void CopyInt64(byte[] str, Int64 Value, int Index)
+        {
+            byte[] ValueBytes = BitConverter.GetBytes(Value);
+            Array.ConstrainedCopy(ValueBytes, 0, str, Index, ValueBytes.Length);
+        }
+        public static void CopyUInt32(byte[] str, UInt32 Value, int Index)
+        {
+            byte[] ValueBytes = BitConverter.GetBytes(Value);
+            Array.ConstrainedCopy(ValueBytes, 0, str, Index, ValueBytes.Length);
+        }
         public static void CopyInt32(byte[] str, Int32 Value, int Index)
         {
             byte[] ValueBytes = BitConverter.GetBytes(Value);

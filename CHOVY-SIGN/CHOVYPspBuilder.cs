@@ -5,7 +5,6 @@ using ParamSfo;
 using PSVIMGTOOLS;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Media;
@@ -18,33 +17,40 @@ namespace CHOVY_SIGN
     public partial class CHOVYPspBuilder : Form
     {
         bool MutedAudio = false;
-        public byte[] GetSfo(string ISOFile) 
+
+        public static byte[] FromHex(string hex)
         {
-            FileStream ISO = File.OpenRead(ISOFile);
+            hex = hex.Replace("-", "");
+            byte[] raw = new byte[hex.Length / 2];
+            for (int i = 0; i < raw.Length; i++)
+            {
+                raw[i] = Convert.ToByte(hex.Substring(i * 2, 2), 16);
+            }
+            return raw;
+        }
 
-            DiscUtils.Iso9660.CDReader cdr = new DiscUtils.Iso9660.CDReader(ISO, false);
-            Stream ParamSfo = cdr.OpenFile(@"PSP_GAME\PARAM.SFO", FileMode.Open,FileAccess.Read);
+        public byte[] ReadFileFromISO(string ISOFile, string FilePath)
+        {
+            try
+            {
+                FileStream ISO = File.OpenRead(ISOFile);
 
-            byte[] Sfo = new byte[ParamSfo.Length];
-            ParamSfo.Read(Sfo, 0x00, (int)ParamSfo.Length);
-            ISO.Close();
-            
-            return Sfo;
+                DiscUtils.Iso9660.CDReader cdr = new DiscUtils.Iso9660.CDReader(ISO, false);
+                Stream FileStr = cdr.OpenFile(FilePath, FileMode.Open, FileAccess.Read);
+
+                byte[] FileBytes = new byte[FileStr.Length];
+                FileStr.Read(FileBytes, 0x00, (int)FileStr.Length);
+                ISO.Close();
+
+                return FileBytes;
+            }
+            catch(Exception)
+            {
+                return new byte[0x00];
+            }
             
         }
-        public byte[] GetIcon(string ISOFile)
-        {
-            FileStream ISO = File.OpenRead(ISOFile);
-            DiscUtils.Iso9660.CDReader cdr = new DiscUtils.Iso9660.CDReader(ISO, false);
-            Stream ParamSfo = cdr.OpenFile(@"PSP_GAME\ICON0.PNG", FileMode.Open, FileAccess.Read);
 
-            byte[] Icon0 = new byte[ParamSfo.Length];
-            ParamSfo.Read(Icon0, 0x00, (int)ParamSfo.Length);
-            ISO.Close();
-
-            return Icon0;
-
-        }
         public static string GetTitleID(string ISOFile)
         {
             FileStream ISO = File.OpenRead(ISOFile);
@@ -71,6 +77,7 @@ namespace CHOVY_SIGN
 
             return isMini;
         }
+
         public string ReadSetting(string Setting)
         {
             string Value = "";
@@ -218,19 +225,27 @@ namespace CHOVY_SIGN
             TotalProgress.Maximum = 100;
             Status.Text = "Overthrowing The PSPEMU Monarchy 0%";
 
-            string BootupImage = "";
-            if (isMini(ISOPath.Text))
-            {
-                BootupImage = Path.Combine(Application.StartupPath, "_tmp", "minis.png");
-                Resources.MINIS.Save(BootupImage);
-            }
-            else
-            {
-                BootupImage = Path.Combine(Application.StartupPath, "_tmp", "chovy.png");
-                Resources.ChovyLogo.Save(BootupImage);
-            }
 
-            Process signnp = pbp.GenPbpFromIso(ISOPath.Text, EbootFile, ContentID, Versionkey.Text, CompressPBP.Checked, BootupImage);
+
+            // Try New System
+            FileStream EbootStream = File.OpenWrite(EbootFile);
+            FileStream IsoStream = File.OpenRead(ISOPath.Text);
+            Bitmap BootupImage;
+            if (isMini(ISOPath.Text))
+                BootupImage = Resources.MINIS;
+            else
+                BootupImage = Resources.ChovyLogo;
+
+            byte[] ParamSfo = ReadFileFromISO(ISOPath.Text, @"PSP_GAME\PARAM.SFO");
+            byte[] Icon0 = ReadFileFromISO(ISOPath.Text, @"PSP_GAME\ICON0.PNG");
+            byte[] Icon1 = ReadFileFromISO(ISOPath.Text, @"PSP_GAME\ICON1.PMF");
+            byte[] Pic0 = ReadFileFromISO(ISOPath.Text, @"PSP_GAME\PIC0.PNG");
+            byte[] Pic1 = ReadFileFromISO(ISOPath.Text, @"PSP_GAME\PIC1.PNG");
+            byte[] Snd0 = ReadFileFromISO(ISOPath.Text, @"PSP_GAME\SND0.AT3");
+
+            Pbp.BuildPbp(EbootStream, IsoStream, CompressPBP.Checked, FromHex(Versionkey.Text), BootupImage, ContentID, ParamSfo, Icon0, Icon1, Pic0, Pic1, Snd0);
+
+            /*Process signnp = pbp.GenPbpFromIso(ISOPath.Text, EbootFile, ContentID, Versionkey.Text, CompressPBP.Checked, BootupImage);
             while (!signnp.HasExited)
             {
                 string Progress = signnp.StandardOutput.ReadLine();
@@ -242,7 +257,7 @@ namespace CHOVY_SIGN
                     Status.Text = "Overthrowing The PSPEMU Monarchy " + ProgressInt.ToString() + "%";
                 }
                 Application.DoEvents();
-            }
+            }*/
             TotalProgress.Value = 0;
 
             Status.Text = "Signing the Declaration of Independance 0%";
@@ -250,7 +265,7 @@ namespace CHOVY_SIGN
             Thread thrd = new Thread(() =>
             {
 
-                int ChovyGenRes = pbp.gen__sce_ebootpbp(EbootFile, IntAid, EbootSignature);
+                int ChovyGenRes = Pbp.gen__sce_ebootpbp(EbootFile, IntAid, EbootSignature);
                 if (!File.Exists(EbootSignature) || ChovyGenRes != 0)
                 {
                     MessageBox.Show("CHOVY-GEN Failed! Please check CHOVY.DLL exists\nand that the Microsoft Visual C++ 2015 Redistributable Update 3 RC is installed");
@@ -369,8 +384,6 @@ namespace CHOVY_SIGN
             string SceSysWorkDir = Path.Combine(BackupWorkDir, "sce_sys");
             Directory.CreateDirectory(SceSysWorkDir);
 
-            byte[] ParamSfo = GetSfo(ISOPath.Text);
-            byte[] Icon0 = GetIcon(ISOPath.Text);
             File.WriteAllBytes(Path.Combine(SceSysWorkDir, "param.sfo"), ParamSfo);
             File.WriteAllBytes(Path.Combine(SceSysWorkDir, "icon0.png"), Icon0);
 
@@ -489,11 +502,11 @@ namespace CHOVY_SIGN
             PSVIMGStream LicensePsvimg = new PSVIMGStream(File.OpenRead(BackupPath), Key);
 
             PSVIMGFileStream EbootPbp = new PSVIMGFileStream(GamePsvimg, "/EBOOT.PBP");
-            byte[] VersionKey = pbp.GetVersionKey(EbootPbp);
+            byte[] VersionKey = Pbp.GetVersionKey(EbootPbp);
             string VerKey = BitConverter.ToString(VersionKey).Replace("-", "");
             WriteSetting("VersionKey", VerKey);
 
-            string ContentID = pbp.GetContentId(EbootPbp);
+            string ContentID = Pbp.GetContentId(EbootPbp);
             PSVIMGFileStream LicenseRif = new PSVIMGFileStream(LicensePsvimg, "/"+ ContentID+ ".rif");
             byte[] LicenseRifBytes = new byte[LicenseRif.Length];
             LicenseRif.Read(LicenseRifBytes, 0x00, LicenseRifBytes.Length);

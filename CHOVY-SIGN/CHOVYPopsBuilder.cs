@@ -204,11 +204,11 @@ namespace CHOVY_SIGN
             PSVIMGStream LicensePsvimg = new PSVIMGStream(File.OpenRead(BackupPath), Key);
 
             PSVIMGFileStream EbootPbp = new PSVIMGFileStream(GamePsvimg, "/EBOOT.PBP");
-            byte[] VersionKey = pbp.GetVersionKeyPs1(EbootPbp);
+            byte[] VersionKey = Pbp.GetVersionKeyPs1(EbootPbp);
             string VerKey = BitConverter.ToString(VersionKey).Replace("-", "");
             WriteSetting("VersionKey", VerKey);
 
-            string ContentID = pbp.GetContentIdPS1(EbootPbp);
+            string ContentID = Pbp.GetContentIdPS1(EbootPbp);
             PSVIMGFileStream LicenseRif = new PSVIMGFileStream(LicensePsvimg, "/" + ContentID + ".rif");
             byte[] LicenseRifBytes = new byte[LicenseRif.Length];
             LicenseRif.Read(LicenseRifBytes, 0x00, LicenseRifBytes.Length);
