@@ -7,6 +7,10 @@ namespace CHOVY_SIGN
     class MobyGamesDB
     {
        
+        // Scraping there site because there API requires auth and API keys,
+        // And fuck that lol
+        // Freedom for ALL!
+        
         public static string CoverImage = "";
         public static string Name = "";
         public static void GetGameInformation(string DiscId)
