@@ -247,7 +247,7 @@ namespace CHOVY_SIGN
                     byte[] Pic0 = ReadFileFromISO(ISOPath.Text, @"PSP_GAME\PIC0.PNG");
                     byte[] Pic1 = ReadFileFromISO(ISOPath.Text, @"PSP_GAME\PIC1.PNG");
                     byte[] Snd0 = ReadFileFromISO(ISOPath.Text, @"PSP_GAME\SND0.AT3");
-
+                    
                     Pbp.BuildPbp(EbootStream, IsoStream, CompressPBP.Checked, FromHex(Versionkey.Text), BootupImage, ContentID, Sfo, Icon0Png, Icon1, Pic0, Pic1, Snd0);
                     IsoStream.Close();
                     EbootStream.Close();
@@ -261,7 +261,7 @@ namespace CHOVY_SIGN
             BuildPbpThread.Start();
             while(BuildPbpThread.IsAlive)
             {
-                if(!Pbp.HasFinished)
+                if (Pbp.DoEvents)
                 {
                     TotalProgress.Maximum = Pbp.NumberOfSectors;
                     TotalProgress.Value = Pbp.SectorsDone;

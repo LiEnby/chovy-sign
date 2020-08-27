@@ -48,7 +48,7 @@ namespace CHOVY_SIGN
 
         static byte[] npumdimg_private_key = new byte[0x14] { 0x14, 0xB0, 0x22, 0xE8, 0x92, 0xCF, 0x86, 0x14, 0xA4, 0x45, 0x57, 0xDB, 0x09, 0x5C, 0x92, 0x8D, 0xE9, 0xB8, 0x99, 0x70 };
         static byte[] npumdimg_public_key = new byte[0x28] {0x01, 0x21, 0xEA, 0x6E, 0xCD, 0xB2, 0x3A, 0x3E,0x23, 0x75, 0x67, 0x1C, 0x53, 0x62, 0xE8, 0xE2,0x8B, 0x1E, 0x78, 0x3B, 0x1A, 0x27, 0x32, 0x15,0x8B, 0x8C, 0xED, 0x98, 0x46, 0x6C, 0x18, 0xA3, 0xAC, 0x3B, 0x11, 0x06, 0xAF, 0xB4, 0xEC, 0x3B};
-
+        
         // PSP
         [DllImport("CHOVY-KIRK.dll", CallingConvention = CallingConvention.Cdecl)]
         private unsafe static extern int lzrc_compress(byte[] outData, int out_len, byte[] inData, int in_len);
@@ -125,8 +125,7 @@ namespace CHOVY_SIGN
 
         public static int NumberOfSectors = 0;
         public static int SectorsDone = 0;
-        public static bool HasFinished = false;
-
+        public static bool DoEvents = true;
         private static UInt32 readUInt32(Stream src)
         {
             byte[] intBuf = new byte[0x4];
@@ -217,19 +216,20 @@ namespace CHOVY_SIGN
 
             pbp.Seek(NPUMDIMGOffest, SeekOrigin.Begin);
 
-            byte[] NP_HEADER = new byte[0x0100];
-            pbp.Read(NP_HEADER, 0x00, 0x0100);
+            byte[] NP_HEADER_ENC = new byte[0x0100];
+            pbp.Read(NP_HEADER_ENC, 0x00, 0x0100);
 
-            byte[] VER_KEY_ENC = new byte[0x40];
+            byte[] NP_HEADER_DEC = new byte[0x40];
             pbp.Seek(NPUMDIMGOffest+0xC0, SeekOrigin.Begin);
-            pbp.Read(VER_KEY_ENC, 0x00, 0x40);
+            pbp.Read(NP_HEADER_DEC, 0x00, 0x40);
 
             byte[] VERSION_KEY = new byte[16];
 
             sceDrmBBMacInit(&mkey, 3);
-            sceDrmBBMacUpdate(&mkey, NP_HEADER, 0xc0);
-            bbmac_getkey(&mkey, VER_KEY_ENC, VERSION_KEY);
+            sceDrmBBMacUpdate(&mkey, NP_HEADER_ENC, 0xc0);
+            bbmac_getkey(&mkey, NP_HEADER_DEC, VERSION_KEY);
             pbp.Close();
+            
             return VERSION_KEY;
         }
 
@@ -285,14 +285,16 @@ namespace CHOVY_SIGN
 
         public static void VerifySignature(bool PS1,byte[] Hash, byte[] Signature)
         {
+            DoEvents = false;
             byte[] TestData = new byte[0x64];
             Array.ConstrainedCopy(npumdimg_public_key, 0, TestData, 0, npumdimg_public_key.Length);
             Array.ConstrainedCopy(Hash, 0, TestData, npumdimg_public_key.Length, Hash.Length);
             Array.ConstrainedCopy(Signature, 0, TestData, npumdimg_public_key.Length + Hash.Length, Signature.Length);
-            if (sceUtilsBufferCopyWithRange(null, 0, TestData, 0x64, KIRK_CMD_ECDSA_VERIFY) != 0)
+            if (sceUtilsBufferCopyWithRange(null, 0, TestData, TestData.Length, KIRK_CMD_ECDSA_VERIFY) != 0)
             {
-                throw new Exception("ECDSA signature for DATA.PSP is invalid!\n");
+                throw new Exception("ECDSA signature for "+BitConverter.ToString(Hash)+" is invalid!\n");
             }
+            DoEvents = true;
         }
 
         public static byte[] BuildDataPsp(byte[] Startdat, string ContentId, byte[] SfoBytes)
@@ -430,16 +432,14 @@ namespace CHOVY_SIGN
             CIPHER_KEY bck;
 
             // Encrypt NPUMDIMG body.
+            
             byte[] ToEncrypt = new byte[0x60];
             Array.ConstrainedCopy(NpumdimgHeader, 0x40, ToEncrypt, 0, ToEncrypt.Length);
             sceDrmBBCipherInit(&bck, 1, 2, header_key, version_key, 0);
             sceDrmBBCipherUpdate(&bck, ToEncrypt, 0x60);
             sceDrmBBCipherFinal(&bck);
-
-
             Array.ConstrainedCopy(ToEncrypt, 0x00, NpumdimgHeader, 0x40, ToEncrypt.Length);
-
-
+          
             // Generate header hash.
             byte[] header_hash = new byte[0x10];
 
@@ -513,7 +513,7 @@ namespace CHOVY_SIGN
 
             // Generate Random Header Key
             byte[] HeaderKey = new byte[0x10];
-            sceUtilsBufferCopyWithRange(HeaderKey, HeaderKey.Length, null, 0, KIRK_CMD_PRNG);
+            //sceUtilsBufferCopyWithRange(HeaderKey, HeaderKey.Length, null, 0, KIRK_CMD_PRNG);
 
             byte[] TableBuffer = new byte[TableSize];
             DataUtils.WriteBytes(BaseStr, TableBuffer, TableSize);
@@ -567,12 +567,14 @@ namespace CHOVY_SIGN
                 DataUtils.CopyInt32(Tb, 0, 0x1C);
 
                 // Encrypt Block
+                
                 sceDrmBBCipherInit(&CKey, 1, 2, HeaderKey, VersionKey, Convert.ToUInt32((IsoOffset >> 4)));
                 if(!Compress)
                     sceDrmBBCipherUpdate(&CKey, IsoBuffer, WSize);
                 else
                     sceDrmBBCipherUpdate(&CKey, LZRCBuffer, WSize);
                 sceDrmBBCipherFinal(&CKey);
+                
 
                 // Build MAC.
                 sceDrmBBMacInit(&MKey, 3);
@@ -599,9 +601,9 @@ namespace CHOVY_SIGN
 
                 // Copy TB Back
                 Array.ConstrainedCopy(EncTb, 0, TableBuffer, TbOffset, EncTb.Length);
+                //Array.ConstrainedCopy(Tb, 0, TableBuffer, TbOffset, Tb.Length);
 
             }
-            HasFinished = true;
             // Generate data key.
             byte[] DataKey = new byte[0x10];
             sceDrmBBMacInit(&MKey, 3);
@@ -648,6 +650,8 @@ namespace CHOVY_SIGN
         }
         public static void BuildPbp(Stream Str, Stream Iso, bool Compress, byte[] VersionKey, Bitmap start_image, string content_id, byte[] param_sfo,byte[] icon0, byte[] icon1pmf, byte[] pic0, byte[] pic1, byte[] sndat3)
         {
+
+            DoEvents = true;
             kirk_init();
 
             byte[] NewSfo = PatchSfo(param_sfo, content_id);
@@ -726,12 +730,12 @@ namespace CHOVY_SIGN
             Str.Write(DataPsar, 0x00, DataPsar.Length);
             OffsetToWrite += DataPsar.Length;
 
+
             // Sign ISO Contents.
             SignIso(OffsetToWrite, Str, Iso, content_id, VersionKey, Compress);
 
             NumberOfSectors = 0;
             SectorsDone = 0;
-            HasFinished = false;
         }
         public static int gen__sce_ebootpbp(string EbootFile, UInt64 AID, string OutSceebootpbpFile)
         {

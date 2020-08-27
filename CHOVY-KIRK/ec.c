@@ -4,35 +4,33 @@
 
 #include <string.h>
 #include <stdio.h>
-#include <stdlib.h>
 
 #include "kirk_engine.h"
-#include "ecdsa.h"
 
 struct point {
 	u8 x[20];
 	u8 y[20];
 };
 
-static u8 ec_p[20];
-static u8 ec_a[20];	// mon
-static u8 ec_b[20];	// mon
-static u8 ec_N[20];
-static struct point ec_G;	// mon
-static struct point ec_Q;	// mon
-static u8 ec_k[20]; // private key
+u8 ec_p[20];
+u8 ec_a[20];
+u8 ec_b[20];
+u8 ec_N[21];
+struct point ec_G;  // mon
+struct point ec_Q;  // mon
+u8 ec_k[21];
 
-static void elt_copy(u8 *d, u8 *a)
+static void elt_copy(u8* d, u8* a)
 {
 	memcpy(d, a, 20);
 }
 
-static void elt_zero(u8 *d)
+static void elt_zero(u8* d)
 {
 	memset(d, 0, 20);
 }
 
-static int elt_is_zero(u8 *d)
+static int elt_is_zero(u8* d)
 {
 	u32 i;
 
@@ -43,61 +41,85 @@ static int elt_is_zero(u8 *d)
 	return 1;
 }
 
-static void elt_add(u8 *d, u8 *a, u8 *b)
+static void elt_add(u8* d, u8* a, u8* b)
 {
 	bn_add(d, a, b, ec_p, 20);
 }
 
-static void elt_sub(u8 *d, u8 *a, u8 *b)
+static void elt_sub(u8* d, u8* a, u8* b)
 {
 	bn_sub(d, a, b, ec_p, 20);
 }
 
-static void elt_mul(u8 *d, u8 *a, u8 *b)
+static void elt_mul(u8* d, u8* a, u8* b)
 {
 	bn_mon_mul(d, a, b, ec_p, 20);
 }
 
-static void elt_square(u8 *d, u8 *a)
+static void elt_square(u8* d, u8* a)
 {
 	elt_mul(d, a, a);
 }
 
-static void elt_inv(u8 *d, u8 *a)
+static void elt_inv(u8* d, u8* a)
 {
 	u8 s[20];
 	elt_copy(s, a);
 	bn_mon_inv(d, s, ec_p, 20);
 }
 
-static void point_to_mon(struct point *p)
+static void point_to_mon(struct point* p)
 {
 	bn_to_mon(p->x, ec_p, 20);
 	bn_to_mon(p->y, ec_p, 20);
 }
 
-static void point_from_mon(struct point *p)
+static void point_from_mon(struct point* p)
 {
 	bn_from_mon(p->x, ec_p, 20);
 	bn_from_mon(p->y, ec_p, 20);
 }
 
-static void point_zero(struct point *p)
+#if 0
+static int point_is_on_curve(u8* p)
+{
+	u8 s[20], t[20];
+	u8* x, * y;
+
+	x = p;
+	y = p + 20;
+
+	elt_square(t, x);
+	elt_mul(s, t, x);
+
+	elt_mul(t, x, ec_a);
+	elt_add(s, s, t);
+
+	elt_add(s, s, ec_b);
+
+	elt_square(t, y);
+	elt_sub(s, s, t);
+
+	return elt_is_zero(s);
+}
+#endif
+
+static void point_zero(struct point* p)
 {
 	elt_zero(p->x);
 	elt_zero(p->y);
 }
 
-static int point_is_zero(struct point *p)
+static int point_is_zero(struct point* p)
 {
 	return elt_is_zero(p->x) && elt_is_zero(p->y);
 }
 
-static void point_double(struct point *r, struct point *p)
+static void point_double(struct point* r, struct point* p)
 {
 	u8 s[20], t[20];
 	struct point pp;
-	u8 *px, *py, *rx, *ry;
+	u8* px, * py, * rx, * ry;
 
 	pp = *p;
 
@@ -111,27 +133,27 @@ static void point_double(struct point *r, struct point *p)
 		return;
 	}
 
-	elt_square(t, px);	// t = px*px
-	elt_add(s, t, t);	// s = 2*px*px
-	elt_add(s, s, t);	// s = 3*px*px
-	elt_add(s, s, ec_a);// s = 3*px*px + a
-	elt_add(t, py, py);	// t = 2*py
-	elt_inv(t, t);		// t = 1/(2*py)
-	elt_mul(s, s, t);	// s = (3*px*px+a)/(2*py)
+	elt_square(t, px);  // t = px*px
+	elt_add(s, t, t); // s = 2*px*px
+	elt_add(s, s, t); // s = 3*px*px
+	elt_add(s, s, ec_a);  // s = 3*px*px + a
+	elt_add(t, py, py); // t = 2*py
+	elt_inv(t, t);    // t = 1/(2*py)
+	elt_mul(s, s, t); // s = (3*px*px+a)/(2*py)
 
-	elt_square(rx, s);	// rx = s*s
-	elt_add(t, px, px);	// t = 2*px
-	elt_sub(rx, rx, t);	// rx = s*s - 2*px
+	elt_square(rx, s);  // rx = s*s
+	elt_add(t, px, px); // t = 2*px
+	elt_sub(rx, rx, t); // rx = s*s - 2*px
 
-	elt_sub(t, px, rx);	// t = -(rx-px)
-	elt_mul(ry, s, t);	// ry = -s*(rx-px)
-	elt_sub(ry, ry, py);// ry = -s*(rx-px) - py
+	elt_sub(t, px, rx); // t = -(rx-px)
+	elt_mul(ry, s, t);  // ry = -s*(rx-px)
+	elt_sub(ry, ry, py);  // ry = -s*(rx-px) - py
 }
 
-static void point_add(struct point *r, struct point *p, struct point *q)
+static void point_add(struct point* r, struct point* p, struct point* q)
 {
 	u8 s[20], t[20], u[20];
-	u8 *px, *py, *qx, *qy, *rx, *ry;
+	u8* px, * py, * qx, * qy, * rx, * ry;
 	struct point pp, qq;
 
 	pp = *p;
@@ -168,27 +190,27 @@ static void point_add(struct point *r, struct point *p, struct point *q)
 		return;
 	}
 
-	elt_inv(t, u);		// t = 1/(qx-px)
-	elt_sub(u, qy, py);	// u = qy-py
-	elt_mul(s, t, u);	// s = (qy-py)/(qx-px)
+	elt_inv(t, u);    // t = 1/(qx-px)
+	elt_sub(u, qy, py); // u = qy-py
+	elt_mul(s, t, u); // s = (qy-py)/(qx-px)
 
-	elt_square(rx, s);	// rx = s*s
-	elt_add(t, px, qx);	// t = px+qx
-	elt_sub(rx, rx, t);	// rx = s*s - (px+qx)
+	elt_square(rx, s);  // rx = s*s
+	elt_add(t, px, qx); // t = px+qx
+	elt_sub(rx, rx, t); // rx = s*s - (px+qx)
 
-	elt_sub(t, px, rx);	// t = -(rx-px)
-	elt_mul(ry, s, t);	// ry = -s*(rx-px)
-	elt_sub(ry, ry, py);// ry = -s*(rx-px) - py
+	elt_sub(t, px, rx); // t = -(rx-px)
+	elt_mul(ry, s, t);  // ry = -s*(rx-px)
+	elt_sub(ry, ry, py);  // ry = -s*(rx-px) - py
 }
 
-static void point_mul(struct point *d, u8 *a, struct point *b)
+static void point_mul(struct point* d, u8* a, struct point* b)
 {
 	u32 i;
 	u8 mask;
 
 	point_zero(d);
 
-	for (i = 0; i < 20; i++)
+	for (i = 0; i < 21; i++)
 		for (mask = 0x80; mask != 0; mask >>= 1) {
 			point_double(d, d);
 			if ((a[i] & mask) != 0)
@@ -196,7 +218,7 @@ static void point_mul(struct point *d, u8 *a, struct point *b)
 		}
 }
 
-static void generate_ecdsa_norandom(u8* outR, u8* outS, u8* k, u8* hash)
+static void generate_ecdsa(u8* outR, u8* outS, u8* k, u8* hash)
 {
 	u8 e[21];
 	u8 kk[21];
@@ -236,155 +258,66 @@ static void generate_ecdsa_norandom(u8* outR, u8* outS, u8* k, u8* hash)
 	memcpy(outS, S + 1, 0x20);
 }
 
-static void generate_ecdsa(u8 *R, u8 *S, u8 *k, u8 *hash, u8 *random)
+static int check_ecdsa(struct point* Q, u8* inR, u8* inS, u8* hash)
 {
-	u8 e[20];
-	u8 kk[20];
-	u8 m[20];
-	u8 minv[20];
-	struct point mG;
+	u8 Sinv[21];
+	u8 e[21], R[21], S[21];
+	u8 w1[21], w2[21];
+	struct point r1, r2;
+	u8 rr[21];
 
-	memcpy(e, hash, 20);
-	bn_reduce(e, ec_N, 20);
+	e[0] = 0;
+	memcpy(e + 1, hash, 20);
+	bn_reduce(e, ec_N, 21);
+	R[0] = 0;
+	memcpy(R + 1, inR, 20);
+	bn_reduce(R, ec_N, 21);
+	S[0] = 0;
+	memcpy(S + 1, inS, 20);
+	bn_reduce(S, ec_N, 21);
 
-	if(random==NULL){
-		do{
-			kirk_CMD14(m, 20);
-		}while(bn_compare(m, ec_N, 20) >= 0);
-	}else{
-		memcpy(m, random, 20);
-	}
+	bn_to_mon(R, ec_N, 21);
+	bn_to_mon(S, ec_N, 21);
+	bn_to_mon(e, ec_N, 21);
+	// make Sinv = 1/S
+	bn_mon_inv(Sinv, S, ec_N, 21);
+	// w1 = m * Sinv
+	bn_mon_mul(w1, e, Sinv, ec_N, 21);
+	// w2 = r * Sinv
+	bn_mon_mul(w2, R, Sinv, ec_N, 21);
 
-	point_mul(&mG, m, &ec_G);
-	point_from_mon(&mG);
-	elt_copy(R, mG.x);
+	// mod N both
+	bn_from_mon(w1, ec_N, 21);
+	bn_from_mon(w2, ec_N, 21);
 
-	bn_copy(kk, k, 20);
-	bn_reduce(kk, ec_N, 20);
-	bn_to_mon(m, ec_N, 20);
-	bn_to_mon(e, ec_N, 20);
-	bn_to_mon(R, ec_N, 20);
-	bn_to_mon(kk, ec_N, 20);
-
-	bn_mon_mul(S, R, kk, ec_N, 20);
-	bn_add(kk, S, e, ec_N, 20);
-	bn_mon_inv(minv, m, ec_N, 20);
-	bn_mon_mul(S, minv, kk, ec_N, 20);
-
-	bn_from_mon(R, ec_N, 20);
-	bn_from_mon(S, ec_N, 20);
-}
-
-static int check_ecdsa(struct point *Q, u8 *R, u8 *S, u8 *hash)
-{
-	u8 Sinv[20];
-	u8 e[20];
-	u8 w1[20], w2[20];
-	struct point r1, r2, r3;
-	u8 rr[20];
-
-	memcpy(e, hash, 20);
-	bn_reduce(e, ec_N, 20);
-
-	// Sinv = INV(s)
-	bn_to_mon(S, ec_N, 20);
-	bn_mon_inv(Sinv, S, ec_N, 20);
-
-	// w1 = e*Sinv
-	bn_to_mon(e, ec_N, 20);
-	bn_mon_mul(w1, e, Sinv, ec_N, 20);
-	bn_from_mon(w1, ec_N, 20);
-
-	// w2 = R*Sinv
-	bn_to_mon(R, ec_N, 20);
-	bn_mon_mul(w2, R, Sinv, ec_N, 20);
-	bn_from_mon(w2, ec_N, 20);
-
-	// r1 = w1*G
+	// r1 = m/s * G
 	point_mul(&r1, w1, &ec_G);
-	// r2 = w2*Q
+	// r2 = r/s * P
 	point_mul(&r2, w2, Q);
-	// r3 = r1+r2
-	point_add(&r3, &r1, &r2);
 
-	point_from_mon(&r3);
-	memcpy(rr, r3.x, 20);
-	bn_reduce(rr, ec_N, 20);
+	//r1 = r1 + r2
+	point_add(&r1, &r1, &r2);
 
-	bn_from_mon(R, ec_N, 20);
-	bn_from_mon(S, ec_N, 20);
+	point_from_mon(&r1);
 
-	return bn_compare(rr, R, 20);
+	rr[0] = 0;
+	memcpy(rr + 1, r1.x, 20);
+	bn_reduce(rr, ec_N, 21);
+
+	bn_from_mon(R, ec_N, 21);
+	bn_from_mon(S, ec_N, 21);
+
+	return (bn_compare(rr, R, 21) == 0);
 }
 
-void ecdsa_sign_fixed(u8 *hash, u8 *fixed_m, u8 *fixed_r, u8 *S)
+void ec_priv_to_pub(u8* k, u8* Q)
 {
-	u8 minv[20], m[20], k[20], r[20], z[20];
-
-	memcpy(z, hash, 20);
-	memcpy(k, ec_k, 20);
-	memcpy(m, fixed_m, 20);
-	memcpy(r, fixed_r, 20);
-
-	bn_to_mon(m, ec_N, 20);
-	bn_mon_inv(minv, m, ec_N, 20);
-
-	bn_to_mon(k, ec_N, 20);
-	bn_to_mon(r, ec_N, 20);
-	bn_mon_mul(z, k, r, ec_N, 20);
-	bn_from_mon(z, ec_N, 20);
-
-	bn_add(z, z, hash, ec_N, 20);
-
-	bn_to_mon(z, ec_N, 20);
-	bn_mon_mul(S, minv, z, ec_N, 20);
-	bn_from_mon(S, ec_N, 20);
-}
-
-void ecdsa_set_curve(ECDSA_PARAM *param)
-{
-	memcpy(ec_p, param->p, 20);
-	memcpy(ec_a, param->a, 20);
-	memcpy(ec_b, param->b, 20);
-	memcpy(ec_N, param->N, 20);
-	memcpy(ec_G.x, param->Gx, 20);
-	memcpy(ec_G.y, param->Gy, 20);
-
-	bn_to_mon(ec_a, ec_p, 20);
-	bn_to_mon(ec_b, ec_p, 20);
-
-	point_to_mon(&ec_G);
-}
-
-void ecdsa_set_N(u8 *N)
-{
-	memcpy(ec_N, N, 20);
-}
-
-void ecdsa_set_pub(u8 *Qx, u8 *Qy)
-{
-	memcpy(ec_Q.x, Qx, 20);
-	memcpy(ec_Q.y, Qy, 20);
-	point_to_mon(&ec_Q);
-}
-
-void ecdsa_set_priv(u8 *k)
-{
-	memcpy(ec_k, k, sizeof ec_k);
-}
-
-int ecdsa_verify(u8 *hash, u8 *R, u8 *S)
-{
-	return check_ecdsa(&ec_Q, R, S, hash);
-}
-void ecdsa_sign_norandom(u8* hash, u8* R, u8* S)
-{
-	generate_ecdsa_norandom(R, S, ec_k, hash);
-}
-
-void ecdsa_sign(u8 *hash, u8 *R, u8 *S, u8 *random)
-{
-	generate_ecdsa(R, S, ec_k, hash, random);
+	struct point ec_temp;
+	bn_to_mon(k, ec_N, 21);
+	point_mul(&ec_temp, k, &ec_G);
+	point_from_mon(&ec_temp);
+	memcpy(Q, ec_temp.x, 20);
+	memcpy(Q + 20, ec_temp.y, 20);
 }
 
 void ec_pub_mult(u8* k, u8* Q)
@@ -396,64 +329,79 @@ void ec_pub_mult(u8* k, u8* Q)
 	memcpy(Q + 20, ec_temp.y, 20);
 }
 
-/*************************************************************/
-
-// calculate the random and private key from signs with same r value
-void ecdsa_find_m_k(u8 *sig_r, u8 *sig_s1, u8 *hash1, u8 *sig_s2, u8 *hash2, u8 *N, u8 *ret_m, u8 *ret_k)
+int ecdsa_set_curve(u8* p, u8* a, u8* b, u8* N, u8* Gx, u8* Gy)
 {
-	u8 e1[20], e2[20];
-	u8 s1[20], s2[20];
-	u8 sinv[20], m[20];
-	u8 r[20], rinv[20], kk[20];
+	memcpy(ec_p, p, 20);
+	memcpy(ec_a, a, 20);
+	memcpy(ec_b, b, 20);
+	memcpy(ec_N, N, 21);
 
-	// e1
-	memcpy(e1, hash1, 20);
-	// e2
-	memcpy(e2, hash2, 20);
-	// s1, s2
-	memcpy(s1, sig_s1, 20);
-	memcpy(s2, sig_s2, 20);
+	bn_to_mon(ec_a, ec_p, 20);
+	bn_to_mon(ec_b, ec_p, 20);
 
-	// restore random m
-	// s1 = s1-s2
-	bn_sub(s1, s1, s2, N, 20);
-	// e1 = e1-e2
-	bn_sub(e1, e1, e2, N, 20);
+	memcpy(ec_G.x, Gx, 20);
+	memcpy(ec_G.y, Gy, 20);
+	point_to_mon(&ec_G);
 
-	bn_to_mon(s1, N, 20);
-	bn_to_mon(e1, N, 20);
-
-	// m = (e1-e2)/(s1-s2)
-	bn_mon_inv(sinv, s1, N, 20);
-	bn_mon_mul(m, sinv, e1, N, 20);
-	bn_from_mon(m, N, 20);
-
-	bn_dump("random m", m, 20);
-	memcpy(ret_m, m, 20);
-
-	// restore private key
-	memcpy(e1, hash1, 20);
-	memcpy(s1, sig_s1, 20);
-	memcpy(r, sig_r, 20);
-
-	// kk = m*s
-	bn_to_mon(s1, N, 20);
-	bn_to_mon(m, N, 20);
-	bn_mon_mul(kk, m, s1, N, 20);
-
-	// kk = m*s-e
-	bn_from_mon(kk, N, 20);
-	bn_sub(kk, kk, e1, N, 20);
-	bn_to_mon(kk, N, 20);
-
-	// kk = (m*s-e)/r
-	bn_to_mon(r, N, 20);
-	bn_mon_inv(rinv, r, N, 20);
-	bn_mon_mul(kk, rinv, kk, N, 20);
-	bn_from_mon(kk, N, 20);
-
-	bn_dump("private key", kk, 20);
-	memcpy(ret_k, kk, 20);
-
+	return 0;
 }
 
+void ecdsa_set_pub(u8* Q)
+{
+	memcpy(ec_Q.x, Q, 20);
+	memcpy(ec_Q.y, Q + 20, 20);
+	point_to_mon(&ec_Q);
+}
+
+void ecdsa_set_priv(u8* ink)
+{
+	u8 k[21];
+	k[0] = 0;
+	memcpy(k + 1, ink, 20);
+	bn_reduce(k, ec_N, 21);
+
+	memcpy(ec_k, k, sizeof ec_k);
+}
+
+int ecdsa_verify(u8* hash, u8* R, u8* S)
+{
+	return check_ecdsa(&ec_Q, R, S, hash);
+}
+
+void ecdsa_sign(u8* hash, u8* R, u8* S)
+{
+	generate_ecdsa(R, S, ec_k, hash);
+}
+
+int point_is_on_curve(u8* p)
+{
+	u8 s[20], t[20];
+	u8* x, * y;
+
+	x = p;
+	y = p + 20;
+
+	elt_square(t, x);
+	elt_mul(s, t, x);// s = x^3
+
+	elt_mul(t, x, ec_a);
+	elt_add(s, s, t); //s = x^3 + a *x
+
+	elt_add(s, s, ec_b);//s = x^3 + a *x + b
+
+	elt_square(t, y); //t = y^2
+	elt_sub(s, s, t); // is s - t = 0?
+	hex_dump("S", s, 20);
+	hex_dump("T", t, 20);
+	return elt_is_zero(s);
+}
+
+void dump_ecc(void)
+{
+	hex_dump("P", ec_p, 20);
+	hex_dump("a", ec_a, 20);
+	hex_dump("b", ec_b, 20);
+	hex_dump("N", ec_N, 21);
+	hex_dump("Gx", ec_G.x, 20);
+	hex_dump("Gy", ec_G.y, 20);
+}
