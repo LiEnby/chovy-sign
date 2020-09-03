@@ -96,32 +96,6 @@ namespace CHOVY_SIGN
         // PSVita
         [DllImport("CHOVY-GEN.DLL", CallingConvention = CallingConvention.Cdecl)]
         private unsafe static extern int chovy_gen(string ebootpbp, UInt64 AID, string outscefile);
-        public static Process GenPbpFromIso(string ISOPath, string OutputPBP, string ContentId, string VersionKey, bool compress, string bootup="")
-        {
-            string SignNpArgs = "-pbp ";
-            if(compress)
-            {
-                SignNpArgs += "-c ";
-            }
-            SignNpArgs += "\"" + ISOPath + "\" ";
-            SignNpArgs += "\"" + OutputPBP + "\" ";
-            SignNpArgs += ContentId+" ";
-            SignNpArgs += VersionKey;
-            if(bootup != "")
-            {
-                SignNpArgs += " \"" + bootup + "\" ";
-            }
-
-            Process signnp = new Process();
-            signnp.StartInfo.FileName = Path.Combine(Application.StartupPath, "tools", "sign_np.exe");
-            signnp.StartInfo.Arguments = SignNpArgs;
-            signnp.StartInfo.CreateNoWindow = true;
-            signnp.StartInfo.UseShellExecute = false;
-            signnp.StartInfo.RedirectStandardOutput = true;
-            signnp.StartInfo.RedirectStandardError = true;
-            signnp.Start();
-            return signnp;
-        }
 
         public static int NumberOfSectors = 0;
         public static int SectorsDone = 0;
@@ -153,7 +127,7 @@ namespace CHOVY_SIGN
             int fz = process_pgd(pgd, pgd.Length, 2);
             if(fz < 0)
             {
-                throw new Exception("Failed to decrypt!");
+                throw new Exception("Failed to decrypt IS1ISO Header.");
             }
             else
             {
@@ -278,21 +252,21 @@ namespace CHOVY_SIGN
 
             if (sceUtilsBufferCopyWithRange(DataPspSignBufOut, DataPspSignBufOut.Length, DataPspSignBufIn, DataPspSignBufIn.Length, KIRK_CMD_ECDSA_SIGN) != 0)
             {
-                throw new Exception("Failed to generate ECDSA signature for DATA.PSP!\n");
+                throw new Exception("Failed to generate ECDSA signature");
             }
             return DataPspSignBufOut;
         }
 
         public static void VerifySignature(bool PS1,byte[] Hash, byte[] Signature)
         {
-            DoEvents = false;
+            DoEvents = false; // Chovy crashes if Application.DoEvents is called while verifying a signature.. for some reason
             byte[] TestData = new byte[0x64];
             Array.ConstrainedCopy(npumdimg_public_key, 0, TestData, 0, npumdimg_public_key.Length);
             Array.ConstrainedCopy(Hash, 0, TestData, npumdimg_public_key.Length, Hash.Length);
             Array.ConstrainedCopy(Signature, 0, TestData, npumdimg_public_key.Length + Hash.Length, Signature.Length);
             if (sceUtilsBufferCopyWithRange(null, 0, TestData, TestData.Length, KIRK_CMD_ECDSA_VERIFY) != 0)
             {
-                throw new Exception("ECDSA signature for "+BitConverter.ToString(Hash)+" is invalid!\n");
+                throw new Exception("ECDSA signature is invalid!");
             }
             DoEvents = true;
         }
@@ -587,7 +561,7 @@ namespace CHOVY_SIGN
                 bbmac_build_final2(3, Tb);
 
                 // Encrypt table.
-                byte[] EncTb = encrypt_table(Tb);
+                byte[] EncTb = EncryptTable(Tb);
 
                 // Write ISO data.
                 WSize = (WSize + 15) & ~15;
@@ -630,7 +604,7 @@ namespace CHOVY_SIGN
             System.Buffer.BlockCopy(Uint32Array, 0, decode, 0, Uint32Array.Length * 4);
             return decode;
         }
-        public static byte[] encrypt_table(byte[] table)
+        public static byte[] EncryptTable(byte[] table)
         {
 
             UInt32[] p = ByteArrayToUint32Array(table);
@@ -650,7 +624,6 @@ namespace CHOVY_SIGN
         }
         public static void BuildPbp(Stream Str, Stream Iso, bool Compress, byte[] VersionKey, Bitmap start_image, string content_id, byte[] param_sfo,byte[] icon0, byte[] icon1pmf, byte[] pic0, byte[] pic1, byte[] sndat3)
         {
-
             DoEvents = true;
             kirk_init();
 

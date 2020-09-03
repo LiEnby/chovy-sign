@@ -149,7 +149,27 @@ namespace CHOVY_SIGN
         {
             Action enable = () => {
                 this.FREEDOM.Enabled = true;
+                this.Ps1Menu.Enabled = true;
+                this.FindFromCMA.Enabled = true;
+                this.RifPath.ReadOnly = false;
+                this.Versionkey.ReadOnly = false;
+                this.ISOPath.ReadOnly = false;
+                this.CompressPBP.Enabled = true;
+                this.BrowseButton.Enabled = true;
             };
+
+            Action disable = () => {
+                this.FREEDOM.Enabled = false;
+                this.Ps1Menu.Enabled = false;
+                this.FindFromCMA.Enabled = false;
+                this.RifPath.ReadOnly = true;
+                this.Versionkey.ReadOnly = true;
+                this.ISOPath.ReadOnly = true;
+                this.CompressPBP.Enabled = false;
+                this.BrowseButton.Enabled = false;
+            };
+
+            disable();
 
             bool isZrif = false;
             if(RifPath.Text == "" || !File.Exists(RifPath.Text))
@@ -163,6 +183,7 @@ namespace CHOVY_SIGN
                 catch(Exception)
                 {
                     MessageBox.Show("INVALID RIF!\nPlease try \"Find from CMA\"", "RIF ERROR", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    enable();
                     return;
                 }
                 
@@ -170,11 +191,13 @@ namespace CHOVY_SIGN
             if(Versionkey.Text.Length != 32)
             {
                 MessageBox.Show("INVALID VERSION KEY!\nPlease try \"Find from CMA\"", "VERKEY ERROR", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                enable();
                 return;
             }
             if(ISOPath.Text == "" || !File.Exists(ISOPath.Text))
             {
                 MessageBox.Show("INVALID ISO PATH!", "ISO ERROR", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                enable();
                 return;
             }
 
@@ -276,19 +299,7 @@ namespace CHOVY_SIGN
                 }
             }
 
-            /*Process signnp = pbp.GenPbpFromIso(ISOPath.Text, EbootFile, ContentID, Versionkey.Text, CompressPBP.Checked, BootupImage);
-            while (!signnp.HasExited)
-            {
-                string Progress = signnp.StandardOutput.ReadLine();
-                if(Progress.StartsWith("Writing ISO blocks: "))
-                {
-                    Progress = Progress.Remove(0,19);
-                    int ProgressInt = int.Parse(Progress.Substring(0,3));
-                    TotalProgress.Value = ProgressInt;
-                    Status.Text = "Overthrowing The PSPEMU Monarchy " + ProgressInt.ToString() + "%";
-                }
-                Application.DoEvents();
-            }*/
+
             TotalProgress.Value = 0;
 
             Status.Text = "Signing the Declaration of Independance 0%";
@@ -297,12 +308,6 @@ namespace CHOVY_SIGN
             {
 
                 int ChovyGenRes = Pbp.gen__sce_ebootpbp(EbootFile, IntAid, EbootSignature);
-                if (!File.Exists(EbootSignature) || ChovyGenRes != 0)
-                {
-                    MessageBox.Show("CHOVY-GEN Failed! Please check CHOVY-KIRK.DLL exists");
-                    enable();
-                    return;
-                }
             });
             ChovyGenThread.Start();
             while(ChovyGenThread.IsAlive)
