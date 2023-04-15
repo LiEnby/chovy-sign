@@ -75,7 +75,7 @@ namespace PopsBuilder.Pops
             int headerSize = DNASHelper.CalculateSize(isoHdr.Length, 0x400);
             byte[] headerEnc = new byte[headerSize];
 
-            int sz = DNASHelper.Encrypt(headerEnc, isoHdr, srcImg.VersionKey, isoHdr.Length, 1, 1, blockSize: 0x400);
+            int sz = DNASHelper.Encrypt(headerEnc, isoHdr, srcImg.DrmInfo.VersionKey, isoHdr.Length, srcImg.DrmInfo.KeyType, 1, blockSize: 0x400);
             byte[] isoHdrPgd = headerEnc.ToArray();
             Array.Resize(ref isoHdrPgd, sz);
 
@@ -155,7 +155,6 @@ namespace PopsBuilder.Pops
 
         private void writeCompressedCDATracks()
         {
-            Random rng = new Random();
 
             IsoHeader.Seek(0x800, SeekOrigin.Begin); // CDA Entries
 
@@ -168,7 +167,7 @@ namespace PopsBuilder.Pops
 
                 using (CueStream audioStream = cue.OpenTrack(i))
                 {
-                    uint key = Convert.ToUInt32(rng.NextInt64(0, uint.MaxValue));
+                    uint key = Rng.RandomUInt();
 
                     Atrac3ToolEncoder enc = new Atrac3ToolEncoder();
 
@@ -202,7 +201,7 @@ namespace PopsBuilder.Pops
             AMCTRL.sceDrmBBMacInit(mkey, 3);
             AMCTRL.sceDrmBBMacUpdate(mkey, data, data.Length);
             Span<byte> checksum = new byte[20 + 0x10];
-            AMCTRL.sceDrmBBMacFinal(mkey, checksum[20..], srcImg.VersionKey);
+            AMCTRL.sceDrmBBMacFinal(mkey, checksum[20..], srcImg.DrmInfo.VersionKey);
 
             ref var aesHdr = ref MemoryMarshal.AsRef<KIRKEngine.KIRK_AES128CBC_HEADER>(checksum);
             aesHdr.mode = KIRKEngine.KIRK_MODE_ENCRYPT_CBC;

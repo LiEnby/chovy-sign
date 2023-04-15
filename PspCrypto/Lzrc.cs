@@ -7,6 +7,8 @@ namespace PspCrypto
 {
     public class Lzrc
     {
+        private bool np9660;
+
         private byte[] input;
         private int in_ptr;
         private int in_len;
@@ -19,11 +21,11 @@ namespace PspCrypto
         private uint code;
         private uint out_code;
         private byte lc;
-        private byte[][] bm_literal = new byte[8][];
-        private byte[][] bm_dist_bits = new byte[8][];
-        private byte[][] bm_dist = new byte[16][];
-        private byte[][] bm_match = new byte[8][];
-        private byte[][] bm_len = new byte[8][];
+        private byte[][] bm_literal;
+        private byte[][] bm_dist_bits;
+        private byte[][] bm_dist;
+        private byte[][] bm_match;
+        private byte[][] bm_len;
 
         const int max_tbl_sz = 65280;
         const int tbl_sz = 65536;
@@ -34,6 +36,28 @@ namespace PspCrypto
 
         static int[] prev = new int[tbl_sz], next = new int[tbl_sz];
         static int[] root = new int[tbl_sz];
+
+        public Lzrc(bool np9660 = false)
+        {
+            this.np9660 = np9660;
+
+            if (np9660)
+            {
+                this.bm_literal = new byte[8][];
+                this.bm_dist_bits = new byte[8][];
+                this.bm_dist = new byte[18][];
+                this.bm_match = new byte[8][];
+                this.bm_len = new byte[8][];
+            }
+            else
+            {
+                this.bm_literal = new byte[8][];
+                this.bm_dist_bits = new byte[8][];
+                this.bm_dist = new byte[16][];
+                this.bm_match = new byte[8][];
+                this.bm_len = new byte[8][];
+            }
+        }
 
         static void Init(byte[][] arr, byte value, int length)
         {
@@ -85,19 +109,23 @@ namespace PspCrypto
             re_putbyte(lc);
 
 
-#if NP9660
-            Init(bm_literal, 0x80, 2048);
-            Init(bm_dist_bits, 0x80, 312);
-            Init(bm_dist, 0x80, 144);
-            Init(bm_match, 0x80, 64);
-            Init(bm_len, 0x80, 248);
-#else
-            Init(bm_literal, 0x80, 256); // 2048  2680 2656
-            Init(bm_dist_bits, 0x80, 23); // 184
-            Init(bm_dist, 0x80, 8); // 128
-            Init(bm_match, 0x80, 8); // 64
-            Init(bm_len, 0x80, 32); // 256 
-#endif
+            if (this.np9660)
+            {
+                Init(bm_literal, 0x80, 256);
+                Init(bm_dist_bits, 0x80, 39);
+                Init(bm_dist, 0x80, 8);
+                Init(bm_match, 0x80, 8);
+                Init(bm_len, 0x80, 31);
+            }
+            else
+            {
+                Init(bm_literal, 0x80, 256); // 2048  2680 2656
+                Init(bm_dist_bits, 0x80, 23); // 184
+                Init(bm_dist, 0x80, 8); // 128
+                Init(bm_match, 0x80, 8); // 64
+                Init(bm_len, 0x80, 32); // 256 
+
+            }
             //memset(re->bm_literal, 0x80, 2048);
             //memset(re->bm_dist_bits, 0x80, 312);
             //memset(re->bm_dist, 0x80, 144);
@@ -122,12 +150,25 @@ namespace PspCrypto
                    (rc_getbyte() << 8) |
                    rc_getbyte());
             out_code = 0xffffffff;
+            
+            if (this.np9660)
+            {
+                Init(bm_literal, 0x80, 256);
+                Init(bm_dist_bits, 0x80, 39);
+                Init(bm_dist, 0x80, 8);
+                Init(bm_match, 0x80, 8);
+                Init(bm_len, 0x80, 31);
+            }
+            else
+            {
+                Init(bm_literal, 0x80, 256); // 2048  2680 2656
+                Init(bm_dist_bits, 0x80, 23); // 184
+                Init(bm_dist, 0x80, 8); // 128
+                Init(bm_match, 0x80, 8); // 64
+                Init(bm_len, 0x80, 32); // 256 
 
-            Init(bm_literal, 0x80, 256); // 2048  2680 2656
-            Init(bm_dist_bits, 0x80, 23); // 184
-            Init(bm_dist, 0x80, 8); // 128
-            Init(bm_match, 0x80, 8); // 64
-            Init(bm_len, 0x80, 32); // 256 
+            }
+
         }
 
         void normalize()
@@ -335,16 +376,16 @@ namespace PspCrypto
             match_len = t_len;
             match_dist = t_pos;
 
-            if (in_ptr == in_len)
+            if (in_ptr >= in_len)
             {
                 match_len = 256;
                 return 0;
             }
 
-            if (in_ptr == (in_len - 1))
+            if (in_ptr >= (in_len - 1))
                 return 0;
 
-            t = text_buf[pos+0];
+            t = text_buf[pos];
             t = (t << 8) | text_buf[pos+1];
             if (root[t] == -1)
             {
@@ -394,6 +435,14 @@ namespace PspCrypto
 
                 p = next[p];
             }
+
+            if (this.np9660) 
+            {
+                // have we calculated match_dist of 256 when its not the end?
+                if (t_len == 256 && in_ptr < in_len)
+                    return 1;
+            }
+            if (t_pos < 0) throw new Exception("t_pos was < 0 :?"); // TODO: figure out why this happens on np9660.
 
             match_len = t_len;
             match_dist = t_pos;
@@ -447,14 +496,12 @@ namespace PspCrypto
 
             do
             {
-
                 tmp = number >> n;
                 bit = (number >> (n - 1)) & 1;
                 re_bit(ref probs, index + tmp, bit);
 
                 n -= 1;
             } while (n > 0);
-            //number = (res_number - limit);
         }
 
         void re_bit(ref byte[] prob, int index, int bit)
@@ -520,7 +567,8 @@ namespace PspCrypto
         {
             if (out_ptr == out_len)
             {
-                throw new Exception("Output overflow!");
+                out_len += 0x100;
+                Array.Resize(ref output, out_len);
             }
 
             output[out_ptr++] = out_byte;
@@ -589,7 +637,7 @@ namespace PspCrypto
             re_putbyte((byte)((code >> 8) & 0xff));
             re_putbyte((byte)((code >> 0) & 0xff));
         }
-        public int lzrc_compress(byte[] out_buf, int out_len, byte[] in_buf, int in_len)
+        public int lzrc_compress(ref byte[] out_buf, int out_len, byte[] in_buf, int in_len)
         {
             int match_step, re_state, len_state, dist_state;
             int i, cur_byte, last_byte;
@@ -610,6 +658,8 @@ namespace PspCrypto
             last_byte = 0;
             match_len = 0;
             match_dist = 0;
+            
+            bool flg = false;
 
             while (true)
             {
@@ -621,19 +671,24 @@ namespace PspCrypto
 
                 if (match_len < 256)
                 {
-#if NP9660
-                    if (match_len < 4 && match_dist > 255)
-#else
-                    if (match_len <= 4 && match_dist > 255)
-#endif
+                    // condition is different if np9660 vs pops
+                    if (this.np9660)
+                        flg = (match_len < 4 && match_dist > 255);
+                    else
+                        flg = (match_len <= 4 && match_dist > 255);
+
+                    if(flg) // if (condition)
                         match_len = 1;
                     update_tree(match_len);
                 }
-#if NP9660
-                if ((match_len == 1 || (match_len < 4 && match_dist > 255)))
-#else
-                if ((match_len == 1 || (match_len <= 4 && match_dist > 255)))
-#endif
+
+                // condition is different if np9660 vs pops
+                if (this.np9660)
+                    flg = (match_len == 1 || (match_len < 4 && match_dist > 255));
+                else
+                    flg = (match_len == 1 || (match_len <= 4 && match_dist > 255));
+
+                if (flg)
                 {
                     re_bit(ref bm_match[re_state], match_step, 0);
 
@@ -643,7 +698,7 @@ namespace PspCrypto
                     cur_byte = re_getbyte();
                     re_bittree(ref bm_literal[((last_byte >> lc) & 0x07)], 0, 0x100, cur_byte);
 
-                    if (in_ptr == in_len)
+                    if (in_ptr >= in_len)
                     {
                         re_normalize();
                         re_flush();
@@ -665,44 +720,51 @@ namespace PspCrypto
                         len_bits += 1;
                     }
                     if (i != 8)
-                    {
                         re_bit(ref bm_match[re_state], match_step, 0);
-                    }
 
                     if (len_bits > 0)
                     {
                         len_state = ((len_bits - 1) << 2) + ((in_ptr << (len_bits - 1)) & 0x03);
                         re_number(ref bm_len[re_state], len_state, len_bits, (match_len - 1));
 
-                        if (in_ptr == in_len)
+                        if (this.np9660)
+                            flg = (match_len == 256);
+                        else
+                            flg = (in_ptr >= in_len);
+
+                        if (flg)
                         {
                             re_normalize();
                             re_flush();
                             return out_ptr;
                         }
                     }
-
                     
                     // determine limit ...
                     dist_state = 0;
                     limit = 8;
-#if NP9660
-                    if ( match_len > 3)
-#else
-                    if( (match_len) > 4 )
-#endif
+
+                    // condition is different if np9660 vs pops
+                    if (this.np9660)
+                        flg = (match_len > 3);
+                    else
+                        flg = (match_len > 4);
+
+
+                    if (flg) // if (condition)
                     {
                         dist_state += 7;
-#if NP9660
-                        limit = 44;
-#else
-                        limit = 16;
-#endif
+
+                        if (this.np9660)
+                            limit = 44;
+                        else
+                            limit = 16;
+
                     }
 
                     // find total 1s in the match_dist
                     dist_bits = 0;
-                    if(match_dist != 0) {
+                    if(match_dist > 0) {
                         while ((match_dist >> dist_bits) != 1)
                             dist_bits += 1;
                     }
@@ -714,9 +776,7 @@ namespace PspCrypto
                     re_bittree(ref bm_dist_bits[len_bits], dist_state, limit, dist_bits);
 
                     if (dist_bits > 0)
-                    {
                         re_number(ref bm_dist[dist_bits], 0, dist_bits, match_dist);
-                    }
                     
 
                     in_ptr += match_len;
@@ -736,15 +796,16 @@ namespace PspCrypto
             int match_src;
             int round = -1;
 
+            bool flg = false;
             len_state = 0;
 
             rc_init(out_buf, out_len, in_buf, in_len);
 
-            if ((lc & 0x80) != 0)
+            /*if ((lc & 0x80) != 0)
             {
                 Buffer.BlockCopy(in_buf, 5, out_buf, 0, (int)code);
                 return (int)code;
-            }
+            }*/
 
             rc_state = 0;
             last_byte = 0;
@@ -758,9 +819,7 @@ namespace PspCrypto
                 if (bit == 0) 
                 {
                     if (rc_state > 0)
-                    {
                         rc_state -= 1;
-                    }
 
                     cur_byte = rc_bittree(bm_literal[(((out_ptr & 7) << 8) + last_byte >> lc) & 0x07], 0, 0x100);
 
@@ -789,29 +848,31 @@ namespace PspCrypto
                     {
                         len_state = ((len_bits - 1) << 2) + ((out_ptr << (len_bits - 1)) & 0x03);
                         match_len = rc_number(bm_len[rc_state], len_state, len_bits);
-                        //if ((match_len == 0xFF || match_len == 0xFE) && out_ptr == out_len)
-                        //{
-                        //    return out_ptr;
-                        //}
+                        if (this.np9660 && match_len == 0xFF)
+                            return out_ptr;
                     }
 
                     dist_state = 0;
                     limit = 8;
-                    if (match_len > 3)
+                    if (this.np9660)
+                        flg = (match_len > 2);
+                    else
+                        flg = (match_len > 3);
+
+                    if (flg)
                     {
                         dist_state += 7;
-                        limit = 16;
+                        if (this.np9660) 
+                            limit = 44;
+                        else
+                            limit = 16;
                     }
                     dist_bits = rc_bittree(bm_dist_bits[len_bits], dist_state, limit);
 
                     if (dist_bits > 0)
-                    {
                         match_dist = rc_number(bm_dist[dist_bits], 0, dist_bits);
-                    }
                     else
-                    {
                         match_dist = 1;
-                    }
 
                     match_src = out_ptr - match_dist;
                     if (match_dist > out_ptr || match_dist < 0)

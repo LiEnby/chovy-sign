@@ -1,4 +1,5 @@
 ﻿using PopsBuilder.Atrac3;
+using PopsBuilder.Psp;
 using PspCrypto;
 using System;
 using System.Collections.Generic;
@@ -13,7 +14,7 @@ namespace PopsBuilder.Pops
     {
         const int MAX_DISCS = 5;
         const int PSISO_ALIGN = 0x8000;
-        public PsTitleImg(byte[] versionKey, string contentId, DiscInfo[] discs) : base(versionKey, contentId)
+        public PsTitleImg(NpDrmInfo drmInfo, DiscInfo[] discs) : base(drmInfo)
         {
             if (discs.Length > MAX_DISCS) throw new Exception("Sorry, multi disc games only support up to 5 discs... (i dont make the rules)");
             this.compressors = new DiscCompressor[MAX_DISCS];
@@ -42,7 +43,7 @@ namespace PopsBuilder.Pops
             psarUtil.WriteStr("PSTITLEIMG000000");
             psarUtil.WriteInt64(PSISO_ALIGN+isoPart.Length); // location of STARTDAT
 
-            psarUtil.WriteRandom(0x10); // dunno what this is
+            psarUtil.WriteBytes(Rng.RandomBytes(0x10)); // dunno what this is
             psarUtil.WritePadding(0x00, 0x1D8);
 
             byte[] isoMap = generateIsoMapPgd();
@@ -52,8 +53,7 @@ namespace PopsBuilder.Pops
             isoPart.Seek(0x00, SeekOrigin.Begin);
             isoPart.CopyTo(Psar);
 
-            startDat.Seek(0x00, SeekOrigin.Begin);
-            startDat.CopyTo(Psar);
+            psarUtil.WriteBytes(StartDat);
 
             psarUtil.WriteBytes(SimplePgd);
         }
@@ -66,7 +66,7 @@ namespace PopsBuilder.Pops
             PspCrypto.AMCTRL.sceDrmBBMacInit(mkey, 3);
             PspCrypto.AMCTRL.sceDrmBBMacUpdate(mkey, header, header.Length /*0xb3c80*/);
             Span<byte> newKey = new byte[20 + 0x10];
-            PspCrypto.AMCTRL.sceDrmBBMacFinal(mkey, newKey[20..], VersionKey);
+            PspCrypto.AMCTRL.sceDrmBBMacFinal(mkey, newKey[20..], DrmInfo.VersionKey);
             ref var aesHdr = ref MemoryMarshal.AsRef<KIRKEngine.KIRK_AES128CBC_HEADER>(newKey);
             aesHdr.mode = KIRKEngine.KIRK_MODE_ENCRYPT_CBC;
             aesHdr.keyseed = 0x63;
@@ -86,7 +86,7 @@ namespace PopsBuilder.Pops
             int encryptedSz = DNASHelper.CalculateSize(isoMapBuf.Length, 1024);
             var isoMapEnc = new byte[encryptedSz];
 
-            DNASHelper.Encrypt(isoMapEnc, isoMapBuf, VersionKey, isoMapBuf.Length, 1, 1);
+            DNASHelper.Encrypt(isoMapEnc, isoMapBuf, DrmInfo.VersionKey, isoMapBuf.Length, DrmInfo.KeyType, 1);
 
             return isoMapEnc;
         }
@@ -101,7 +101,7 @@ namespace PopsBuilder.Pops
                 int padLen = Convert.ToInt32(PSISO_ALIGN - (isoPart.Position % PSISO_ALIGN));
                 isoPartUtil.WritePadding(0x00, padLen);
 
-                using (PsIsoImg psIsoImg = new PsIsoImg(this.VersionKey, this.ContentId, compressors[i]))
+                using (PsIsoImg psIsoImg = new PsIsoImg(this.DrmInfo, compressors[i]))
                 {
                     isoMapUtil.WriteUInt32(Convert.ToUInt32(PSISO_ALIGN + isoPart.Position));
 
@@ -127,8 +127,8 @@ namespace PopsBuilder.Pops
             isoMapUtil.WriteBytes(checksums);
             isoMapUtil.WriteStrWithPadding(discs.First().DiscIdHdr, 0x00, 0x20);
 
-            isoMapUtil.WriteInt64(Convert.ToInt64(PSISO_ALIGN + isoPart.Length + startDat.Length));
-            isoMapUtil.WriteRandom(0x80);
+            isoMapUtil.WriteInt64(Convert.ToInt64(PSISO_ALIGN + isoPart.Length + StartDat.Length));
+            psarUtil.WriteBytes(Rng.RandomBytes(0x80));
             isoMapUtil.WriteStrWithPadding(discs.First().DiscName, 0x00, 0x80);
             isoMapUtil.WriteInt32(MAX_DISCS);
             isoMapUtil.WritePadding(0x00, 0x70);

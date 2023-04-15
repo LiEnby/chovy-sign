@@ -12,27 +12,22 @@ namespace PopsBuilder.Pops
 {
     public class PopsImg : NpDrmPsar
     {
-        public PopsImg(byte[] versionKey, string contentId) : base(versionKey, contentId)
+        public PopsImg(NpDrmInfo versionKey) : base(versionKey)
         {
-            startDat = new MemoryStream();
-            startDatUtil = new StreamUtil(startDat);
-
             simple = new MemoryStream();
             simpleUtil = new StreamUtil(simple);
 
-            createStartDat();
+            StartDat = NpDrmPsar.CreateStartDat(Resources.STARTDATPOPS);
             createSimpleDat();
-
             SimplePgd = generateSimplePgd();
 
         }
-        internal MemoryStream startDat;
-        internal StreamUtil startDatUtil;
+        
 
         private MemoryStream simple;
         private StreamUtil simpleUtil;
+        public byte[] StartDat;
         public byte[] SimplePgd;
-        internal Random rng = new Random();
         private void createSimpleDat()
         {
             simpleUtil.WriteStr("SIMPLE  ");
@@ -45,20 +40,7 @@ namespace PopsBuilder.Pops
             simpleUtil.WriteBytes(Resources.SIMPLE);
         }
 
-        private void createStartDat()
-        {
-            startDatUtil.WriteStr("STARTDAT");
-            startDatUtil.WriteInt32(0x1);
-            startDatUtil.WriteInt32(0x1);
-            startDatUtil.WriteInt32(0x50);
-            startDatUtil.WriteInt32(Resources.STARTDAT.Length);
-            startDatUtil.WriteInt32(0x0);
-            startDatUtil.WriteInt32(0x0);
-
-            startDatUtil.WritePadding(0, 0x30);
-
-            startDatUtil.WriteBytes(Resources.STARTDAT);
-        }
+        
 
         private byte[] generateSimplePgd()
         {
@@ -69,7 +51,7 @@ namespace PopsBuilder.Pops
             byte[] simpleEnc = new byte[simpleSz];
 
             // get pgd
-            int sz = DNASHelper.Encrypt(simpleEnc, simpleData, VersionKey, simpleData.Length, 1, 1, blockSize: 0x400);
+            int sz = DNASHelper.Encrypt(simpleEnc, simpleData, DrmInfo.VersionKey, simpleData.Length, DrmInfo.KeyType, 1, blockSize: 0x400);
             byte[] pgd = simpleEnc.ToArray();
             Array.Resize(ref pgd, sz);
 
@@ -77,7 +59,7 @@ namespace PopsBuilder.Pops
         }
 
 
-        public byte[] GenerateDataPsp()
+        public override byte[] GenerateDataPsp()
         {
             Span<byte> loaderEnc = new byte[0x9B13];
 
@@ -95,7 +77,7 @@ namespace PopsBuilder.Pops
             Array.ConstrainedCopy(lowBits, 0, dataPspElf, 0x68C, 0x2);
             Array.ConstrainedCopy(highBits, 0, dataPspElf, 0x694, 0x2);
 
-            SceMesgLed.Encrypt(loaderEnc, dataPspElf, 0x0DAA06F0, SceExecFileDecryptMode.DECRYPT_MODE_POPS_EXEC, VersionKey, ContentId, Resources.DATAPSPSDCFG);
+            SceMesgLed.Encrypt(loaderEnc, dataPspElf, 0x0DAA06F0, SceExecFileDecryptMode.DECRYPT_MODE_POPS_EXEC, DrmInfo.VersionKey, DrmInfo.ContentId, Resources.DATAPSPSDCFG);
             return loaderEnc.ToArray();
         }
 

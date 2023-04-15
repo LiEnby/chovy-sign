@@ -9,22 +9,43 @@ using System.Threading.Tasks;
 
 namespace PopsBuilder.Psp
 {
-    public class NpDrmPsar : IDisposable
+    public abstract class NpDrmPsar : IDisposable
     {
-        public NpDrmPsar(byte[] versionKey, string contentId)
+        public NpDrmPsar(NpDrmInfo npDrmInfo)
         {
-            VersionKey = versionKey;
-            ContentId = contentId;
+            DrmInfo = npDrmInfo;
 
             Psar = new MemoryStream();
             psarUtil = new StreamUtil(Psar);
         }
 
-        public byte[] VersionKey;
-        public string ContentId;
+        public NpDrmInfo DrmInfo;
 
         public MemoryStream Psar;
         internal StreamUtil psarUtil;
+        public abstract byte[] GenerateDataPsp();
+        public static byte[] CreateStartDat(byte[] image)
+        {
+            using(MemoryStream startDatStream = new MemoryStream())
+            {
+                StreamUtil startDatUtil = new StreamUtil(startDatStream);
+
+                startDatUtil.WriteStr("STARTDAT");
+                startDatUtil.WriteInt32(0x1);
+                startDatUtil.WriteInt32(0x1);
+                startDatUtil.WriteInt32(0x50);
+                startDatUtil.WriteInt32(image.Length);
+                startDatUtil.WriteInt32(0x0);
+                startDatUtil.WriteInt32(0x0);
+
+                startDatUtil.WritePadding(0, 0x30);
+
+                startDatUtil.WriteBytes(image);
+
+                startDatStream.Seek(0x00, SeekOrigin.Begin);
+                return startDatStream.ToArray();
+            }
+        }
 
         public virtual void Dispose()
         {

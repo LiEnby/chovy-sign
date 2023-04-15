@@ -1,4 +1,5 @@
-﻿using System;
+﻿using PspCrypto;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -9,11 +10,9 @@ namespace PopsBuilder
     public class StreamUtil
     {
         private Stream s;
-        private Random rng;
         public StreamUtil(Stream s)
         {
             this.s = s;
-            rng = new Random();
         }
 
         public void WriteStrWithPadding(string str, byte b, int len)
@@ -29,13 +28,6 @@ namespace PopsBuilder
                 WriteBytes(sdata);
                 WritePadding(b, (len - sdata.Length));
             }
-        }
-
-        public void WriteRandom(int len)
-        {
-            byte[] randomBytes = new byte[len];
-            rng.NextBytes(randomBytes);
-            this.WriteBytes(randomBytes);
         }
         public byte[] ReadBytes(int len)
         {
@@ -80,7 +72,10 @@ namespace PopsBuilder
         {
             WriteBytes(BitConverter.GetBytes(v));
         }
-
+        public void WriteInt32BE(Int32 v)
+        {
+            WriteBytes(BitConverter.GetBytes(v).Reverse().ToArray());
+        }
         public void WriteInt32(Int32 v)
         {
             WriteBytes(BitConverter.GetBytes(v));
@@ -98,6 +93,11 @@ namespace PopsBuilder
             }
         }
 
+        public void AlignTo(byte padByte, int align)
+        {
+            int padAmt = Convert.ToInt32(align - (s.Position % align));
+            this.WritePadding(padByte, padAmt);
+        }
         public void PadUntil(byte b, int len)
         {
             int remain = Convert.ToInt32(len - s.Length);

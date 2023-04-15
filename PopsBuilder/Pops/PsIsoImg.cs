@@ -1,6 +1,7 @@
 ﻿using Org.BouncyCastle.Crypto.Paddings;
 using PopsBuilder.Atrac3;
 using PopsBuilder.Cue;
+using PopsBuilder.Psp;
 using PspCrypto;
 using System;
 using System.Net;
@@ -11,24 +12,24 @@ namespace PopsBuilder.Pops
 {
     public class PsIsoImg : PopsImg
     {
-        internal PsIsoImg(byte[] versionkey, string contentId, DiscCompressor discCompressor) : base(versionkey, contentId)
+        internal PsIsoImg(NpDrmInfo versionKey, DiscCompressor discCompressor) : base(versionKey)
         {
             this.compressor = discCompressor;
         }
 
-        public PsIsoImg(byte[] versionkey, string contentId, DiscInfo disc, IAtracEncoderBase encoder) : base(versionkey, contentId)
+        public PsIsoImg(NpDrmInfo versionKey, DiscInfo disc, IAtracEncoderBase encoder) : base(versionKey)
         {
             this.compressor = new DiscCompressor(this, disc, encoder);
         }
 
-        public PsIsoImg(byte[] versionkey, string contentId, DiscInfo disc) : base(versionkey, contentId)
+        public PsIsoImg(NpDrmInfo versionKey, DiscInfo disc) : base(versionKey)
         {
             this.compressor = new DiscCompressor(this, disc, new Atrac3ToolEncoder());
         }
         public void CreatePsar(bool isPartOfMultiDisc=false)
         {
             compressor.GenerateIsoHeaderAndCompress();
-            if (!isPartOfMultiDisc) compressor.WriteSimpleDatLocation((compressor.IsoOffset + compressor.CompressedIso.Length) + startDat.Length);
+            if (!isPartOfMultiDisc) compressor.WriteSimpleDatLocation((compressor.IsoOffset + compressor.CompressedIso.Length) + StartDat.Length);
 
             psarUtil.WriteStr("PSISOIMG0000");
             psarUtil.WriteInt64(0x00); // location of STARTDAT
@@ -47,8 +48,7 @@ namespace PopsBuilder.Pops
 
             // write STARTDAT
             Int64 startDatLocation = Psar.Position;
-            startDat.Seek(0x00, SeekOrigin.Begin);
-            startDat.CopyTo(Psar);
+            psarUtil.WriteBytes(StartDat);
 
             // write pgd
             psarUtil.WriteBytes(this.SimplePgd);

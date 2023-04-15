@@ -533,11 +533,11 @@ namespace PbpResign
             Span<byte> table = new byte[tablesize];
             var tp = MemoryMarshal.Cast<byte, uint>(table);
             input.Read(table);
+
             // Decrypt Table
             for (int i = 0; i < totalBlocks; i++)
-            {
                 XorTable(tp[(i * 8)..]);
-            }
+
 
             var blocks = MemoryMarshal.Cast<byte, NpBlock>(table);
             for (int i = 0; i < blocks.Length; i++)
@@ -578,9 +578,7 @@ namespace PbpResign
 
             // Encrypt Table
             for (int i = 0; i < totalBlocks; i++)
-            {
                 XorTable(tp[(i * 8)..]);
-            }
 
             output.Seek(entityOff, SeekOrigin.Begin);
             output.Write(table);
@@ -1073,6 +1071,17 @@ namespace PbpResign
                     return false;
                 }
                 type = 0;
+
+                Console.WriteLine("VersionKey: " + BitConverter.ToString(NewVersionKey.ToArray()));
+
+                NpUmdImg npumd = new NpUmdImg(new NpDrmInfo(NewVersionKey.ToArray(), CId, npHdr.NpFlags),
+                                                "fft.iso", "ULUS10297", File.ReadAllBytes("TEST\\PARAM.SFO"), false);
+
+                npumd.CreatePsar();
+                byte[] paramFile = File.ReadAllBytes("TEST\\PARAM.SFO");
+
+                PbpBuilder.CreatePbp(paramFile, File.ReadAllBytes("TEST\\ICON0.PNG"), null, File.ReadAllBytes("TEST\\PIC0.PNG"), File.ReadAllBytes("TEST\\PIC1.PNG"), null, npumd, "FFT.PBP");
+                
                 return CopyNpUmdImg(input, output, pbpHdr, psarBuff, npHdr);
             }
 
@@ -1086,7 +1095,7 @@ namespace PbpResign
                     return false;
                 }
                 type = 1;
-                DiscInfo[] discs = new DiscInfo[2];
+                /*DiscInfo[] discs = new DiscInfo[2];
                 discs[0] = new DiscInfo("ABEE\\D1.CUE", "Oddworld: Abe's Exoddus", "SLES01480");
                 discs[1] = new DiscInfo("ABEE\\D2.CUE", "Oddworld: Abe's Exoddus", "SLES11480");
                 PsTitleImg title = new PsTitleImg(NewVersionKey.ToArray(), CId, discs);
@@ -1098,7 +1107,7 @@ namespace PbpResign
                 //     File.ReadAllBytes("TEST\\PARAM.SFO"), File.ReadAllBytes("TEST\\ICON0.PNG"), null,
                 //     File.ReadAllBytes("TEST\\PIC0.PNG"), File.ReadAllBytes("TEST\\PIC1.PNG"), null);
                 //File.WriteAllBytes("TEST.BIN", i.GetIsoHeader());
-                //File.WriteAllBytes("TEST.ISOc", i.GetIso());
+                //File.WriteAllBytes("TEST.ISOc", i.GetIso());*/
 
 
                  return CopyPsIsoImg(input, output, pbpHdr);

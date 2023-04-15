@@ -127,7 +127,13 @@
   <data name="SIMPLE" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>Resources\SIMPLE.PNG;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
-  <data name="STARTDAT" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>Resources\STARTDAT.PNG;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  <data name="STARTDATMINIS" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>Resources\STARTDATMINIS.PNG;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="STARTDATPOPS" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>Resources\STARTDATPOPS.PNG;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="STARTDATPSP" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>Resources\STARTDATPSP.PNG;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
 </root>

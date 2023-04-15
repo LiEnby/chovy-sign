@@ -22,7 +22,7 @@ namespace PopsBuilder {
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "17.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    internal class Resources {
+    public class Resources {
         
         private static global::System.Resources.ResourceManager resourceMan;
         
@@ -36,7 +36,7 @@ namespace PopsBuilder {
         ///   Returns the cached ResourceManager instance used by this class.
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        internal static global::System.Resources.ResourceManager ResourceManager {
+        public static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
                     global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("PopsBuilder.Resources", typeof(Resources).Assembly);
@@ -51,7 +51,7 @@ namespace PopsBuilder {
         ///   resource lookups using this strongly typed resource class.
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        internal static global::System.Globalization.CultureInfo Culture {
+        public static global::System.Globalization.CultureInfo Culture {
             get {
                 return resourceCulture;
             }
@@ -63,7 +63,7 @@ namespace PopsBuilder {
         /// <summary>
         ///   Looks up a localized resource of type System.Byte[].
         /// </summary>
-        internal static byte[] DATAPSPSD {
+        public static byte[] DATAPSPSD {
             get {
                 object obj = ResourceManager.GetObject("DATAPSPSD", resourceCulture);
                 return ((byte[])(obj));
@@ -73,7 +73,7 @@ namespace PopsBuilder {
         /// <summary>
         ///   Looks up a localized resource of type System.Byte[].
         /// </summary>
-        internal static byte[] DATAPSPSDCFG {
+        public static byte[] DATAPSPSDCFG {
             get {
                 object obj = ResourceManager.GetObject("DATAPSPSDCFG", resourceCulture);
                 return ((byte[])(obj));
@@ -83,7 +83,7 @@ namespace PopsBuilder {
         /// <summary>
         ///   Looks up a localized resource of type System.Byte[].
         /// </summary>
-        internal static byte[] SIMPLE {
+        public static byte[] SIMPLE {
             get {
                 object obj = ResourceManager.GetObject("SIMPLE", resourceCulture);
                 return ((byte[])(obj));
@@ -93,9 +93,29 @@ namespace PopsBuilder {
         /// <summary>
         ///   Looks up a localized resource of type System.Byte[].
         /// </summary>
-        internal static byte[] STARTDAT {
+        public static byte[] STARTDATMINIS {
             get {
-                object obj = ResourceManager.GetObject("STARTDAT", resourceCulture);
+                object obj = ResourceManager.GetObject("STARTDATMINIS", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
+        public static byte[] STARTDATPOPS {
+            get {
+                object obj = ResourceManager.GetObject("STARTDATPOPS", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
+        public static byte[] STARTDATPSP {
+            get {
+                object obj = ResourceManager.GetObject("STARTDATPSP", resourceCulture);
                 return ((byte[])(obj));
             }
         }

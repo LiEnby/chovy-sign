@@ -3,6 +3,7 @@
 .vs/*
 *.7z
 
+*thumbs.db
 
 PbpResign/bin/*
 PbpResign/obj/*

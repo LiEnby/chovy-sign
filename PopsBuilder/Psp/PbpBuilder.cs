@@ -10,14 +10,19 @@ namespace PopsBuilder.Psp
     {
         public static void CreatePbp(byte[]? paramSfo, byte[]? icon0Png, byte[]? icon1Png,
                               byte[]? pic0Png, byte[]? pic1Png, byte[]? snd0At3,
-                              byte[] dataPsp, NpDrmPsar dataPsar, string outputFile)
+                              NpDrmPsar dataPsar, string outputFile, short version = 1)
         {
 
             using (FileStream pbpStream = File.Open(outputFile, FileMode.Create))
             {
+                byte[] dataPsp = dataPsar.GenerateDataPsp();
+                int padLen = Convert.ToInt32(0x100 - (dataPsp.Length % 0x100));
+                Array.Resize(ref dataPsp, dataPsp.Length + padLen);
+
                 StreamUtil pbpUtil = new StreamUtil(pbpStream);
                 pbpUtil.WriteByte(0x00);
-                pbpUtil.WriteStrWithPadding("PBP", 0x00, 0x5);
+                pbpUtil.WriteStr("PBP");
+                pbpUtil.WriteInt16(version);
                 pbpUtil.WriteInt16(1);
 
                 // param location
