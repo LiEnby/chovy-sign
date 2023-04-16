@@ -102,7 +102,7 @@ namespace GameBuilder.Pops
             int encryptedSz = DNASHelper.CalculateSize(isoMapBuf.Length, 1024);
             var isoMapEnc = new byte[encryptedSz];
 
-            DNASHelper.Encrypt(isoMapEnc, isoMapBuf, DrmInfo.VersionKey, isoMapBuf.Length, DrmInfo.KeyType, 1);
+            DNASHelper.Encrypt(isoMapEnc, isoMapBuf, DrmInfo.VersionKey, isoMapBuf.Length, DrmInfo.KeyIndex, 1);
 
             return isoMapEnc;
         }

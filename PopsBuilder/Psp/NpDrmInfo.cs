@@ -10,12 +10,12 @@ namespace GameBuilder.Psp
     {
         public string ContentId;
         public byte[] VersionKey;
-        public int KeyType;
+        public int KeyIndex;
 
         public NpDrmInfo(byte[] versionKey, string contentId, int keyType)
         {
             this.VersionKey = versionKey;
-            this.KeyType = keyType;
+            this.KeyIndex = keyType;
             this.ContentId = contentId;
         }
     }

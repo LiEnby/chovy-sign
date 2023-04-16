@@ -51,7 +51,7 @@ namespace GameBuilder.Psp
         private void createNpHdr()
         {
             npHdrUtil.WriteStr("NPUMDIMG");
-            npHdrUtil.WriteInt32(DrmInfo.KeyType);
+            npHdrUtil.WriteInt32(DrmInfo.KeyIndex);
             npHdrUtil.WriteInt32(BLOCK_BASIS);
             npHdrUtil.WriteStrWithPadding(DrmInfo.ContentId, 0x00, 0x30);
 
@@ -110,7 +110,7 @@ namespace GameBuilder.Psp
                 dataPspUtil.WriteBytes(signature);
                 dataPspUtil.WritePadding(0x00, 0x530);
                 dataPspUtil.WriteStrWithPadding(DrmInfo.ContentId, 0x00, 0x30);
-                dataPspUtil.WriteInt32BE(DrmInfo.KeyType);
+                dataPspUtil.WriteInt32BE(DrmInfo.KeyIndex);
                 dataPspUtil.WriteInt32(0);
                 dataPspUtil.WriteInt32(0);
                 dataPspUtil.WriteInt32(0);
@@ -198,7 +198,7 @@ namespace GameBuilder.Psp
         private byte[] encryptBlock(byte[] blockData, int offset)
         {
             AMCTRL.CIPHER_KEY ckey = new AMCTRL.CIPHER_KEY();
-            AMCTRL.sceDrmBBCipherInit(out ckey, 1, DrmInfo.KeyType, headerKey, DrmInfo.VersionKey, offset >> 4);
+            AMCTRL.sceDrmBBCipherInit(out ckey, 1, DrmInfo.KeyIndex, headerKey, DrmInfo.VersionKey, offset >> 4);
             AMCTRL.sceDrmBBCipherUpdate(ref ckey, blockData, blockData.Length);
             AMCTRL.sceDrmBBCipherFinal(ref ckey);
             return blockData;
@@ -262,7 +262,7 @@ namespace GameBuilder.Psp
         private byte[] encryptHeader(byte[] headerBytes)
         {
             AMCTRL.CIPHER_KEY ckey = new AMCTRL.CIPHER_KEY();
-            AMCTRL.sceDrmBBCipherInit(out ckey, 1, DrmInfo.KeyType, headerKey, DrmInfo.VersionKey, 0);
+            AMCTRL.sceDrmBBCipherInit(out ckey, 1, DrmInfo.KeyIndex, headerKey, DrmInfo.VersionKey, 0);
             AMCTRL.sceDrmBBCipherUpdate(ref ckey, headerBytes, headerBytes.Length);
             AMCTRL.sceDrmBBCipherFinal(ref ckey);
             return headerBytes;

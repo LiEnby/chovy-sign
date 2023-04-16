@@ -76,7 +76,7 @@ namespace GameBuilder.Pops
             int headerSize = DNASHelper.CalculateSize(isoHdr.Length, 0x400);
             byte[] headerEnc = new byte[headerSize];
 
-            int sz = DNASHelper.Encrypt(headerEnc, isoHdr, srcImg.DrmInfo.VersionKey, isoHdr.Length, srcImg.DrmInfo.KeyType, 1, blockSize: 0x400);
+            int sz = DNASHelper.Encrypt(headerEnc, isoHdr, srcImg.DrmInfo.VersionKey, isoHdr.Length, srcImg.DrmInfo.KeyIndex, 1, blockSize: 0x400);
             byte[] isoHdrPgd = headerEnc.ToArray();
             Array.Resize(ref isoHdrPgd, sz);
 

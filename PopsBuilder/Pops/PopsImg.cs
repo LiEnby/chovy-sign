@@ -51,7 +51,7 @@ namespace GameBuilder.Pops
             byte[] simpleEnc = new byte[simpleSz];
 
             // get pgd
-            int sz = DNASHelper.Encrypt(simpleEnc, simpleData, DrmInfo.VersionKey, simpleData.Length, DrmInfo.KeyType, 1, blockSize: 0x400);
+            int sz = DNASHelper.Encrypt(simpleEnc, simpleData, DrmInfo.VersionKey, simpleData.Length, DrmInfo.KeyIndex, 1, blockSize: 0x400);
             byte[] pgd = simpleEnc.ToArray();
             Array.Resize(ref pgd, sz);
 

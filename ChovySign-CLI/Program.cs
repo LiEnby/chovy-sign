@@ -180,11 +180,11 @@ namespace ChovySign_CLI
             if (drmInfo is null) return Error("no versionkey was found, exiting", 6);
             if (pbpMode is null) return Error("no pbp mode was set, exiting", 7);
 
-            if (pbpMode == PbpMode.PSP && drmInfo.KeyType != 2)
-                return Error("KeyType is "+drmInfo.KeyType+", but PBP mode is PSP, you cant do that .. please use a type 1 versionkey.", 8);
+            if (pbpMode == PbpMode.PSP && drmInfo.KeyIndex != 2)
+                return Error("KeyType is "+drmInfo.KeyIndex+", but PBP mode is PSP, you cant do that .. please use a type 1 versionkey.", 8);
 
-            if (pbpMode == PbpMode.POPS && drmInfo.KeyType != 1)
-                return Error("KeyType is " + drmInfo.KeyType + ", but PBP mode is POPS, you cant do that .. please use a type 1 versionkey.", 8);
+            if (pbpMode == PbpMode.POPS && drmInfo.KeyIndex != 1)
+                return Error("KeyType is " + drmInfo.KeyIndex + ", but PBP mode is POPS, you cant do that .. please use a type 1 versionkey.", 8);
 
             if (pbpMode == PbpMode.POPS && (popsDiscName is null || popsIcon0File is null)) return Error("pbp mode is POPS, but you have not specified a disc title or icon file using --pops-info.", 9);
 
