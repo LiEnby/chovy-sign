@@ -46,7 +46,6 @@ namespace GameBuilder.Pops
             compressor.CompressedIso.Seek(0x00, SeekOrigin.Begin);
             compressor.CompressedIso.CopyTo(Psar);
 
-            Psar.Seek(0x00, SeekOrigin.Begin);
             if (isPartOfMultiDisc) return;
 
             // write STARTDAT
@@ -59,8 +58,6 @@ namespace GameBuilder.Pops
             // set STARTDAT location
             Psar.Seek(0xC, SeekOrigin.Begin);
             psarUtil.WriteInt64(startDatLocation);
-            
-            Psar.Seek(0x00, SeekOrigin.Begin);
         }
 
 

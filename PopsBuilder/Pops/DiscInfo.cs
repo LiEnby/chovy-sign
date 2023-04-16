@@ -59,6 +59,7 @@ namespace GameBuilder.Pops
                     {
                         using (SparseStream systemCnfStream = cdReader.OpenFile("SYSTEM.CNF", FileMode.Open))
                         {
+                            systemCnfStream.Seek(0x18, SeekOrigin.Begin);
                             using (StreamReader systemCnfReader = new StreamReader(systemCnfStream))
                             {
                                 for (string? line = systemCnfReader.ReadLine(); line is not null; line = systemCnfReader.ReadLine())

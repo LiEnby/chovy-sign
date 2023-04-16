@@ -18,9 +18,9 @@ namespace GameBuilder.Pops
             simple = new MemoryStream();
             simpleUtil = new StreamUtil(simple);
 
-            StartDat = NpDrmPsar.CreateStartDat(Resources.STARTDATPOPS);
-            createSimpleDat();
-            SimplePgd = generateSimplePgd();
+            this.StartDat = NpDrmPsar.CreateStartDat(Resources.STARTDATPOPS);
+            this.createSimpleDat();
+            this.SimplePgd = generateSimplePgd();
 
         }
 
