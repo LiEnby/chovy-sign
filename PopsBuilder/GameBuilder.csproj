@@ -7,6 +7,11 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="DiscUtils.Core" Version="0.16.13" />
+    <PackageReference Include="DiscUtils.Iso9660" Version="0.16.13" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\PspCrypto\PspCrypto.csproj" />
   </ItemGroup>
 

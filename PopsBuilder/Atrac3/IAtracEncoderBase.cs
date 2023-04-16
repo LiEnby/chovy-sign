@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace PopsBuilder.Atrac3
+namespace GameBuilder.Atrac3
 {
     public interface IAtracEncoderBase
     {

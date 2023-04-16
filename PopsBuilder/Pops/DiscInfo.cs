@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace PopsBuilder.Pops
+namespace GameBuilder.Pops
 {
     public class DiscInfo
     {

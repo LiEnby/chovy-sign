@@ -1,11 +1,11 @@
-﻿using PopsBuilder.Cue;
+﻿using GameBuilder.Cue;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace PopsBuilder.Pops
+namespace GameBuilder.Pops
 {
     public class EccRemoverStream : Stream
     {

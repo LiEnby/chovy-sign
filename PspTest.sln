@@ -9,7 +9,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PbpResign", "PbpResign\PbpR
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PsvImage", "PsvImage\PsvImage.csproj", "{0F4A59D9-FF92-4B4F-BDC4-4BC473F9AA5C}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PopsBuilder", "PopsBuilder\PopsBuilder.csproj", "{D1DF66DB-52BE-489C-A292-525BC71F2BB2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GameBuilder", "PopsBuilder\GameBuilder.csproj", "{D1DF66DB-52BE-489C-A292-525BC71F2BB2}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

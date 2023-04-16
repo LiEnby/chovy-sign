@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace PopsBuilder
+namespace GameBuilder
 {
     public class xXEccD3str0yerXx
     {
@@ -42,7 +42,7 @@ namespace PopsBuilder
                 }
 
                 // extend ISO image to compress block sz
-                int padLen = COMPRESS_BLOCK_SZ - (Convert.ToInt32(noEccIso.Length) % COMPRESS_BLOCK_SZ);
+                int padLen = MathUtil.CalculatePaddingAmount(Convert.ToInt32(noEccIso.Length), COMPRESS_BLOCK_SZ);
                 byte[] padding = new byte[padLen];
                 noEccIso.Write(padding, 0x00, padding.Length);
 

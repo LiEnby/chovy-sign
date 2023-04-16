@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace PopsBuilder.Psp
+namespace GameBuilder.Psp
 {
     public static class PbpBuilder
     {
@@ -16,7 +16,9 @@ namespace PopsBuilder.Psp
             using (FileStream pbpStream = File.Open(outputFile, FileMode.Create))
             {
                 byte[] dataPsp = dataPsar.GenerateDataPsp();
-                int padLen = Convert.ToInt32(0x100 - (dataPsp.Length % 0x100));
+
+                int padLen = MathUtil.CalculatePaddingAmount(dataPsp.Length, 0x100);
+                
                 Array.Resize(ref dataPsp, dataPsp.Length + padLen);
 
                 StreamUtil pbpUtil = new StreamUtil(pbpStream);

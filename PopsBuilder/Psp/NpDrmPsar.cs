@@ -7,7 +7,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace PopsBuilder.Psp
+namespace GameBuilder.Psp
 {
     public abstract class NpDrmPsar : IDisposable
     {

@@ -5,7 +5,7 @@ using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace PopsBuilder.Cue
+namespace GameBuilder.Cue
 {
     public class CueReader : IDisposable
     {

@@ -1,7 +1,7 @@
 ﻿using CommunityToolkit.HighPerformance;
 using Ionic.Zlib;
-using PopsBuilder.Pops;
-using PopsBuilder.Psp;
+using GameBuilder.Pops;
+using GameBuilder.Psp;
 using PspCrypto;
 using PsvImage;
 using System;
@@ -11,6 +11,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Collections.Generic;
 
 namespace PbpResign
 {
@@ -1074,13 +1075,19 @@ namespace PbpResign
 
                 Console.WriteLine("VersionKey: " + BitConverter.ToString(NewVersionKey.ToArray()));
 
-                NpUmdImg npumd = new NpUmdImg(new NpDrmInfo(NewVersionKey.ToArray(), CId, npHdr.NpFlags),
-                                                "fft.iso", "ULUS10297", File.ReadAllBytes("TEST\\PARAM.SFO"), true);
+                UmdDisc disc = new UmdDisc("fft.iso");
+                NpUmdImg npumd = new NpUmdImg(new NpDrmInfo(NewVersionKey.ToArray(), CId, npHdr.NpFlags), disc, false);
 
                 npumd.CreatePsar();
-                byte[] paramFile = File.ReadAllBytes("TEST\\PARAM.SFO");
 
-                PbpBuilder.CreatePbp(paramFile, File.ReadAllBytes("TEST\\ICON0.PNG"), null, File.ReadAllBytes("TEST\\PIC0.PNG"), File.ReadAllBytes("TEST\\PIC1.PNG"), null, npumd, "FFT.PBP");
+                PbpBuilder.CreatePbp(disc.DataFiles["PARAM.SFO"],
+                                    disc.DataFiles["ICON0.PNG"], 
+                                    disc.DataFiles["ICON1.PMF"], 
+                                    disc.DataFiles["PIC0.PNG"], 
+                                    disc.DataFiles["PIC1.PNG"],
+                                    disc.DataFiles["SND0.AT3"],
+                                    npumd,
+                                    "FFT.PBP");
                 
                 return CopyNpUmdImg(input, output, pbpHdr, psarBuff, npHdr);
             }

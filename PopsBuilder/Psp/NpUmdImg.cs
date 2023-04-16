@@ -1,6 +1,6 @@
 ﻿using Org.BouncyCastle.Crypto.Paddings;
 using Org.BouncyCastle.Ocsp;
-using PopsBuilder.Pops;
+using GameBuilder.Pops;
 using PspCrypto;
 using System;
 using System.Collections.Generic;
@@ -10,7 +10,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace PopsBuilder.Psp
+namespace GameBuilder.Psp
 {
     public class NpUmdImg : NpDrmPsar
     {
@@ -18,9 +18,8 @@ namespace PopsBuilder.Psp
         const int BLOCK_BASIS = 0x10;
         const int SECTOR_SZ = 2048;
         const int BLOCK_SZ = BLOCK_BASIS * SECTOR_SZ;
-        public NpUmdImg(NpDrmInfo drmInfo, string iso, string discId, byte[] paramSfo, bool compress) : base(drmInfo)
+        public NpUmdImg(NpDrmInfo drmInfo, UmdDisc umdImage, bool compress) : base(drmInfo)
         {
-            this.isoStream = File.OpenRead(iso);
             this.compress = compress;
 
             this.npHdr = new MemoryStream();
@@ -37,13 +36,18 @@ namespace PopsBuilder.Psp
 
             this.headerKey = Rng.RandomBytes(0x10);
 
-            this.discId = discId.ToUpperInvariant().Replace("-", "").Replace("_", "");
-            this.paramSfo = paramSfo;
-
-            isoBlocks = Convert.ToInt64((isoStream.Length + BLOCK_SZ - 1) / BLOCK_SZ);
+            this.umdImage = umdImage;
+            isoBlocks = Convert.ToInt64((umdImage.IsoStream.Length + BLOCK_SZ - 1) / BLOCK_SZ);
 
         }
 
+        private void patchSfo()
+        {
+            Sfo sfoKeys = Sfo.ReadSfo(umdImage.DataFiles["PARAM.SFO"]);
+            sfoKeys["DISC_ID"] = DrmInfo.ContentId.Substring(7, 9);
+            umdImage.DataFiles["PARAM.SFO"] = sfoKeys.WriteSfo();
+
+        }
         private void createNpHdr()
         {
             npHdrUtil.WriteStr("NPUMDIMG");
@@ -69,6 +73,8 @@ namespace PopsBuilder.Psp
 
         public void CreatePsar()
         {
+            patchSfo();
+            
             createNpUmdTbl();
             byte[] tbl = encryptTable();
             this.dataKey = hashBlock(tbl);
@@ -102,7 +108,7 @@ namespace PopsBuilder.Psp
             using (MemoryStream dataPsp = new MemoryStream())
             {
                 StreamUtil dataPspUtil = new StreamUtil(dataPsp);
-                byte[] signature = signParamSfo(paramSfo);
+                byte[] signature = signParamSfo(umdImage.DataFiles["PARAM.SFO"]);
                 dataPspUtil.WriteBytes(signature);
                 dataPspUtil.WritePadding(0x00, 0x530);
                 dataPspUtil.WriteStrWithPadding(DrmInfo.ContentId, 0x00, 0x30);
@@ -118,14 +124,14 @@ namespace PopsBuilder.Psp
         private void createNpUmdTbl()
         {
             Int64 tableSz = isoBlocks * 0x20;
-            Int64 isoSz = this.isoStream.Length;
+            Int64 isoSz = umdImage.IsoStream.Length;
             int wsize = 0;
             Int64 isoOffset = 0x100 + tableSz;
 
             for (int i = 0; i < isoBlocks; i++)
             {
                 byte[] isoBuf = new byte[BLOCK_SZ];
-                wsize = isoStream.Read(isoBuf, 0x00, BLOCK_SZ);
+                wsize = umdImage.IsoStream.Read(isoBuf, 0x00, BLOCK_SZ);
 
                 byte[] wbuf = isoBuf;
 
@@ -140,13 +146,14 @@ namespace PopsBuilder.Psp
                     {
                         wbuf = lzRcBuf;
 
-                        wsize = (lzRcBuf.Length + 15) & ~15;
+                        wsize = lzRcBuf.Length;
+                        wsize += MathUtil.CalculatePaddingAmount(wsize, 16);
                         Array.Resize(ref lzRcBuf, wsize);
                     }
                 }
 
                 int unpaddedSz = wsize;
-                wsize = (wsize + 15) & ~15;
+                wsize += MathUtil.CalculatePaddingAmount(wsize, 16);
                 Array.Resize(ref wbuf, wsize);
                 encryptBlock(wbuf, Convert.ToInt32(isoOffset));
                 byte[] hash = hashBlock(wbuf);
@@ -162,7 +169,7 @@ namespace PopsBuilder.Psp
 
                 isoOffset += wsize;
 
-                Console.Write(Convert.ToInt32(Math.Floor((Convert.ToDouble(isoStream.Position) / Convert.ToDouble(isoStream.Length)) * 100.0)) + "%\r");
+                Console.Write(Convert.ToInt32(Math.Floor((Convert.ToDouble(umdImage.IsoStream.Position) / Convert.ToDouble(umdImage.IsoStream.Length)) * 100.0)) + "%\r");
             }
 
         }
@@ -215,7 +222,7 @@ namespace PopsBuilder.Psp
         {
             npHdrBodyUtil.WriteUInt16(SECTOR_SZ); // sector_sz
 
-            if (isoStream.Length > 0x40000000)
+            if (umdImage.IsoStream.Length > 0x40000000)
                 npHdrBodyUtil.WriteUInt16(0xE001); // unk_2
             else
                 npHdrBodyUtil.WriteUInt16(0xE000); //unk_2
@@ -236,7 +243,7 @@ namespace PopsBuilder.Psp
             npHdrBodyUtil.WriteUInt32(0x01003FFE); // unk_40
             npHdrBodyUtil.WriteUInt32(0x100); // block_entry_offset 
 
-            npHdrBodyUtil.WriteStrWithPadding(this.discId.Substring(0, 4) + "-" + this.discId.Substring(4, 5), 0x00, 0x10);
+            npHdrBodyUtil.WriteStrWithPadding(umdImage.DiscIdSeperated, 0x00, 0x10);
 
             npHdrBodyUtil.WriteInt32(0); // header_start_offset 
             npHdrBodyUtil.WriteInt32(0); // unk_68
@@ -266,14 +273,11 @@ namespace PopsBuilder.Psp
         private Int64 isoBlocks;
         private bool compress;
 
-        private string discId;
-
-        private byte[] paramSfo;
+        UmdDisc umdImage;
 
         private byte[] headerKey;
         private byte[] dataKey;
 
-        private FileStream isoStream;
 
         private MemoryStream npHdr;
         private StreamUtil npHdrUtil;

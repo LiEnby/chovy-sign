@@ -1,5 +1,5 @@
-﻿using Org.BouncyCastle.Crypto.Paddings;
-using PopsBuilder.Psp;
+﻿using GameBuilder;
+using GameBuilder.Psp;
 using PspCrypto;
 using System;
 using System.Collections.Generic;
@@ -8,7 +8,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace PopsBuilder.Pops
+namespace GameBuilder.Pops
 {
     public class PopsImg : NpDrmPsar
     {

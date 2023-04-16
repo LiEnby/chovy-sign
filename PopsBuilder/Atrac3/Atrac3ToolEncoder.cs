@@ -8,7 +8,7 @@ using System.Threading.Channels;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 
-namespace PopsBuilder.Atrac3
+namespace GameBuilder.Atrac3
 {
     public class Atrac3ToolEncoder : IAtracEncoderBase
     {

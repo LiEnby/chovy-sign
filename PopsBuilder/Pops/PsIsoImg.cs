@@ -1,14 +1,14 @@
 ﻿using Org.BouncyCastle.Crypto.Paddings;
-using PopsBuilder.Atrac3;
-using PopsBuilder.Cue;
-using PopsBuilder.Psp;
+using GameBuilder.Atrac3;
+using GameBuilder.Cue;
+using GameBuilder.Psp;
 using PspCrypto;
 using System;
 using System.Net;
 using System.Runtime.InteropServices;
 using System.Security.Cryptography.X509Certificates;
 
-namespace PopsBuilder.Pops
+namespace GameBuilder.Pops
 {
     public class PsIsoImg : PopsImg
     {

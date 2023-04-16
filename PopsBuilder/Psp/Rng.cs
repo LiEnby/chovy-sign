@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace PopsBuilder.Psp
+namespace GameBuilder.Psp
 {
     public static class Rng
     {
