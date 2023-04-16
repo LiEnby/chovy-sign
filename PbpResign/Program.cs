@@ -1075,7 +1075,7 @@ namespace PbpResign
                 Console.WriteLine("VersionKey: " + BitConverter.ToString(NewVersionKey.ToArray()));
 
                 NpUmdImg npumd = new NpUmdImg(new NpDrmInfo(NewVersionKey.ToArray(), CId, npHdr.NpFlags),
-                                                "fft.iso", "ULUS10297", File.ReadAllBytes("TEST\\PARAM.SFO"), false);
+                                                "fft.iso", "ULUS10297", File.ReadAllBytes("TEST\\PARAM.SFO"), true);
 
                 npumd.CreatePsar();
                 byte[] paramFile = File.ReadAllBytes("TEST\\PARAM.SFO");

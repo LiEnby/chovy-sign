@@ -133,7 +133,6 @@ namespace PopsBuilder.Psp
                 {
                     byte[] lzRcBuf = Lz.compress(isoBuf, true);
                     //memset(lzrc_buf + lzrc_size, 0, 16);
-                    //
 
                     int ratio = (lzRcBuf.Length * 100) / BLOCK_SZ;
 

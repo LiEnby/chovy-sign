@@ -22,17 +22,8 @@ namespace PspCrypto
             //return 0;
             var lzrc = new Lzrc(np9660);
 
-            // create a buffer big enough to hold compression result
-            byte[] compression_result = new byte[in_buf.Length]; 
-            // (this could get resized by the compression code, if its too small)
-
             // compress data, and get the compressed data length
-            int compressed_length = lzrc.lzrc_compress(ref compression_result, compression_result.Length, in_buf, in_buf.Length);
-
-            // resize array to actual compressed length ...
-            Array.Resize(ref compression_result, compressed_length);
-
-            return compression_result;
+            return lzrc.lzrc_compress(in_buf, in_buf.Length);
         }
         public static int decompress(byte[] @out, byte[] @in, int size, int insize, bool np9660=false)
         {

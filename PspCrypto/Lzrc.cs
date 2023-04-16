@@ -27,15 +27,16 @@ namespace PspCrypto
         private byte[][] bm_match;
         private byte[][] bm_len;
 
-        const int max_tbl_sz = 65280;
-        const int tbl_sz = 65536;
+        const int MAX_WIN_SZ = 16384;
+        const int MAX_TBL_SZ = 65280;
+        const int TBL_SZ = 65536;
 
-        static byte[] text_buf = new byte[tbl_sz];
-        static int t_start, t_end, t_fill, sp_fill;
-        static int t_len, t_pos;
+        private byte[] text_buf = new byte[TBL_SZ];
+        private int t_start, t_end, t_fill, sp_fill;
+        private int t_len, t_pos;
 
-        static int[] prev = new int[tbl_sz], next = new int[tbl_sz];
-        static int[] root = new int[tbl_sz];
+        private int[] prev = new int[TBL_SZ], next = new int[TBL_SZ];
+        private int[] root = new int[TBL_SZ];
 
         public Lzrc(bool np9660 = false)
         {
@@ -91,14 +92,14 @@ namespace PspCrypto
             output[out_ptr++] = b;
         }
 
-        void re_init(ref byte[] out_buf, int out_len, ref byte[] in_buf, int in_len)
+        void re_init(ref byte[] in_buf, int in_len)
         {
             input = in_buf;
             this.in_len = in_len;
             in_ptr = 0;
 
-            output = out_buf;
-            this.out_len = out_len;
+            this.output = new byte[in_len];
+            this.out_len = in_len;
             out_ptr = 0;
 
             range = 0xffffffff;
@@ -268,7 +269,7 @@ namespace PspCrypto
         {
             int i;
 
-            for (i = 0; i < tbl_sz; i++)
+            for (i = 0; i < TBL_SZ; i++)
             {
                 root[i] = -1;
                 prev[i] = -1;
@@ -290,7 +291,7 @@ namespace PspCrypto
             if (sp_fill == in_len)
                 return;
 
-            content_size = (t_fill < t_end) ? (max_tbl_sz + t_fill - t_end) : (t_fill - t_end);
+            content_size = (t_fill < t_end) ? (MAX_TBL_SZ + t_fill - t_end) : (t_fill - t_end);
             if (content_size >= 509)
                 return;
 
@@ -308,7 +309,7 @@ namespace PspCrypto
             }
             else
             {
-                back_size = max_tbl_sz - t_fill;
+                back_size = MAX_TBL_SZ - t_fill;
                 if (t_start == 0)
                     back_size -= 1;
                 if (sp_fill + back_size > in_len)
@@ -331,12 +332,12 @@ namespace PspCrypto
 
                 sp_fill += front_size;
 
-                Array.ConstrainedCopy(text_buf, 255, text_buf, max_tbl_sz, front_size);
+                Array.ConstrainedCopy(text_buf, 255, text_buf, MAX_TBL_SZ, front_size);
                 //memcpy(text_buf + max_tbl_sz, text_buf, 255);
 
                 t_fill += front_size;
-                if (t_fill >= max_tbl_sz)
-                    t_fill -= max_tbl_sz;
+                if (t_fill >= MAX_TBL_SZ)
+                    t_fill -= MAX_TBL_SZ;
             }
         }
         void remove_node(int p)
@@ -370,7 +371,7 @@ namespace PspCrypto
 
             //src = text_buf[pos..];
             //win = text_buf[t_start..];
-            content_size = (t_fill < pos) ? (max_tbl_sz + t_fill - pos) : (t_fill - pos);
+            content_size = (t_fill < pos) ? (MAX_TBL_SZ + t_fill - pos) : (t_fill - pos);
             t_len = 1;
             t_pos = 0;
             match_len = t_len;
@@ -420,7 +421,7 @@ namespace PspCrypto
                 {
                     int mp = pos - p;
                     if (mp < 0)
-                        mp += max_tbl_sz;
+                        mp += MAX_TBL_SZ;
                     if (mp < t_pos)
                     {
                         t_len = i;
@@ -454,15 +455,15 @@ namespace PspCrypto
             int i, win_size;
             int tmp_len, tmp_pos;
 
-            win_size = (t_end >= t_start) ? (t_end - t_start) : (max_tbl_sz + t_end - t_start);
+            win_size = (t_end >= t_start) ? (t_end - t_start) : (MAX_TBL_SZ + t_end - t_start);
 
             for (i = 0; i < length; i++)
             {
-                if (win_size == 16384)
+                if (win_size == MAX_WIN_SZ)
                 {
                     remove_node(t_start);
                     t_start += 1;
-                    if (t_start == max_tbl_sz)
+                    if (t_start == MAX_TBL_SZ)
                         t_start = 0;
                 }
                 else
@@ -475,8 +476,8 @@ namespace PspCrypto
                     insert_node(t_end, out tmp_len, out tmp_pos, 0);
                 }
                 t_end += 1;
-                if (t_end >= max_tbl_sz)
-                    t_end -= max_tbl_sz;
+                if (t_end >= MAX_TBL_SZ)
+                    t_end -= MAX_TBL_SZ;
             }
         }
         void re_bittree(ref byte[] probs,int index, int limit, int number)
@@ -499,7 +500,6 @@ namespace PspCrypto
                 tmp = number >> n;
                 bit = (number >> (n - 1)) & 1;
                 re_bit(ref probs, index + tmp, bit);
-
                 n -= 1;
             } while (n > 0);
         }
@@ -567,7 +567,7 @@ namespace PspCrypto
         {
             if (out_ptr == out_len)
             {
-                out_len += 0x100;
+                out_len += 0x1000;
                 Array.Resize(ref output, out_len);
             }
 
@@ -637,7 +637,14 @@ namespace PspCrypto
             re_putbyte((byte)((code >> 8) & 0xff));
             re_putbyte((byte)((code >> 0) & 0xff));
         }
-        public int lzrc_compress(ref byte[] out_buf, int out_len, byte[] in_buf, int in_len)
+
+        private byte[] re_trunc()
+        {
+            Array.Resize(ref output, out_ptr);
+            return output;
+        }
+
+        public byte[] lzrc_compress(byte[] in_buf, int in_len)
         {
             int match_step, re_state, len_state, dist_state;
             int i, cur_byte, last_byte;
@@ -645,10 +652,8 @@ namespace PspCrypto
             int match_dist, dist_bits, limit;
             int round = -1;
 
-            len_state = 0;
-
             // initalize buffers to all 0x80
-            re_init(ref out_buf, out_len, ref in_buf, in_len);
+            re_init(ref in_buf, in_len);
 
             // initalize the tree
             init_tree();
@@ -698,11 +703,11 @@ namespace PspCrypto
                     cur_byte = re_getbyte();
                     re_bittree(ref bm_literal[((last_byte >> lc) & 0x07)], 0, 0x100, cur_byte);
 
-                    if (in_ptr >= in_len)
+                    if (!this.np9660 && in_ptr >= in_len)
                     {
                         re_normalize();
                         re_flush();
-                        return out_ptr;
+                        return re_trunc();
                     }
                 }
                 else
@@ -736,7 +741,7 @@ namespace PspCrypto
                         {
                             re_normalize();
                             re_flush();
-                            return out_ptr;
+                            return re_trunc();
                         }
                     }
                     
@@ -756,9 +761,13 @@ namespace PspCrypto
                         dist_state += 7;
 
                         if (this.np9660)
+                        {
                             limit = 44;
+                        }
                         else
+                        {
                             limit = 16;
+                        }
 
                     }
 
@@ -766,7 +775,9 @@ namespace PspCrypto
                     dist_bits = 0;
                     if(match_dist > 0) {
                         while ((match_dist >> dist_bits) != 1)
+                        {
                             dist_bits += 1;
+                        }
                     }
                     else
                     {
