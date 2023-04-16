@@ -11,10 +11,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PsvImage", "PsvImage\PsvIma
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PopsBuilder", "PopsBuilder\PopsBuilder.csproj", "{D1DF66DB-52BE-489C-A292-525BC71F2BB2}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UnicornManaged", "UnicornManaged\UnicornManaged.csproj", "{AF774802-8809-415F-AE18-437036630FEA}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UnicornTest", "UnicornTest\UnicornTest.csproj", "{E7B6A043-340B-4BAF-99B6-B7AB903C817E}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -37,14 +33,6 @@ Global
 		{D1DF66DB-52BE-489C-A292-525BC71F2BB2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D1DF66DB-52BE-489C-A292-525BC71F2BB2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D1DF66DB-52BE-489C-A292-525BC71F2BB2}.Release|Any CPU.Build.0 = Release|Any CPU
-		{AF774802-8809-415F-AE18-437036630FEA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{AF774802-8809-415F-AE18-437036630FEA}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{AF774802-8809-415F-AE18-437036630FEA}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{AF774802-8809-415F-AE18-437036630FEA}.Release|Any CPU.Build.0 = Release|Any CPU
-		{E7B6A043-340B-4BAF-99B6-B7AB903C817E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{E7B6A043-340B-4BAF-99B6-B7AB903C817E}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{E7B6A043-340B-4BAF-99B6-B7AB903C817E}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{E7B6A043-340B-4BAF-99B6-B7AB903C817E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
