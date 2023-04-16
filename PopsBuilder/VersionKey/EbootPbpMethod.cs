@@ -33,7 +33,7 @@ namespace GameBuilder.VersionKey
                     int dataPsarLocation = ebootUtil.ReadInt32At(0x24);
                     ebootStream.Seek(dataPsarLocation, SeekOrigin.Begin);
 
-                    string magic = ebootUtil.ReadCStr();
+                    string magic = ebootUtil.ReadStrLen(8);
 
                     switch (magic)
                     {
@@ -47,7 +47,7 @@ namespace GameBuilder.VersionKey
                             byte[] versionkey = getKey(npUmdHdr, npUmdBody);
 
                             return new NpDrmInfo(versionkey, contentId, keyType);
-                        case "PSISOIMG0000":
+                        case "PSISOIMG":
                             using (DNASStream dnas = new DNASStream(ebootStream, dataPsarLocation + 0x400))
                             {
                                 contentId = ebootUtil.ReadStringAt(dataPspLocation + 0x560);
@@ -56,7 +56,7 @@ namespace GameBuilder.VersionKey
 
                                 return new NpDrmInfo(versionkey, contentId, keyType);
                             }
-                        case "PSTITLEIMG000000":
+                        case "PSTITLEI":
                             using (DNASStream dnas = new DNASStream(ebootStream, dataPsarLocation + 0x200))
                             {
                                 contentId = ebootUtil.ReadStringAt(dataPspLocation + 0x560);
@@ -66,7 +66,7 @@ namespace GameBuilder.VersionKey
                                 return new NpDrmInfo(versionkey, contentId, keyType);
                             }
                         default:
-                            throw new Exception("Cannot obtain versionkey from this EBOOT.PBP");
+                            throw new Exception("Cannot obtain versionkey from this EBOOT.PBP (magic:" + magic + ")");
                     }
 
                 }

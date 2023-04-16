@@ -14,6 +14,10 @@ namespace GameBuilder
         {
             this.s = s;
         }
+        public string ReadStrLen(int len)
+        {
+            return Encoding.UTF8.GetString(ReadBytes(len));
+        }
         public string ReadCStr()
         {
             using (MemoryStream ms = new MemoryStream())

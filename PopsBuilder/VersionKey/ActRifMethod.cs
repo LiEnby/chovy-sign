@@ -16,8 +16,10 @@ namespace GameBuilder.VersionKey
             byte[] versionKey = new byte[0x10];
             SceNpDrm.SetPSID(consoleId);
             SceNpDrm.sceNpDrmGetVersionKey(versionKey, actDat, licenseDat, keyType);
-            string contentId = Encoding.UTF8.GetString(licenseDat, 0x10, 0x24);
+            SceNpDrm.Aid = BitConverter.ToUInt64(licenseDat, 0x8);
 
+            string contentId = Encoding.UTF8.GetString(licenseDat, 0x10, 0x24);
+            
             return new NpDrmInfo(versionKey, contentId, keyType);
         }
     }

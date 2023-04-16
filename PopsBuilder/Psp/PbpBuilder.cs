@@ -19,8 +19,8 @@ namespace GameBuilder.Psp
                 byte[] dataPsp = dataPsar.GenerateDataPsp();
 
                 int padLen = MathUtil.CalculatePaddingAmount(dataPsp.Length, 0x100);
-                
-                Array.Resize(ref dataPsp, dataPsp.Length + padLen);
+                if(version == 1)
+                    Array.Resize(ref dataPsp, dataPsp.Length + padLen);
 
                 StreamUtil pbpUtil = new StreamUtil(pbpStream);
                 pbpUtil.WriteByte(0x00);

@@ -2,6 +2,7 @@
 using GameBuilder.Progress;
 using GameBuilder.Psp;
 using GameBuilder.VersionKey;
+using PspCrypto;
 
 namespace ChovySign_CLI
 {
@@ -178,14 +179,17 @@ namespace ChovySign_CLI
             if(res != 0) return res;
 
             if (drmInfo is null) return Error("no versionkey was found, exiting", 6);
-            if (pbpMode is null) return Error("no pbp mode was set, exiting", 7);
 
+            Console.WriteLine("Version Key: " + BitConverter.ToString(drmInfo.VersionKey).Replace("-", ""));
+
+            if (pbpMode is null) return Error("no pbp mode was set, exiting", 7);
+            
             if (pbpMode == PbpMode.PSP && drmInfo.KeyIndex != 2)
                 return Error("KeyType is "+drmInfo.KeyIndex+", but PBP mode is PSP, you cant do that .. please use a type 1 versionkey.", 8);
 
             if (pbpMode == PbpMode.POPS && drmInfo.KeyIndex != 1)
                 return Error("KeyType is " + drmInfo.KeyIndex + ", but PBP mode is POPS, you cant do that .. please use a type 1 versionkey.", 8);
-
+            
             if (pbpMode == PbpMode.POPS && (popsDiscName is null || popsIcon0File is null)) return Error("pbp mode is POPS, but you have not specified a disc title or icon file using --pops-info.", 9);
 
             if (pbpMode == PbpMode.POPS)
@@ -223,14 +227,18 @@ namespace ChovySign_CLI
                             psIsoImg, 
                             "EBOOT.PBP", 
                             0);
+
+                        byte[] ebootsig = new byte[0x200];
+                        SceNpDrm.KsceNpDrmEbootSigGenPs1("EBOOT.PBP", ebootsig, 0x3600000);
+                        File.WriteAllBytes("__sce_ebootpbp", ebootsig.ToArray());
                     }
                 }
                 else
                 {
-                    using (PsTitleImg psIsoImg = new PsTitleImg(drmInfo, discInfs))
+                    using (PsTitleImg psTitleImg = new PsTitleImg(drmInfo, discInfs))
                     {
-                        psIsoImg.RegisterCallback(onProgress);
-                        psIsoImg.CreatePsar();
+                        psTitleImg.RegisterCallback(onProgress);
+                        psTitleImg.CreatePsar();
 
                         PbpBuilder.CreatePbp(psfo.WriteSfo(),
                             File.ReadAllBytes(popsIcon0File),
@@ -238,9 +246,13 @@ namespace ChovySign_CLI
                             (popsPic0File is not null) ? File.ReadAllBytes(popsPic0File) : null,
                             Resources.PIC1,
                             null,
-                            psIsoImg,
+                            psTitleImg,
                             "EBOOT.PBP",
                             0);
+
+                        byte[] ebootsig = new byte[0x200];
+                        SceNpDrm.KsceNpDrmEbootSigGenPs1("EBOOT.PBP", ebootsig, 0x3600000);
+                        File.WriteAllBytes("__sce_ebootpbp", ebootsig.ToArray());
                     }
                 }
             }
@@ -262,6 +274,10 @@ namespace ChovySign_CLI
                             npUmd, 
                             "EBOOT.PBP", 
                             1);
+
+                        byte[] ebootsig = new byte[0x200];
+                        SceNpDrm.KsceNpDrmEbootSigGenPsp("EBOOT.PBP", ebootsig, 0x3600000);
+                        File.WriteAllBytes("__sce_ebootpbp", ebootsig.ToArray());
 
                     }
                 }

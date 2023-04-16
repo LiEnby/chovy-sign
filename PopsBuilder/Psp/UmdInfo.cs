@@ -25,7 +25,7 @@ namespace GameBuilder.Psp
         {
             this.IsoFile = isoFile;
             this.IsoStream = File.OpenRead(isoFile);
-            using (CDReader cdReader = new CDReader(this.IsoStream, true, true))
+            using (CDReader cdReader = new CDReader(this.IsoStream, true, true, 2048))
             {
                 foreach (string file in filesList)
                 {

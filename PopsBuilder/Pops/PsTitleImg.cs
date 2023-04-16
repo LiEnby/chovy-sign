@@ -57,8 +57,8 @@ namespace GameBuilder.Pops
             createIsoMap();
 
             psarUtil.WriteStr("PSTITLEIMG000000");
-            psarUtil.WriteInt64(PSISO_ALIGN+isoPart.Length); // location of STARTDAT
-
+            psarUtil.WriteInt64(PSISO_ALIGN + isoPart.Length); // location of STARTDAT
+            
             psarUtil.WriteBytes(Rng.RandomBytes(0x10)); // dunno what this is
             psarUtil.WritePadding(0x00, 0x1D8);
 
@@ -70,7 +70,6 @@ namespace GameBuilder.Pops
             isoPart.CopyTo(Psar);
 
             psarUtil.WriteBytes(StartDat);
-
             psarUtil.WriteBytes(SimplePgd);
         }
 
@@ -115,7 +114,7 @@ namespace GameBuilder.Pops
                 discNumber++;
                 if (compressors[i] is null) { isoMapUtil.WriteInt32(0); continue; };
 
-                int padLen = Convert.ToInt32(PSISO_ALIGN - (isoPart.Position % PSISO_ALIGN));
+                int padLen = MathUtil.CalculatePaddingAmount(Convert.ToInt32(isoPart.Position), PSISO_ALIGN);
                 isoPartUtil.WritePadding(0x00, padLen);
 
                 using (PsIsoImg psIsoImg = new PsIsoImg(this.DrmInfo, compressors[i]))
@@ -144,7 +143,7 @@ namespace GameBuilder.Pops
             isoMapUtil.WriteStrWithPadding(discs.First().DiscIdHdr, 0x00, 0x20);
 
             isoMapUtil.WriteInt64(Convert.ToInt64(PSISO_ALIGN + isoPart.Length + StartDat.Length));
-            psarUtil.WriteBytes(Rng.RandomBytes(0x80));
+            isoMapUtil.WriteBytes(Rng.RandomBytes(0x80));
             isoMapUtil.WriteStrWithPadding(discs.First().DiscName, 0x00, 0x80);
             isoMapUtil.WriteInt32(MAX_DISCS);
             isoMapUtil.WritePadding(0x00, 0x70);
