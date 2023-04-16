@@ -1,4 +1,5 @@
-﻿using PspCrypto;
+﻿using GameBuilder.Progress;
+using PspCrypto;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace GameBuilder.Psp
 {
-    public abstract class NpDrmPsar : IDisposable
+    public abstract class NpDrmPsar : ProgressTracker, IDisposable
     {
         public NpDrmPsar(NpDrmInfo npDrmInfo)
         {
@@ -17,10 +18,10 @@ namespace GameBuilder.Psp
 
             Psar = new MemoryStream();
             psarUtil = new StreamUtil(Psar);
+
         }
 
         public NpDrmInfo DrmInfo;
-
         public MemoryStream Psar;
         internal StreamUtil psarUtil;
         public abstract byte[] GenerateDataPsp();

@@ -1,4 +1,5 @@
 ﻿using GameBuilder.Atrac3;
+using GameBuilder.Progress;
 using GameBuilder.Psp;
 using PspCrypto;
 using System;
@@ -14,6 +15,14 @@ namespace GameBuilder.Pops
     {
         const int MAX_DISCS = 5;
         const int PSISO_ALIGN = 0x8000;
+
+        private int discNumber = 0;
+
+        private void onProgress(ProgressInfo inf)
+        {
+            this.UpdateProgress(inf.Done, inf.Remain, inf.CurrentProcess + " (disc " + discNumber + ")");
+        }
+
         public PsTitleImg(NpDrmInfo drmInfo, DiscInfo[] discs) : base(drmInfo)
         {
             if (discs.Length > MAX_DISCS) throw new Exception("Sorry, multi disc games only support up to 5 discs... (i dont make the rules)");
@@ -22,8 +31,15 @@ namespace GameBuilder.Pops
 
             for (int i = 0; i < compressors.Length; i++)
             {
-                if (i > (discs.Length - 1)) compressors[i] = null;
-                else compressors[i] = new DiscCompressor(this, discs[i], new Atrac3ToolEncoder());
+                if (i > (discs.Length - 1))
+                {
+                    compressors[i] = null;
+                }
+                else
+                {
+                    compressors[i] = new DiscCompressor(this, discs[i], new Atrac3ToolEncoder());
+                    compressors[i].RegisterCallback(onProgress);
+                }
             }
 
 
@@ -96,6 +112,7 @@ namespace GameBuilder.Pops
             byte[] checksums = new byte[0x10 * MAX_DISCS];
             for(int i = 0; i < MAX_DISCS; i++)
             {
+                discNumber++;
                 if (compressors[i] is null) { isoMapUtil.WriteInt32(0); continue; };
 
                 int padLen = Convert.ToInt32(PSISO_ALIGN - (isoPart.Position % PSISO_ALIGN));
@@ -106,7 +123,6 @@ namespace GameBuilder.Pops
                     isoMapUtil.WriteUInt32(Convert.ToUInt32(PSISO_ALIGN + isoPart.Position));
 
                     psIsoImg.CreatePsar(true);
-                    
                     
                     psIsoImg.Psar.Seek(0x0, SeekOrigin.Begin);
                     compressors[i].IsoHeader.Seek(0x00, SeekOrigin.Begin);

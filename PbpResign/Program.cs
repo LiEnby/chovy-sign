@@ -1072,10 +1072,10 @@ namespace PbpResign
                     return false;
                 }
                 type = 0;
-
+                /*
                 Console.WriteLine("VersionKey: " + BitConverter.ToString(NewVersionKey.ToArray()));
 
-                UmdDisc disc = new UmdDisc("fft.iso");
+                UmdInfo disc = new UmdInfo("fft.iso");
                 NpUmdImg npumd = new NpUmdImg(new NpDrmInfo(NewVersionKey.ToArray(), CId, npHdr.NpFlags), disc, false);
 
                 npumd.CreatePsar();
@@ -1087,7 +1087,7 @@ namespace PbpResign
                                     disc.DataFiles["PIC1.PNG"],
                                     disc.DataFiles["SND0.AT3"],
                                     npumd,
-                                    "FFT.PBP");
+                                    "FFT.PBP"); */
                 
                 return CopyNpUmdImg(input, output, pbpHdr, psarBuff, npHdr);
             }

@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace GameBuilder.Psp
 {
-    public class UmdDisc : IDisposable
+    public class UmdInfo : IDisposable
     {
         private string[] filesList = new string[]
         {
@@ -21,7 +21,7 @@ namespace GameBuilder.Psp
         };
 
         public Dictionary<string, byte[]?> DataFiles = new Dictionary<string, byte[]?>();
-        public UmdDisc(string isoFile)
+        public UmdInfo(string isoFile)
         {
             this.IsoFile = isoFile;
             this.IsoStream = File.OpenRead(isoFile);
@@ -54,12 +54,19 @@ namespace GameBuilder.Psp
             Sfo sfo = Sfo.ReadSfo(DataFiles["PARAM.SFO"]);
             this.DiscId = sfo["DISC_ID"] as String;
 
+            // check minis
+            if (sfo["ATTRIBUTE"] is UInt32)
+                this.Minis = ((UInt32)sfo["ATTRIBUTE"] & 0b00000001000000000000000000000000) != 0;
+            else 
+                this.Minis = false;
+
             IsoStream.Seek(0x00, SeekOrigin.Begin);
         }
 
 
         public string IsoFile;
         public FileStream IsoStream;
+        public bool Minis;
         public string DiscId;
         public string DiscIdSeperated
         {

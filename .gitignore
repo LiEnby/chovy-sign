@@ -8,9 +8,14 @@
 PbpResign/bin/*
 PbpResign/obj/*
 
+ChovySign-CLI/bin/*
+ChovySign-CLI/obj/*
+
+DiscUtils/bin/*
+DiscUtils/obj/*
+
 PopsBuilder/bin/*
 PopsBuilder/obj/*
-
 
 PspCrypto/bin/*
 PspCrypto/obj/*

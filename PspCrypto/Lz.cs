@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using System.Text;
-using SevenZip.Compression.LZMA;
-using Decoder = SevenZip.Compression.LZMA.Decoder;
 
 namespace PspCrypto
 {

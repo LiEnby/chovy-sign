@@ -14,7 +14,7 @@ namespace GameBuilder
         {
             this.s = s;
         }
-        public string ReadString()
+        public string ReadCStr()
         {
             using (MemoryStream ms = new MemoryStream())
             {
@@ -28,11 +28,20 @@ namespace GameBuilder
                 return Encoding.UTF8.GetString(ms.ToArray());
             }
         }
-        public UInt32 ReadUint32At(int location)
+        public UInt32 ReadUInt32At(int location)
         {
             long oldPos = s.Position;
             s.Seek(location, SeekOrigin.Begin);
             UInt32 outp = ReadUInt32();
+            s.Seek(oldPos, SeekOrigin.Begin);
+            return outp;
+        }
+
+        public Int32 ReadInt32At(int location)
+        {
+            long oldPos = s.Position;
+            s.Seek(location, SeekOrigin.Begin);
+            Int32 outp = ReadInt32();
             s.Seek(oldPos, SeekOrigin.Begin);
             return outp;
         }
@@ -50,7 +59,7 @@ namespace GameBuilder
         {
             long oldPos = s.Position;
             s.Seek(location, SeekOrigin.Begin);
-            string outp = ReadString();
+            string outp = ReadCStr();
             s.Seek(oldPos, SeekOrigin.Begin);
             return outp;
         }

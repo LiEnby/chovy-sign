@@ -12,6 +12,7 @@ namespace GameBuilder.Pops
 {
     public class PopsImg : NpDrmPsar
     {
+        
         public PopsImg(NpDrmInfo versionKey) : base(versionKey)
         {
             simple = new MemoryStream();
@@ -22,7 +23,6 @@ namespace GameBuilder.Pops
             SimplePgd = generateSimplePgd();
 
         }
-        
 
         private MemoryStream simple;
         private StreamUtil simpleUtil;

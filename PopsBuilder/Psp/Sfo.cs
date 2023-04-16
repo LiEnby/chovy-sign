@@ -34,25 +34,51 @@ namespace GameBuilder.Psp
         {
             get
             {
-                return sfoEntries[index].value;
+                if (sfoEntries.ContainsKey(index))
+                    return sfoEntries[index].value;
+                else
+                    return null;
             }
             set
             {
-                SfoEntry sfoEnt = sfoEntries[index];
-                sfoEnt.value = value;
+                if (sfoEntries.ContainsKey(index))
+                {
+                    SfoEntry sfoEnt = sfoEntries[index];
+                    sfoEnt.value = value;
 
-                // update sz
-                sfoEnt.valueSize = getObjectSz(sfoEnt.value);
+                    // update sz
+                    sfoEnt.valueSize = getObjectSz(sfoEnt.value);
 
-                if (sfoEnt.valueSize > sfoEnt.totalSize)
-                    sfoEnt.totalSize = Convert.ToUInt32(MathUtil.CalculatePaddingAmount(Convert.ToInt32(sfoEnt.valueSize), sfoEnt.align));
-                
-                // update type
-                sfoEnt.type = getPsfType(sfoEnt.value);
+                    if (sfoEnt.valueSize > sfoEnt.totalSize)
+                        sfoEnt.totalSize = Convert.ToUInt32(MathUtil.CalculatePaddingAmount(Convert.ToInt32(sfoEnt.valueSize), sfoEnt.align));
 
-                sfoEntries[index] = sfoEnt;
+                    // update type
+                    sfoEnt.type = getPsfType(sfoEnt.value);
+
+                    sfoEntries[index] = sfoEnt;
+                }
+                else
+                {
+                    UInt32 sz = getObjectSz(value);
+                    int alg = MathUtil.CalculatePaddingAmount(Convert.ToInt32(sz), 4);
+
+                    AddKey(index, value, Convert.ToUInt32(sz + alg), 4);
+                }
             }
         }
+
+        public void AddKey(string keyName, object value, UInt32 totalSize, byte align = 4)
+        {
+            SfoEntry ent = new SfoEntry();
+            ent.keyName = keyName;
+            ent.type = getPsfType(value);
+            ent.valueSize = getObjectSz(value);
+            ent.totalSize = Convert.ToUInt32(totalSize + MathUtil.CalculatePaddingAmount(Convert.ToInt32(totalSize), align));
+            ent.align = align;
+            ent.value = value;
+            sfoEntries[ent.keyName] = ent;
+        }
+
         public Sfo()
         {
             sfoEntries = new Dictionary<string, SfoEntry>();
@@ -198,7 +224,7 @@ namespace GameBuilder.Psp
                             break; 
 
                         case PSF_TYPE_VAL:
-                            entry.value = DataUtils.ReadUint32At(valueLocation);
+                            entry.value = DataUtils.ReadUInt32At(valueLocation);
                             break;
 
                         case PSF_TYPE_BIN:

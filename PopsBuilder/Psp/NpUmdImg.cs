@@ -18,7 +18,7 @@ namespace GameBuilder.Psp
         const int BLOCK_BASIS = 0x10;
         const int SECTOR_SZ = 2048;
         const int BLOCK_SZ = BLOCK_BASIS * SECTOR_SZ;
-        public NpUmdImg(NpDrmInfo drmInfo, UmdDisc umdImage, bool compress) : base(drmInfo)
+        public NpUmdImg(NpDrmInfo drmInfo, UmdInfo umdImage, bool compress) : base(drmInfo)
         {
             this.compress = compress;
 
@@ -44,9 +44,9 @@ namespace GameBuilder.Psp
         private void patchSfo()
         {
             Sfo sfoKeys = Sfo.ReadSfo(umdImage.DataFiles["PARAM.SFO"]);
-            sfoKeys["DISC_ID"] = DrmInfo.ContentId.Substring(7, 9);
+            if ((sfoKeys["CATEGORY"] as String) == "UG") // "UMD Game"
+                sfoKeys["CATEGORY"] = "EG"; // set it to "Eboot Game"
             umdImage.DataFiles["PARAM.SFO"] = sfoKeys.WriteSfo();
-
         }
         private void createNpHdr()
         {
@@ -74,7 +74,6 @@ namespace GameBuilder.Psp
         public void CreatePsar()
         {
             patchSfo();
-            
             createNpUmdTbl();
             byte[] tbl = encryptTable();
             this.dataKey = hashBlock(tbl);
@@ -103,8 +102,7 @@ namespace GameBuilder.Psp
 
         public override byte[] GenerateDataPsp()
         {
-            bool minis = false; // TODO: read minis flag from param.sfo
-            byte[] startDat = CreateStartDat(minis ? Resources.STARTDATMINIS : Resources.STARTDATPSP);
+            byte[] startDat = CreateStartDat(umdImage.Minis ? Resources.STARTDATMINIS : Resources.STARTDATPSP);
             using (MemoryStream dataPsp = new MemoryStream())
             {
                 StreamUtil dataPspUtil = new StreamUtil(dataPsp);
@@ -169,7 +167,7 @@ namespace GameBuilder.Psp
 
                 isoOffset += wsize;
 
-                Console.Write(Convert.ToInt32(Math.Floor((Convert.ToDouble(umdImage.IsoStream.Position) / Convert.ToDouble(umdImage.IsoStream.Length)) * 100.0)) + "%\r");
+                UpdateProgress(Convert.ToInt32(umdImage.IsoStream.Position), Convert.ToInt32(umdImage.IsoStream.Length), "Compress & Encrypt UMD Image");
             }
 
         }
@@ -270,10 +268,19 @@ namespace GameBuilder.Psp
             return headerBytes;
         }
 
+        public override void Dispose()
+        {
+            npHdr.Dispose();
+            npHdrBody.Dispose();
+            isoData.Dispose();
+            npTbl.Dispose();
+            base.Dispose();
+        }
+
         private Int64 isoBlocks;
         private bool compress;
 
-        UmdDisc umdImage;
+        UmdInfo umdImage;
 
         private byte[] headerKey;
         private byte[] dataKey;
