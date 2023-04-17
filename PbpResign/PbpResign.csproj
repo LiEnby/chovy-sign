@@ -11,9 +11,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\PopsBuilder\GameBuilder.csproj" />
+    <ProjectReference Include="..\GameBuilder\GameBuilder.csproj" />
     <ProjectReference Include="..\PspCrypto\PspCrypto.csproj" />
-    <ProjectReference Include="..\PsvImgTools\Vita.csproj" />
+    <ProjectReference Include="..\Vita\Vita.csproj" />
   </ItemGroup>
 
 </Project>

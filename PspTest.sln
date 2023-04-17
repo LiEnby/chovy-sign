@@ -23,12 +23,12 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ChovySign-CLI", "ChovySign-
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DiscUtils", "DiscUtils\DiscUtils.csproj", "{BF155D74-2923-432F-8566-26D83B15EEE8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Vita", "PsvImgTools\Vita.csproj", "{75BBF537-8ED8-42A3-AA8B-80A730F1B3F2}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Vita", "Vita\Vita.csproj", "{75BBF537-8ED8-42A3-AA8B-80A730F1B3F2}"
 	ProjectSection(ProjectDependencies) = postProject
 		{63475285-AAD2-4DE9-B698-AFC9FAA58AC8} = {63475285-AAD2-4DE9-B698-AFC9FAA58AC8}
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LiLib", "LiGeneralUtilities\LiLib.csproj", "{63475285-AAD2-4DE9-B698-AFC9FAA58AC8}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LiLib", "LiLib\LiLib.csproj", "{63475285-AAD2-4DE9-B698-AFC9FAA58AC8}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

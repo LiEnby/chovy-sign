@@ -12,7 +12,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\LiGeneralUtilities\LiLib.csproj" />
+    <ProjectReference Include="..\LiLib\LiLib.csproj" />
   </ItemGroup>
 
 </Project>

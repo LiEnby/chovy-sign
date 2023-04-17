@@ -14,14 +14,17 @@ ChovySign-CLI/obj/*
 DiscUtils/bin/*
 DiscUtils/obj/*
 
-PopsBuilder/bin/*
-PopsBuilder/obj/*
+GameBuilder/bin/*
+GameBuilder/obj/*
 
 PspCrypto/bin/*
 PspCrypto/obj/*
 
-PsvImage/bin/*
-PsvImage/obj/*
+LiLib/bin/*
+LiLib/obj/*
+
+Vita/bin/*
+Vita/obj/*
 
 UnicornTest/*
 UnicornManaged/*
