@@ -1,10 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Runtime.InteropServices;
-using System.Text;
 
-namespace PsvImage
+namespace Vita.PsvImgTools
 {
+
     internal class PSVIMGConstants
     {
         public const int AES_BLOCK_SIZE = 0x10;
@@ -19,8 +17,27 @@ namespace PsvImage
         public const int FULL_PSVIMG_SIZE = PSVIMG_BLOCK_SIZE + SHA256_BLOCK_SIZE;
     }
 
-    [StructLayout(LayoutKind.Sequential)]
-    internal struct SceDateTime
+    internal class StringReader
+    {
+        internal static string ReadUntilTerminator(byte[] StringBytes)
+        {
+            string str = "";
+            foreach (byte sByte in StringBytes)
+            {
+                if (sByte != 0x00)
+                {
+                    str += (char)sByte;
+                }
+                else
+                {
+                    return str;
+                }
+            }
+            return str;
+        }
+    }
+
+    internal class SceDateTime
     {
         public ushort Year;
         public ushort Month;
@@ -29,13 +46,15 @@ namespace PsvImage
         public ushort Minute;
         public ushort Second;
         public uint Microsecond;
+
+        public SceDateTime()
+        {
+
+        }
     }
 
-
-    [StructLayout(LayoutKind.Sequential)]
-    internal unsafe struct SceIoStat
+    internal class SceIoStat
     {
-        [Flags]
         public enum Modes
         {
             /** Format bits mask */
@@ -103,7 +122,7 @@ namespace PsvImage
         public Modes Mode;
         public AttributesEnum Attributes;
         /** Size of the file in bytes. */
-        public UInt64 Size;
+        public ulong Size;
         /** Creation time. */
         public SceDateTime CreationTime;
         /** Access time. */
@@ -111,26 +130,38 @@ namespace PsvImage
         /** Modification time. */
         public SceDateTime ModificaionTime;
         /** Device-specific data. */
-        public fixed uint Private[6];
-    }
+        public uint[] Private = new uint[6];
+        public SceIoStat()
+        {
+            for (int i = 0; i < Private.Length; i++)
+            {
+                Private[i] = 0;
+            }
+        }
+    };
 
-    [StructLayout(LayoutKind.Sequential)]
-    internal unsafe struct PsvImgTailer
+    internal class PsvImgTailer
     {
-
         public ulong Flags;
-        public fixed byte Padding[1004];
-        public fixed byte bEnd[12];
-    }
+        public byte[] Padding = new byte[1004];
+        public byte[] bEnd = new byte[12];
 
+        public string End
+        {
+            get
+            {
+                return StringReader.ReadUntilTerminator(bEnd);
+            }
+        }
+    }
     internal class PSVIMGPadding
     {
         public static long GetPadding(long size)
         {
             long padding;
-            if ((size & (PSVIMGConstants.PSVIMG_ENTRY_ALIGN - 1)) >= 1)
+            if ((size & PSVIMGConstants.PSVIMG_ENTRY_ALIGN - 1) >= 1)
             {
-                padding = (PSVIMGConstants.PSVIMG_ENTRY_ALIGN - (size & (PSVIMGConstants.PSVIMG_ENTRY_ALIGN - 1)));
+                padding = PSVIMGConstants.PSVIMG_ENTRY_ALIGN - (size & PSVIMGConstants.PSVIMG_ENTRY_ALIGN - 1);
             }
             else
             {
@@ -140,15 +171,43 @@ namespace PsvImage
         }
     }
 
-    internal unsafe struct PsvImgHeader
+    internal class PsvImgHeader
     {
         public ulong SysTime;
         public ulong Flags;
         public SceIoStat Statistics;
-        public fixed byte bParentPath[256];
-        public uint unk_16C;
-        public fixed byte bPath[256];
-        public fixed byte Padding[904];
-        public fixed byte bEnd[12];
+        public byte[] bParentPath = new byte[256];
+        public uint unk_16C; // set to 1
+        public byte[] bPath = new byte[256];
+        public byte[] Padding = new byte[904];
+        public byte[] bEnd = new byte[12];
+
+        public string Path
+        {
+            get
+            {
+                return StringReader.ReadUntilTerminator(bPath);
+            }
+        }
+
+        public string End
+        {
+            get
+            {
+                return StringReader.ReadUntilTerminator(bEnd);
+            }
+        }
+
+        public string ParentPath
+        {
+            get
+            {
+                return StringReader.ReadUntilTerminator(bParentPath);
+            }
+        }
+        public PsvImgHeader()
+        {
+
+        }
     }
 }

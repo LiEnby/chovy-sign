@@ -13,7 +13,7 @@
   <ItemGroup>
     <ProjectReference Include="..\PopsBuilder\GameBuilder.csproj" />
     <ProjectReference Include="..\PspCrypto\PspCrypto.csproj" />
-    <ProjectReference Include="..\PsvImage\PsvImage.csproj" />
+    <ProjectReference Include="..\PsvImgTools\Vita.csproj" />
   </ItemGroup>
 
 </Project>

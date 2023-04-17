@@ -1,6 +1,6 @@
 ﻿using GameBuilder.Atrac3;
+using Li.Progress;
 using GameBuilder.Cue;
-using GameBuilder.Progress;
 using GameBuilder.Psp;
 using PspCrypto;
 using System;
@@ -9,10 +9,11 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
+using Li.Utilities;
 
 namespace GameBuilder.Pops
 {
-    public class DiscCompressor : ProgressTracker
+    public class DiscCompressor : ProgressTracker, IDisposable
     {
         const int COMPRESS_BLOCK_SZ = 0x9300;
         const int DEFAULT_ISO_OFFSET = 0x100000;
@@ -103,7 +104,7 @@ namespace GameBuilder.Pops
                     while (eccRem.Position < eccRem.Length)
                     {                        
                         writeCompressedIsoBlock(eccRem);
-                        UpdateProgress(Convert.ToInt32(eccRem.Position), Convert.ToInt32(eccRem.Length), "Compress & Encrypt Disc");
+                        updateProgress(Convert.ToInt32(eccRem.Position), Convert.ToInt32(eccRem.Length), "Compress & Encrypt Disc");
                     }
                 }
             }
@@ -163,7 +164,7 @@ namespace GameBuilder.Pops
             for (int i = 1; i <= totalTracks; i++)
             {
                 if (cue.GetTrackNumber(i).TrackType != TrackType.TRACK_CDDA) continue;
-                UpdateProgress(i, totalTracks, "Convert CD Audio tracks to ATRAC3");
+                updateProgress(i, totalTracks, "Convert CD Audio tracks to ATRAC3");
 
                 using (CueStream audioStream = cue.OpenTrack(i))
                 {
@@ -219,6 +220,12 @@ namespace GameBuilder.Pops
             isoHeaderUtil.WriteBytes(cue.CreateToc());
         }
 
+        public void Dispose()
+        {
+            IsoHeader.Dispose();
+            CompressedIso.Dispose();
+            cue.Dispose();
+        }
 
         private DiscInfo disc;
         private CueReader cue;

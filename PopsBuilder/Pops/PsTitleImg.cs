@@ -1,5 +1,6 @@
-﻿using GameBuilder.Atrac3;
-using GameBuilder.Progress;
+﻿using Li.Progress;
+using Li.Utilities;
+using GameBuilder.Atrac3;
 using GameBuilder.Psp;
 using PspCrypto;
 using System;
@@ -20,7 +21,7 @@ namespace GameBuilder.Pops
 
         private void onProgress(ProgressInfo inf)
         {
-            this.UpdateProgress(inf.Done, inf.Remain, inf.CurrentProcess + " (disc " + discNumber + ")");
+            this.updateProgress(inf.Done, inf.Remain, inf.CurrentProcess + " (disc " + discNumber + ")");
         }
 
         public PsTitleImg(NpDrmInfo drmInfo, DiscInfo[] discs) : base(drmInfo)
@@ -52,7 +53,7 @@ namespace GameBuilder.Pops
 
         }
 
-        public void CreatePsar()
+        public override void CreatePsar()
         {
             createIsoMap();
 
@@ -119,20 +120,31 @@ namespace GameBuilder.Pops
 
                 using (PsIsoImg psIsoImg = new PsIsoImg(this.DrmInfo, compressors[i]))
                 {
+                    // write location of iso
                     isoMapUtil.WriteUInt32(Convert.ToUInt32(PSISO_ALIGN + isoPart.Position));
 
-                    psIsoImg.CreatePsar(true);
+                    // compress current iso and generate headers
+                    compressors[i].GenerateIsoHeaderAndCompress();
                     
+                    // generate PSISOIMG header
+                    psIsoImg.generatePsIsoHeader();
+
+                    // Copy compressed ISO to PSISOIMG
+                    compressors[i].CompressedIso.Seek(0x00, SeekOrigin.Begin);
+                    compressors[i].CompressedIso.CopyTo(psIsoImg.Psar);
+
+                    // read 0x400 bytes from PSAR copy iso header after that,.
                     psIsoImg.Psar.Seek(0x0, SeekOrigin.Begin);
                     compressors[i].IsoHeader.Seek(0x00, SeekOrigin.Begin);
-
                     byte[] isoHdr = new byte[compressors[i].IsoHeader.Length + 0x400];
                     psIsoImg.Psar.Read(isoHdr, 0x00, 0x400);
                     compressors[i].IsoHeader.Read(isoHdr, 0x400, Convert.ToInt32(compressors[i].IsoHeader.Length));
 
+                    // Calculate checksum 
                     byte[] checksum = calculateChecksumForIsoImgTitle(isoHdr);
                     Array.ConstrainedCopy(checksum, 0, checksums, i * 0x10, 0x10);
 
+                    // copy psiso to TITLE ..
                     psIsoImg.Psar.Seek(0x00, SeekOrigin.Begin);
                     psIsoImg.Psar.CopyTo(isoPart);
 

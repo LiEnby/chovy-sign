@@ -1,8 +1,10 @@
-﻿using GameBuilder.Pops;
-using GameBuilder.Progress;
+﻿using Li.Progress;
+using GameBuilder.Pops;
 using GameBuilder.Psp;
 using GameBuilder.VersionKey;
 using PspCrypto;
+using System.Reflection.PortableExecutable;
+using System.IO.Pipes;
 
 namespace ChovySign_CLI
 {
@@ -36,7 +38,11 @@ namespace ChovySign_CLI
         }
         public static int Error(string errorMsg, int ret)
         {
+            ConsoleColor prevColor = Console.ForegroundColor;
+            Console.ForegroundColor = ConsoleColor.DarkRed;
             Console.Error.WriteLine("ERROR: "+errorMsg);
+            Console.ForegroundColor = prevColor;
+
             return ret;
         }
         public static byte[] StringToByteArray(string hex)
@@ -46,7 +52,12 @@ namespace ChovySign_CLI
 
         private static void onProgress(ProgressInfo info)
         {
-            Console.Write(info.CurrentProcess + " " + info.ProgressInt.ToString() + "% (" + info.Done + "/" + info.Remain + ") \r");
+            string msg = info.CurrentProcess + " " + info.ProgressInt.ToString() + "% (" + info.Done + "/" + info.Remain + ")";
+            int spaceLen = (Console.WindowWidth - msg.Length) - 2;
+            string emptySpace = " ";
+            for (int i = 0; i < spaceLen; i++) 
+                emptySpace += " ";
+            Console.Write(msg + emptySpace + "\r");
         }
 
         private static int complete()
@@ -98,7 +109,8 @@ namespace ChovySign_CLI
         }
         public static int Main(string[] args)
         {
-            if(args.Length == 0)
+
+            if (args.Length == 0)
             {
                 Console.WriteLine("Chovy-Sign v2 (CLI)");
                 Console.WriteLine("--pops [disc1.cue] [disc2.cue] [disc3.cue] ... (up to 5)");
@@ -209,49 +221,33 @@ namespace ChovySign_CLI
                 psfo.AddKey("PSP_SYSTEM_VER", "6.60", 8);
                 psfo.AddKey("REGION", 32768, 4);
                 psfo.AddKey("TITLE", popsDiscName, 128);
-
+                byte[] sfo = psfo.WriteSfo();
 
                 if (discs.Length == 1)
                 {
-                    using (PsIsoImg psIsoImg = new PsIsoImg(drmInfo, discInfs.First()))
-                    {
-                        psIsoImg.RegisterCallback(onProgress);
-                        psIsoImg.CreatePsar();
-
-                        PbpBuilder.CreatePbp(psfo.WriteSfo(),
-                            File.ReadAllBytes(popsIcon0File),
-                            null, 
-                            (popsPic0File is not null) ? File.ReadAllBytes(popsPic0File) : null, 
-                            Resources.PIC1,
-                            null,
-                            psIsoImg, 
-                            "EBOOT.PBP", 
-                            0);
+                    using (PbpBuilder pbpBuilder = new PbpBuilder(sfo, File.ReadAllBytes(popsIcon0File), null, (popsPic0File is not null) ? File.ReadAllBytes(popsPic0File) : null, Resources.PIC1, null, new PsIsoImg(drmInfo, discInfs.First()), 0))
+                    { 
+                        pbpBuilder.RegisterCallback(onProgress);
+                        pbpBuilder.CreatePsarAndPbp();
+                        pbpBuilder.PbpStream.Seek(0x00, SeekOrigin.Begin);
 
                         byte[] ebootsig = new byte[0x200];
-                        SceNpDrm.KsceNpDrmEbootSigGenPs1("EBOOT.PBP", ebootsig, 0x3600000);
+                        SceNpDrm.KsceNpDrmEbootSigGenPs1(pbpBuilder.PbpStream, ebootsig, 0x3674000);
                         File.WriteAllBytes("__sce_ebootpbp", ebootsig.ToArray());
+                        pbpBuilder.WritePbpToFile("EBOOT.PBP");
                     }
                 }
                 else
                 {
-                    using (PsTitleImg psTitleImg = new PsTitleImg(drmInfo, discInfs))
+                    using (PbpBuilder pbpBuilder = new PbpBuilder(sfo, File.ReadAllBytes(popsIcon0File), null, (popsPic0File is not null) ? File.ReadAllBytes(popsPic0File) : null, Resources.PIC1, null, new PsTitleImg(drmInfo, discInfs), 0))
                     {
-                        psTitleImg.RegisterCallback(onProgress);
-                        psTitleImg.CreatePsar();
-
-                        PbpBuilder.CreatePbp(psfo.WriteSfo(),
-                            File.ReadAllBytes(popsIcon0File),
-                            null,
-                            (popsPic0File is not null) ? File.ReadAllBytes(popsPic0File) : null,
-                            Resources.PIC1,
-                            null,
-                            psTitleImg,
-                            "EBOOT.PBP",
-                            0);
+                        pbpBuilder.RegisterCallback(onProgress);
+                        pbpBuilder.CreatePsarAndPbp();
+                        pbpBuilder.PbpStream.Seek(0x00, SeekOrigin.Begin);
 
                         byte[] ebootsig = new byte[0x200];
-                        SceNpDrm.KsceNpDrmEbootSigGenPs1("EBOOT.PBP", ebootsig, 0x3600000);
+                        pbpBuilder.WritePbpToFile("EBOOT.PBP");
+                        SceNpDrm.KsceNpDrmEbootSigGenPs1(pbpBuilder.PbpStream, ebootsig, 0x3674000);
                         File.WriteAllBytes("__sce_ebootpbp", ebootsig.ToArray());
                     }
                 }
@@ -260,25 +256,16 @@ namespace ChovySign_CLI
             {
                 using (UmdInfo umd = new UmdInfo(discs.First()))
                 {
-                    using (NpUmdImg npUmd = new NpUmdImg(drmInfo, umd, pspCompress))
+                    using (PbpBuilder pbpBuilder = new PbpBuilder(umd.DataFiles["PARAM.SFO"], umd.DataFiles["ICON0.PNG"], umd.DataFiles["ICON1.PMF"], umd.DataFiles["PIC0.PNG"], umd.DataFiles["PIC1.PNG"], umd.DataFiles["SND0.AT3"], new NpUmdImg(drmInfo, umd, pspCompress), 1))
                     {
-                        npUmd.RegisterCallback(onProgress);
-                        npUmd.CreatePsar();
-
-                        PbpBuilder.CreatePbp(umd.DataFiles["PARAM.SFO"], 
-                            umd.DataFiles["ICON0.PNG"],
-                            umd.DataFiles["ICON1.PMF"], 
-                            umd.DataFiles["PIC0.PNG"], 
-                            umd.DataFiles["PIC1.PNG"], 
-                            umd.DataFiles["SND0.AT3"], 
-                            npUmd, 
-                            "EBOOT.PBP", 
-                            1);
+                        pbpBuilder.RegisterCallback(onProgress);
+                        pbpBuilder.CreatePsarAndPbp();
+                        pbpBuilder.PbpStream.Seek(0x00, SeekOrigin.Begin);
 
                         byte[] ebootsig = new byte[0x200];
-                        SceNpDrm.KsceNpDrmEbootSigGenPsp("EBOOT.PBP", ebootsig, 0x3600000);
+                        SceNpDrm.KsceNpDrmEbootSigGenPsp(pbpBuilder.PbpStream, ebootsig, 0x3674000);
                         File.WriteAllBytes("__sce_ebootpbp", ebootsig.ToArray());
-
+                        pbpBuilder.WritePbpToFile("EBOOT.PBP");
                     }
                 }
             }

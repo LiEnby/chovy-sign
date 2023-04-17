@@ -721,6 +721,20 @@ namespace PspCrypto
         {
             return SceNpDrmEbootSigGenMultiDisc(fileName, sceDiscInfo, ebootSig, swVer, _memory.Span, BLK_SIZE);
         }
+        public static int KsceNpDrmEbootSigGenPs1(Stream file, Span<byte> ebootSig, int swVer)
+        {
+            return SceNpDrmEbootSigGen(file, 3, ebootSig, swVer, _memory.Span, BLK_SIZE);
+        }
+
+        public static int KsceNpDrmEbootSigGenPsp(Stream file, Span<byte> ebootSig, int swVer)
+        {
+            return SceNpDrmEbootSigGen(file, 2, ebootSig, swVer, _memory.Span, BLK_SIZE);
+        }
+
+        public static int KsceNpDrmPspEbootSigGen(Stream file, Span<byte> ebootSig)
+        {
+            return SceNpDrmPspEbootSigGen(file, ebootSig, _memory.Span, BLK_SIZE);
+        }
 
         public static int KsceNpDrmEbootSigGenPs1(string fileName, Span<byte> ebootSig, int swVer)
         {
@@ -996,8 +1010,20 @@ namespace PspCrypto
             return ret;
         }
 
-        private static int SceNpDrmEbootSigGen(string fileName, int type, Span<byte> ebootSig, int swVer, Span<byte> buffer,
-            int blockSize)
+        private static int SceNpDrmEbootSigGen(string fileName, int type, Span<byte> ebootSig, int swVer, Span<byte> buffer, int blockSize)
+        {
+            if(string.IsNullOrWhiteSpace(fileName)) return -0x7f78ffff;
+            var fi = new FileInfo(fileName);
+            if (!fi.Exists)
+            {
+                return -1;
+            }
+            using(FileStream fstream = fi.OpenRead()){
+                return SceNpDrmEbootSigGen(fstream, type, ebootSig, swVer, buffer, blockSize);
+            }
+
+        }
+        private static int SceNpDrmEbootSigGen(Stream ebootStream, int type, Span<byte> ebootSig, int swVer, Span<byte> buffer, int blockSize)
         {
             Span<byte> pbpHdrDigest = stackalloc byte[32];
             Span<byte> npUmdImgDigest = stackalloc byte[32];
@@ -1008,8 +1034,7 @@ namespace PspCrypto
                 blockSize &= unchecked((int)0xFFFFFFC0);
             }
 
-            if (string.IsNullOrWhiteSpace(fileName) || buffer == null || ebootSig == null || blockSize < 0x400 ||
-                type > 3)
+            if (ebootStream == null || buffer == null || ebootSig == null || blockSize < 0x400 || type > 3)
             {
                 return -0x7f78ffff;
             }
@@ -1021,21 +1046,16 @@ namespace PspCrypto
             sceEbootPbp.SwVer = swVer;
             sceEbootPbp.Aid = Aid;
             sceEbootPbp.SecureTick = Utils.AsRef<ulong>(secureTick);
-            var fi = new FileInfo(fileName);
-            if (!fi.Exists)
-            {
-                return -1;
-            }
 
-            using var stream = fi.OpenRead();
-            var ret = SceEbootPbpDigest(stream, fi.Length, pbpHdrDigest, npUmdImgDigest, buffer, blockSize);
+            long flen = ebootStream.Length;
+            int ret = SceEbootPbpDigest(ebootStream, flen, pbpHdrDigest, npUmdImgDigest, buffer, blockSize);
             if (ret < 0)
             {
                 return ret;
             }
-            stream.Close();
+            
             sceEbootPbp.KeyType = 1;
-            sceEbootPbp.PbpSize = fi.Length;
+            sceEbootPbp.PbpSize = flen;
             sceEbootPbp.Type = type;
             var psarSig = Encoding.ASCII.GetString(buffer.Slice(0, 8));
             if (type == 3)
@@ -1178,8 +1198,23 @@ namespace PspCrypto
             return ret;
         }
 
-        private static int SceNpDrmPspEbootSigGen(string fileName, Span<byte> ebootSig, Span<byte> buffer,
-            int blockSize)
+        private static int SceNpDrmPspEbootSigGen(string fileName, Span<byte> ebootSig, Span<byte> buffer, int blockSize)
+        {
+            if(string.IsNullOrWhiteSpace(fileName))
+                return -0x7f78ffff;
+
+            var fi = new FileInfo(fileName);
+            if (!fi.Exists)
+            {
+                return -1;
+            }
+            using(FileStream fs = fi.OpenRead())
+            {
+                return SceNpDrmPspEbootSigGen(fs, ebootSig, buffer, blockSize);
+            }
+        }
+
+        private static int SceNpDrmPspEbootSigGen(Stream ebootStream, Span<byte> ebootSig, Span<byte> buffer,int blockSize)
         {
             Span<byte> pbpHdrDigest = stackalloc byte[32];
             Span<byte> npUmdImgDigest = stackalloc byte[32];
@@ -1190,23 +1225,17 @@ namespace PspCrypto
                 blockSize &= unchecked((int)0xFFFFFFC0);
             }
 
-            if (string.IsNullOrWhiteSpace(fileName) || buffer == null || ebootSig == null || blockSize < 0x400)
+            if (ebootStream == null || buffer == null || ebootSig == null || blockSize < 0x400)
             {
                 return -0x7f78ffff;
             }
-            var fi = new FileInfo(fileName);
-            if (!fi.Exists)
-            {
-                return -1;
-            }
 
-            using var stream = fi.OpenRead();
-            var ret = SceEbootPbpDigest(stream, fi.Length, pbpHdrDigest, npUmdImgDigest, buffer, blockSize);
+            long fileSize = ebootStream.Length;
+            int ret = SceEbootPbpDigest(ebootStream, fileSize, pbpHdrDigest, npUmdImgDigest, buffer, blockSize);
             if (ret < 0)
             {
                 return ret;
             }
-            stream.Close();
 
             if (Encoding.ASCII.GetString(buffer.Slice(0, 8)) != "NPUMDIMG")
             {

@@ -9,6 +9,7 @@ using System.Net.Security;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
+using Li.Utilities;
 
 namespace GameBuilder.Psp
 {
@@ -71,7 +72,7 @@ namespace GameBuilder.Psp
             npHdrUtil.PadUntil(0x00, 0x100);
         }
 
-        public void CreatePsar()
+        public override void CreatePsar()
         {
             patchSfo();
             createNpUmdTbl();
@@ -167,7 +168,7 @@ namespace GameBuilder.Psp
 
                 isoOffset += wsize;
 
-                UpdateProgress(Convert.ToInt32(umdImage.IsoStream.Position), Convert.ToInt32(umdImage.IsoStream.Length), "Compress & Encrypt UMD Image");
+                updateProgress(Convert.ToInt32(umdImage.IsoStream.Position), Convert.ToInt32(umdImage.IsoStream.Length), "Compress & Encrypt UMD Image");
             }
 
         }

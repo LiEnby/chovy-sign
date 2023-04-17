@@ -1,4 +1,5 @@
-﻿using GameBuilder.Progress;
+﻿using Li.Progress;
+using Li.Utilities;
 using PspCrypto;
 using System;
 using System.Collections.Generic;
@@ -24,6 +25,7 @@ namespace GameBuilder.Psp
         public NpDrmInfo DrmInfo;
         public MemoryStream Psar;
         internal StreamUtil psarUtil;
+        public abstract void CreatePsar();
         public abstract byte[] GenerateDataPsp();
         public static byte[] CreateStartDat(byte[] image)
         {

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace GameBuilder.Progress
+namespace Li.Progress
 {
     public class ProgressInfo
     {

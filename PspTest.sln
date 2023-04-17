@@ -6,11 +6,13 @@ MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PspCrypto", "PspCrypto\PspCrypto.csproj", "{A60BE4C2-C0D2-42FD-BCFF-631B9AFC62FE}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PbpResign", "PbpResign\PbpResign.csproj", "{834B9F97-1B63-48EB-922E-0FC155BB2481}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PsvImage", "PsvImage\PsvImage.csproj", "{0F4A59D9-FF92-4B4F-BDC4-4BC473F9AA5C}"
+	ProjectSection(ProjectDependencies) = postProject
+		{75BBF537-8ED8-42A3-AA8B-80A730F1B3F2} = {75BBF537-8ED8-42A3-AA8B-80A730F1B3F2}
+	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GameBuilder", "PopsBuilder\GameBuilder.csproj", "{D1DF66DB-52BE-489C-A292-525BC71F2BB2}"
 	ProjectSection(ProjectDependencies) = postProject
+		{63475285-AAD2-4DE9-B698-AFC9FAA58AC8} = {63475285-AAD2-4DE9-B698-AFC9FAA58AC8}
 		{BF155D74-2923-432F-8566-26D83B15EEE8} = {BF155D74-2923-432F-8566-26D83B15EEE8}
 	EndProjectSection
 EndProject
@@ -19,7 +21,14 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ChovySign-CLI", "ChovySign-
 		{A60BE4C2-C0D2-42FD-BCFF-631B9AFC62FE} = {A60BE4C2-C0D2-42FD-BCFF-631B9AFC62FE}
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DiscUtils", "DiscUtils\DiscUtils.csproj", "{BF155D74-2923-432F-8566-26D83B15EEE8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DiscUtils", "DiscUtils\DiscUtils.csproj", "{BF155D74-2923-432F-8566-26D83B15EEE8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Vita", "PsvImgTools\Vita.csproj", "{75BBF537-8ED8-42A3-AA8B-80A730F1B3F2}"
+	ProjectSection(ProjectDependencies) = postProject
+		{63475285-AAD2-4DE9-B698-AFC9FAA58AC8} = {63475285-AAD2-4DE9-B698-AFC9FAA58AC8}
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LiLib", "LiGeneralUtilities\LiLib.csproj", "{63475285-AAD2-4DE9-B698-AFC9FAA58AC8}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -35,10 +44,6 @@ Global
 		{834B9F97-1B63-48EB-922E-0FC155BB2481}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{834B9F97-1B63-48EB-922E-0FC155BB2481}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{834B9F97-1B63-48EB-922E-0FC155BB2481}.Release|Any CPU.Build.0 = Release|Any CPU
-		{0F4A59D9-FF92-4B4F-BDC4-4BC473F9AA5C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{0F4A59D9-FF92-4B4F-BDC4-4BC473F9AA5C}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{0F4A59D9-FF92-4B4F-BDC4-4BC473F9AA5C}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{0F4A59D9-FF92-4B4F-BDC4-4BC473F9AA5C}.Release|Any CPU.Build.0 = Release|Any CPU
 		{D1DF66DB-52BE-489C-A292-525BC71F2BB2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{D1DF66DB-52BE-489C-A292-525BC71F2BB2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D1DF66DB-52BE-489C-A292-525BC71F2BB2}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -51,6 +56,14 @@ Global
 		{BF155D74-2923-432F-8566-26D83B15EEE8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BF155D74-2923-432F-8566-26D83B15EEE8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BF155D74-2923-432F-8566-26D83B15EEE8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{75BBF537-8ED8-42A3-AA8B-80A730F1B3F2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{75BBF537-8ED8-42A3-AA8B-80A730F1B3F2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{75BBF537-8ED8-42A3-AA8B-80A730F1B3F2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{75BBF537-8ED8-42A3-AA8B-80A730F1B3F2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{63475285-AAD2-4DE9-B698-AFC9FAA58AC8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{63475285-AAD2-4DE9-B698-AFC9FAA58AC8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{63475285-AAD2-4DE9-B698-AFC9FAA58AC8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{63475285-AAD2-4DE9-B698-AFC9FAA58AC8}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

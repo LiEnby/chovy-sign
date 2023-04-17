@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace GameBuilder.Progress
+namespace Li.Progress
 {
     public class ProgressTracker
     {
@@ -15,9 +15,9 @@ namespace GameBuilder.Progress
             progressCallbacks.Add(cb);
         }
 
-        public void UpdateProgress(int total, int remain, string what)
+        protected void updateProgress(int done, int remain, string what)
         {
-            ProgressInfo inf = new ProgressInfo(total, remain, what);
+            ProgressInfo inf = new ProgressInfo(done, remain, what);
             foreach (Action<ProgressInfo> cb in progressCallbacks)
                 cb(inf);
         }

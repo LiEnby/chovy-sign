@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\DiscUtils\DiscUtils.csproj" />
+    <ProjectReference Include="..\LiGeneralUtilities\LiLib.csproj" />
     <ProjectReference Include="..\PspCrypto\PspCrypto.csproj" />
   </ItemGroup>
 

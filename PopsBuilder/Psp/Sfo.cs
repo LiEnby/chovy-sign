@@ -1,10 +1,11 @@
-﻿using System;
+﻿using Li.Utilities;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics.Tracing;
 using System.IO;
 using System.Runtime.CompilerServices;
 
-// A Sfo Parser Written by SilicaAndPina
+// A Sfo Parser Written by Li
 // Because all the others are overly-complicated for no reason!
 // MIT Licensed.
 

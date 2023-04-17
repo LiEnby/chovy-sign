@@ -1,11 +1,10 @@
-﻿using PspCrypto;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace GameBuilder
+namespace Li.Utilities
 {
     public class StreamUtil
     {

@@ -1,14 +1,14 @@
-﻿using GameBuilder.Atrac3;
+﻿using Li.Progress;
+using GameBuilder.Atrac3;
 using GameBuilder.Cue;
 using GameBuilder.Psp;
 using PspCrypto;
 using System;
 using System.Net;
-using GameBuilder.Progress;
 
 namespace GameBuilder.Pops
 {
-    public class PsIsoImg : PopsImg
+    public class PsIsoImg : PopsImg, IDisposable
     {
         internal PsIsoImg(NpDrmInfo versionKey, DiscCompressor discCompressor) : base(versionKey)
         {
@@ -26,11 +26,9 @@ namespace GameBuilder.Pops
             this.compressor = new DiscCompressor(this, disc, new Atrac3ToolEncoder());
             this.compressor.RegisterCallback(onProgress);
         }
-        public void CreatePsar(bool isPartOfMultiDisc=false)
-        {
-            compressor.GenerateIsoHeaderAndCompress();
-            if (!isPartOfMultiDisc) compressor.WriteSimpleDatLocation((compressor.IsoOffset + compressor.CompressedIso.Length) + StartDat.Length);
 
+        internal void generatePsIsoHeader()
+        {
             psarUtil.WriteStr("PSISOIMG0000");
             psarUtil.WriteInt64(0x00); // location of STARTDAT
 
@@ -39,11 +37,22 @@ namespace GameBuilder.Pops
             byte[] isoHdrPgd = compressor.GenerateIsoPgd();
             psarUtil.WriteBytes(isoHdrPgd);
             psarUtil.PadUntil(0x00, compressor.IsoOffset);
+        }
 
+        public override void CreatePsar()
+        {
+            // compress ISO and generate header.
+            compressor.GenerateIsoHeaderAndCompress();
+
+            // write STARTDAT location
+            compressor.WriteSimpleDatLocation((compressor.IsoOffset + compressor.CompressedIso.Length) + StartDat.Length);
+            
+            // write general PSISO header
+            generatePsIsoHeader();
+
+            // Copy compressed ISO to PSAR stream..
             compressor.CompressedIso.Seek(0x00, SeekOrigin.Begin);
             compressor.CompressedIso.CopyTo(Psar);
-
-            if (isPartOfMultiDisc) return;
 
             // write STARTDAT
             Int64 startDatLocation = Psar.Position;
@@ -57,10 +66,14 @@ namespace GameBuilder.Pops
             psarUtil.WriteInt64(startDatLocation);
         }
 
-
+        public override void Dispose()
+        {
+            compressor.Dispose();
+            base.Dispose();
+        }
         private void onProgress(ProgressInfo inf)
         {
-            this.UpdateProgress(inf.Done, inf.Remain, inf.CurrentProcess);
+            this.updateProgress(inf.Done, inf.Remain, inf.CurrentProcess);
         }
 
         private DiscCompressor compressor;

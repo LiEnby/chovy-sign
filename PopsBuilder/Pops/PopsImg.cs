@@ -1,5 +1,6 @@
 ﻿using GameBuilder;
 using GameBuilder.Psp;
+using Li.Utilities;
 using PspCrypto;
 using System;
 using System.Collections.Generic;
@@ -10,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace GameBuilder.Pops
 {
-    public class PopsImg : NpDrmPsar
+    public abstract class PopsImg : NpDrmPsar
     {
         
         public PopsImg(NpDrmInfo versionKey) : base(versionKey)
@@ -28,6 +29,7 @@ namespace GameBuilder.Pops
         private StreamUtil simpleUtil;
         public byte[] StartDat;
         public byte[] SimplePgd;
+
         private void createSimpleDat()
         {
             simpleUtil.WriteStr("SIMPLE  ");
@@ -39,9 +41,6 @@ namespace GameBuilder.Pops
 
             simpleUtil.WriteBytes(Resources.SIMPLE);
         }
-
-        
-
         private byte[] generateSimplePgd()
         {
             simple.Seek(0x0, SeekOrigin.Begin);
