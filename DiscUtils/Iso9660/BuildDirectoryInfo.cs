@@ -39,15 +39,13 @@ namespace DiscUtils.Iso9660
 
         private readonly BuildDirectoryInfo _parent;
         private List<BuildDirectoryMember> _sortedMembers;
-        private int _sectorSize;
 
-        internal BuildDirectoryInfo(string name, BuildDirectoryInfo parent, int sectorSize)
+        internal BuildDirectoryInfo(string name, BuildDirectoryInfo parent)
             : base(name, MakeShortDirName(name, parent))
         {
             _parent = parent == null ? this : parent;
             HierarchyDepth = parent == null ? 0 : parent.HierarchyDepth + 1;
             _members = new Dictionary<string, BuildDirectoryMember>();
-            _sectorSize = sectorSize;
         }
 
         internal int HierarchyDepth { get; }
@@ -89,16 +87,16 @@ namespace DiscUtils.Iso9660
 
                 // If this record would span a sector boundary, then the current sector is
                 // zero-padded, and the record goes at the start of the next sector.
-                if (total % _sectorSize + recordSize > _sectorSize)
+                if (total % IsoUtilities.SectorSize + recordSize > IsoUtilities.SectorSize)
                 {
-                    long padLength = _sectorSize - total % _sectorSize;
+                    long padLength = IsoUtilities.SectorSize - total % IsoUtilities.SectorSize;
                     total += padLength;
                 }
 
                 total += recordSize;
             }
 
-            return MathUtilities.RoundUp(total, _sectorSize);
+            return MathUtilities.RoundUp(total, IsoUtilities.SectorSize);
         }
 
         internal uint GetPathTableEntrySize(Encoding enc)
@@ -115,31 +113,31 @@ namespace DiscUtils.Iso9660
             List<BuildDirectoryMember> sorted = GetSortedMembers();
 
             // Two pseudo entries, effectively '.' and '..'
-            pos += WriteMember(this, "\0", Encoding.ASCII, buffer, offset + pos, locationTable, enc, _sectorSize);
-            pos += WriteMember(_parent, "\x01", Encoding.ASCII, buffer, offset + pos, locationTable, enc, _sectorSize);
+            pos += WriteMember(this, "\0", Encoding.ASCII, buffer, offset + pos, locationTable, enc);
+            pos += WriteMember(_parent, "\x01", Encoding.ASCII, buffer, offset + pos, locationTable, enc);
 
             foreach (BuildDirectoryMember m in sorted)
             {
                 uint recordSize = m.GetDirectoryRecordSize(enc);
 
-                if (pos % _sectorSize + recordSize > _sectorSize)
+                if (pos % IsoUtilities.SectorSize + recordSize > IsoUtilities.SectorSize)
                 {
-                    int padLength = _sectorSize - pos % _sectorSize;
+                    int padLength = IsoUtilities.SectorSize - pos % IsoUtilities.SectorSize;
                     Array.Clear(buffer, offset + pos, padLength);
                     pos += padLength;
                 }
 
-                pos += WriteMember(m, null, enc, buffer, offset + pos, locationTable, enc, _sectorSize);
+                pos += WriteMember(m, null, enc, buffer, offset + pos, locationTable, enc);
             }
 
             // Ensure final padding data is zero'd
-            int finalPadLength = MathUtilities.RoundUp(pos, _sectorSize) - pos;
+            int finalPadLength = MathUtilities.RoundUp(pos, IsoUtilities.SectorSize) - pos;
             Array.Clear(buffer, offset + pos, finalPadLength);
 
             return pos + finalPadLength;
         }
 
-        private static int WriteMember(BuildDirectoryMember m, string nameOverride, Encoding nameEnc, byte[] buffer, int offset, Dictionary<BuildDirectoryMember, uint> locationTable, Encoding dataEnc, int sectorSize)
+        private static int WriteMember(BuildDirectoryMember m, string nameOverride, Encoding nameEnc, byte[] buffer, int offset, Dictionary<BuildDirectoryMember, uint> locationTable, Encoding dataEnc)
         {
             DirectoryRecord dr = new DirectoryRecord();
             dr.FileIdentifier = m.PickName(nameOverride, nameEnc);

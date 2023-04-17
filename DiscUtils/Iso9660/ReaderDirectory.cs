@@ -37,8 +37,8 @@ namespace DiscUtils.Iso9660
         public ReaderDirectory(IsoContext context, ReaderDirEntry dirEntry)
             : base(context, dirEntry)
         {
-            byte[] buffer = new byte[context.SectorSize];
-            Stream extent = new ExtentStream(_context.DataStream, dirEntry.Record.LocationOfExtent, uint.MaxValue, 0, 0, context.SectorSize);
+            byte[] buffer = new byte[IsoUtilities.SectorSize];
+            Stream extent = new ExtentStream(_context.DataStream, dirEntry.Record.LocationOfExtent, uint.MaxValue, 0, 0);
 
             _records = new List<ReaderDirEntry>();
 
@@ -47,8 +47,6 @@ namespace DiscUtils.Iso9660
             while (totalRead < totalLength)
             {
                 int bytesRead = (int)Math.Min(buffer.Length, totalLength - totalRead);
-
-                extent.Seek(24, SeekOrigin.Current);
 
                 StreamUtilities.ReadExact(extent, buffer, 0, bytesRead);
                 totalRead += (uint)bytesRead;

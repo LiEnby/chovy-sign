@@ -28,8 +28,8 @@ namespace DiscUtils.Iso9660
     {
         public const string ElToritoSystemIdentifier = "EL TORITO SPECIFICATION";
 
-        public BootVolumeDescriptor(uint catalogSector, int sectorSize)
-            : base(VolumeDescriptorType.Boot, 1, sectorSize)
+        public BootVolumeDescriptor(uint catalogSector)
+            : base(VolumeDescriptorType.Boot, 1)
         {
             CatalogSector = catalogSector;
         }

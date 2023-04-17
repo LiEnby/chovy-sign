@@ -37,9 +37,7 @@ namespace DiscUtils.Iso9660
         /// <param name="data">The stream to read the ISO image from.</param>
         /// <param name="joliet">Whether to read Joliet extensions.</param>
         public CDReader(Stream data, bool joliet)
-            : base(new VfsCDReader(data, joliet, false, 2048))
-        {
-        }
+            : base(new VfsCDReader(data, joliet, false)) {}
 
         /// <summary>
         /// Initializes a new instance of the CDReader class.
@@ -48,27 +46,7 @@ namespace DiscUtils.Iso9660
         /// <param name="joliet">Whether to read Joliet extensions.</param>
         /// <param name="hideVersions">Hides version numbers (e.g. ";1") from the end of files.</param>
         public CDReader(Stream data, bool joliet, bool hideVersions)
-            : base(new VfsCDReader(data, joliet, hideVersions, 2048)) { }
-
-
-        /// <summary>
-        /// Initializes a new instance of the CDReader class.
-        /// </summary>
-        /// <param name="data">The stream to read the ISO image from.</param>
-        /// <param name="joliet">Whether to read Joliet extensions.</param>
-        /// <param name="sectorSize">The size of a sector</param>
-        public CDReader(Stream data, bool joliet, int sectorSize)
-            : base(new VfsCDReader(data, joliet, false, sectorSize)) {
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the CDReader class.
-        /// </summary>
-        /// <param name="data">The stream to read the ISO image from.</param>
-        /// <param name="joliet">Whether to read Joliet extensions.</param>
-        /// <param name="hideVersions">Hides version numbers (e.g. ";1") from the end of files.</param>
-        public CDReader(Stream data, bool joliet, bool hideVersions, int sectorSize)
-            : base(new VfsCDReader(data, joliet, hideVersions, sectorSize)) {}
+            : base(new VfsCDReader(data, joliet, hideVersions)) {}
 
         /// <summary>
         /// Gets which of the Iso9660 variants is being used.
@@ -196,18 +174,18 @@ namespace DiscUtils.Iso9660
         /// </summary>
         /// <param name="data">The stream to inspect.</param>
         /// <returns><c>true</c> if the stream contains an ISO file system, else false.</returns>
-        public static bool Detect(Stream data, int sectorSize)
+        public static bool Detect(Stream data)
         {
-            byte[] buffer = new byte[sectorSize];
+            byte[] buffer = new byte[IsoUtilities.SectorSize];
 
-            if (data.Length < 0x8000 + sectorSize)
+            if (data.Length < 0x8000 + IsoUtilities.SectorSize)
             {
                 return false;
             }
 
             data.Position = 0x8000;
-            int numRead = StreamUtilities.ReadMaximum(data, buffer, 0, sectorSize);
-            if (numRead != sectorSize)
+            int numRead = StreamUtilities.ReadMaximum(data, buffer, 0, IsoUtilities.SectorSize);
+            if (numRead != IsoUtilities.SectorSize)
             {
                 return false;
             }

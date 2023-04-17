@@ -28,18 +28,11 @@ namespace DiscUtils.Iso9660
 {
     internal class IsoContext : VfsContext
     {
-        public IsoContext(int sectorSize)
-        {
-            SectorSize = sectorSize;
-        }
-
         public Stream DataStream { get; set; }
 
         public string RockRidgeIdentifier { get; set; }
 
         public bool SuspDetected { get; set; }
-
-        public int SectorSize { get; set; }
 
         public List<SuspExtension> SuspExtensions { get; set; }
 

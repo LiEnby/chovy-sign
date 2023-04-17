@@ -29,8 +29,8 @@ namespace DiscUtils.Iso9660
     {
         private byte[] _readCache;
 
-        public VolumeDescriptorDiskRegion(long start, int sectorSize)
-            : base(start, sectorSize) {}
+        public VolumeDescriptorDiskRegion(long start)
+            : base(start, IsoUtilities.SectorSize) {}
 
         public override void Dispose() {}
 

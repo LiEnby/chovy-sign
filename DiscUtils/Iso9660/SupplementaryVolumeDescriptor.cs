@@ -39,11 +39,10 @@ namespace DiscUtils.Iso9660
             uint rootDirExtentLocation,
             uint rootDirDataLength,
             DateTime buildTime,
-            Encoding enc, 
-            int sectorSize)
+            Encoding enc)
             : base(
                 VolumeDescriptorType.Supplementary, 1, volumeSpaceSize, pathTableSize, typeLPathTableLocation,
-                typeMPathTableLocation, rootDirExtentLocation, rootDirDataLength, buildTime, enc, sectorSize) {}
+                typeMPathTableLocation, rootDirExtentLocation, rootDirDataLength, buildTime, enc) {}
 
         internal override void WriteTo(byte[] buffer, int offset)
         {

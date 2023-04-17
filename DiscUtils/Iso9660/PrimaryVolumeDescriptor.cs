@@ -38,11 +38,10 @@ namespace DiscUtils.Iso9660
             uint typeMPathTableLocation,
             uint rootDirExtentLocation,
             uint rootDirDataLength,
-            DateTime buildTime, 
-            int sectorSize)
+            DateTime buildTime)
             : base(
                 VolumeDescriptorType.Primary, 1, volumeSpaceSize, pathTableSize, typeLPathTableLocation,
-                typeMPathTableLocation, rootDirExtentLocation, rootDirDataLength, buildTime, Encoding.ASCII, sectorSize) {}
+                typeMPathTableLocation, rootDirExtentLocation, rootDirDataLength, buildTime, Encoding.ASCII) {}
 
         internal override void WriteTo(byte[] buffer, int offset)
         {

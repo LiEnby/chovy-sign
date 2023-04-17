@@ -1,12 +1,9 @@
-﻿using Org.BouncyCastle.Crypto.Paddings;
-using GameBuilder.Atrac3;
+﻿using GameBuilder.Atrac3;
 using GameBuilder.Cue;
 using GameBuilder.Psp;
 using PspCrypto;
 using System;
 using System.Net;
-using System.Runtime.InteropServices;
-using System.Security.Cryptography.X509Certificates;
 using GameBuilder.Progress;
 
 namespace GameBuilder.Pops

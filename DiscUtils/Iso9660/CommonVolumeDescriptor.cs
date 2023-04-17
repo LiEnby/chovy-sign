@@ -97,9 +97,8 @@ namespace DiscUtils.Iso9660
             uint rootDirExtentLocation,
             uint rootDirDataLength,
             DateTime buildTime,
-            Encoding enc, 
-            int sectorSize)
-            : base(type, version, sectorSize)
+            Encoding enc)
+            : base(type, version)
         {
             CharacterEncoding = enc;
 
@@ -108,7 +107,7 @@ namespace DiscUtils.Iso9660
             VolumeSpaceSize = volumeSpaceSize;
             VolumeSetSize = 1;
             VolumeSequenceNumber = 1;
-            LogicalBlockSize = (ushort)sectorSize;
+            LogicalBlockSize = IsoUtilities.SectorSize;
             PathTableSize = pathTableSize;
             TypeLPathTableLocation = typeLPathTableLocation;
             ////OptionalTypeLPathTableLocation = 0;

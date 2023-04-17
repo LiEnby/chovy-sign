@@ -28,10 +28,7 @@ namespace DiscUtils.Iso9660
         {
             VolumeIdentifier = string.Empty;
             UseJoliet = true;
-            SectorSize = 2048;
         }
-
-        public int SectorSize { get; set; }
 
         public bool UseJoliet { get; set; }
 

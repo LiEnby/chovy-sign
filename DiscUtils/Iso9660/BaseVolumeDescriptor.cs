@@ -32,14 +32,12 @@ namespace DiscUtils.Iso9660
         public readonly string StandardIdentifier;
         public readonly VolumeDescriptorType VolumeDescriptorType;
         public readonly byte VolumeDescriptorVersion;
-        private int SectorSize;
 
-        public BaseVolumeDescriptor(VolumeDescriptorType type, byte version, int sectorSize)
+        public BaseVolumeDescriptor(VolumeDescriptorType type, byte version)
         {
             VolumeDescriptorType = type;
             StandardIdentifier = "CD001";
             VolumeDescriptorVersion = version;
-            SectorSize = sectorSize;
         }
 
         public BaseVolumeDescriptor(byte[] src, int offset)
@@ -51,7 +49,7 @@ namespace DiscUtils.Iso9660
 
         internal virtual void WriteTo(byte[] buffer, int offset)
         {
-            Array.Clear(buffer, offset, SectorSize);
+            Array.Clear(buffer, offset, IsoUtilities.SectorSize);
             buffer[offset] = (byte)VolumeDescriptorType;
             IsoUtilities.WriteAChars(buffer, offset + 1, 5, StandardIdentifier);
             buffer[offset + 6] = VolumeDescriptorVersion;

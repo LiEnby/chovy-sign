@@ -30,7 +30,7 @@ namespace DiscUtils.Iso9660
 {
     internal static class IsoUtilities
     {
-        //public const int SectorSize = 2048;
+        public const int SectorSize = 2048;
 
         public static uint ToUInt32FromBoth(byte[] data, int offset)
         {

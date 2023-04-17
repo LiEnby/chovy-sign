@@ -1,4 +1,4 @@
-﻿using DiscUtils.Iso9660;
+﻿using DiscUtils.Iso9660Ps1;
 using DiscUtils.Streams;
 using GameBuilder.Cue;
 using System;
