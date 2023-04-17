@@ -26,25 +26,25 @@ namespace GameBuilder.VersionKey
             {
                 StreamUtil ebootUtil = new StreamUtil(ebootStream);
                 ebootStream.Seek(0x1, SeekOrigin.Begin);
-
-                if (ebootUtil.ReadCStr() != "PBP")
+                string pbpMagic = ebootUtil.ReadStrLen(0x3);
+                if (pbpMagic == "PBP")
                 {
                     int dataPspLocation = ebootUtil.ReadInt32At(0x20);
                     int dataPsarLocation = ebootUtil.ReadInt32At(0x24);
                     ebootStream.Seek(dataPsarLocation, SeekOrigin.Begin);
 
-                    string magic = ebootUtil.ReadStrLen(8);
+                    string psarMagic = ebootUtil.ReadStrLen(8);
 
-                    switch (magic)
+                    switch (psarMagic)
                     {
                         case "NPUMDIMG":
                             int keyType = ebootUtil.ReadInt32();
                             string contentId = ebootUtil.ReadStringAt(dataPsarLocation + 0x10);
 
-                            byte[] npUmdHdr = ebootUtil.ReadBytesAt(dataPsarLocation, 0x100);
-                            byte[] npUmdBody = ebootUtil.ReadBytesAt(dataPsarLocation + 0xC0, 0x10);
+                            byte[] npUmdHdr = ebootUtil.ReadBytesAt(dataPsarLocation, 0xC0);
+                            byte[] npUmdHeaderHash = ebootUtil.ReadBytesAt(dataPsarLocation + 0xC0, 0x10);
                             
-                            byte[] versionkey = getKey(npUmdHdr, npUmdBody);
+                            byte[] versionkey = getKey(npUmdHeaderHash, npUmdHdr);
 
                             return new NpDrmInfo(versionkey, contentId, keyType);
                         case "PSISOIMG":
@@ -66,13 +66,13 @@ namespace GameBuilder.VersionKey
                                 return new NpDrmInfo(versionkey, contentId, keyType);
                             }
                         default:
-                            throw new Exception("Cannot obtain versionkey from this EBOOT.PBP (magic:" + magic + ")");
+                            throw new Exception("Cannot obtain versionkey from this EBOOT.PBP (magic:" + psarMagic + ")");
                     }
 
                 }
                 else
                 {
-                    throw new Exception("Invalid PBP");
+                    throw new Exception("Invalid PBP (got \"" + pbpMagic + "\", expected \"PBP\")");
                 }
             }
         }

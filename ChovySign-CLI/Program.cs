@@ -180,7 +180,7 @@ namespace ChovySign_CLI
 
             if (drmInfo is null) return Error("no versionkey was found, exiting", 6);
 
-            Console.WriteLine("Version Key: " + BitConverter.ToString(drmInfo.VersionKey).Replace("-", ""));
+            Console.WriteLine("Version Key: " + BitConverter.ToString(drmInfo.VersionKey).Replace("-", "") + ", " + drmInfo.KeyIndex);
 
             if (pbpMode is null) return Error("no pbp mode was set, exiting", 7);
             

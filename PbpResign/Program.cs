@@ -362,6 +362,9 @@ namespace PbpResign
                 return false;
             }
 
+            File.WriteAllBytes("PSAR.BUFF", psarBuff.ToArray());
+            File.WriteAllBytes("HDRHASH.BUFF", npHdr.HeaderHash.ToArray());
+
             var vkey = new byte[0x10];
             Span<byte> mkey = stackalloc byte[Marshal.SizeOf<AMCTRL.MAC_KEY>()];
             AMCTRL.sceDrmBBMacInit(mkey, 3);
