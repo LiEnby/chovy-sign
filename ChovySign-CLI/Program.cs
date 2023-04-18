@@ -3,8 +3,6 @@ using GameBuilder.Pops;
 using GameBuilder.Psp;
 using GameBuilder.VersionKey;
 using PspCrypto;
-using System.Reflection.PortableExecutable;
-using System.IO.Pipes;
 
 namespace ChovySign_CLI
 {
@@ -225,7 +223,7 @@ namespace ChovySign_CLI
 
                 if (discs.Length == 1)
                 {
-                    using (PbpBuilder pbpBuilder = new PbpBuilder(sfo, File.ReadAllBytes(popsIcon0File), null, (popsPic0File is not null) ? File.ReadAllBytes(popsPic0File) : null, Resources.PIC1, null, new PsIsoImg(drmInfo, discInfs.First()), 0))
+                    using (PbpBuilder pbpBuilder = new PbpBuilder(sfo, File.ReadAllBytes(popsIcon0File), null, (popsPic0File is not null) ? File.ReadAllBytes(popsPic0File) : null, LibChovy.Resources.PIC1, null, new PsIsoImg(drmInfo, discInfs.First()), 0))
                     { 
                         pbpBuilder.RegisterCallback(onProgress);
                         pbpBuilder.CreatePsarAndPbp();
