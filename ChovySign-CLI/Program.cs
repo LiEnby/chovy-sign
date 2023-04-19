@@ -3,6 +3,7 @@ using GameBuilder.Pops;
 using GameBuilder.Psp;
 using GameBuilder.VersionKey;
 using PspCrypto;
+using LibChovy;
 
 namespace ChovySign_CLI
 {
@@ -12,10 +13,12 @@ namespace ChovySign_CLI
         private static List<string> parameters = new List<string>();
         private static string[] discs;
         private static bool pspCompress = false;
+        private static bool devKit = false;
         private static string? popsDiscName;
         private static string? popsIcon0File;
         private static string? popsPic0File;
         private static PbpMode? pbpMode = null;
+        private static NpDrmRif? rifFile = null;
         private static NpDrmInfo? drmInfo = null;
         enum PbpMode
         {
@@ -32,7 +35,8 @@ namespace ChovySign_CLI
             VERSIONKEY = 3,
             VERSIONKEY_EXTRACT = 4,
             VERSIONKEY_GENERATOR = 5,
-            POPS_INFO = 6
+            POPS_INFO = 6,
+            RIF = 7
         }
         public static int Error(string errorMsg, int ret)
         {
@@ -92,12 +96,17 @@ namespace ChovySign_CLI
                     drmInfo = ActRifMethod.GetVersionKey(File.ReadAllBytes(parameters[0]), File.ReadAllBytes(parameters[1]), StringToByteArray(parameters[2]), int.Parse(parameters[3]));
                     break;
                 case ArgumentParsingMode.POPS_INFO:
-                    if (parameters.Count < 2) return Error("--pops-info takes at least 2 arguments ("+parameters.Count+" given)", 4);
+                    if (parameters.Count < 2) return Error("--pops-info takes at least 1 arguments ("+parameters.Count+" given)", 4);
                     if (parameters.Count > 3) return Error("--pops-info takes no more than 3 arguments("+parameters.Count+" given)", 4);
                     popsDiscName = parameters[0];
-                    popsIcon0File = parameters[1];
+                    if (parameters.Count > 1)
+                        popsIcon0File = parameters[1];
                     if (parameters.Count > 2) 
                         popsPic0File = parameters[2];
+                    break;
+                case ArgumentParsingMode.RIF:
+                    if (parameters.Count != 1) return Error("--rif expects only 1 argument,", 4);
+                    rifFile = new NpDrmRif(File.ReadAllBytes(parameters[0]));
                     break;
             }
 
@@ -112,8 +121,10 @@ namespace ChovySign_CLI
             {
                 Console.WriteLine("Chovy-Sign v2 (CLI)");
                 Console.WriteLine("--pops [disc1.cue] [disc2.cue] [disc3.cue] ... (up to 5)");
-                Console.WriteLine("--pops-info [game title] [icon0.png] [pic1.png] (optional)");
+                Console.WriteLine("--pops-info [game title] [icon0.png] (optional) [pic1.png] (optional)");
                 Console.WriteLine("--psp [umd.iso] [compress; true/false] (optional)");
+                Console.WriteLine("--rif [GAME.RIF]");
+                Console.WriteLine("--devkit (Use 000000000000 account id)");
                 Console.WriteLine("--vkey [versionkey] [contentid] [key_index]");
                 Console.WriteLine("--vkey-extract [eboot.pbp]");
                 Console.WriteLine("--vkey-gen [act.dat] [license.rif] [console_id] [key_index]");
@@ -170,6 +181,16 @@ namespace ChovySign_CLI
                                     return Error("versionkey is already set", 3);
 
                                 break;
+                            case "--rif":
+                                mode = ArgumentParsingMode.RIF;
+
+                                if (rifFile is not null)
+                                    return Error("rif is already set", 3);
+
+                                break;
+                            case "--devkit":
+                                devKit = true;
+                                break;
                             default:
                                 return Error("Unknown argument: " + arg, 1);
                         }
@@ -180,6 +201,7 @@ namespace ChovySign_CLI
                     case ArgumentParsingMode.PSP_UMD:
                     case ArgumentParsingMode.POPS_DISC:
                     case ArgumentParsingMode.POPS_INFO:
+                    case ArgumentParsingMode.RIF:
                     default:
                         parameters.Add(arg);
                         break;
@@ -199,73 +221,38 @@ namespace ChovySign_CLI
 
             if (pbpMode == PbpMode.POPS && drmInfo.KeyIndex != 1)
                 return Error("KeyType is " + drmInfo.KeyIndex + ", but PBP mode is POPS, you cant do that .. please use a type 1 versionkey.", 8);
-            
-            if (pbpMode == PbpMode.POPS && (popsDiscName is null || popsIcon0File is null)) return Error("pbp mode is POPS, but you have not specified a disc title or icon file using --pops-info.", 9);
 
+            if (rifFile is null)
+                return Error("Rif is not set, use --rif to specify base game RIF", 8);
+            //if (pbpMode == PbpMode.POPS && (popsDiscName is null || popsIcon0File is null)) return Error("pbp mode is POPS, but you have not specified a disc title or icon file using --pops-info.", 9);
+            ChovySign csign = new ChovySign();
+            csign.RegisterCallback(onProgress);
             if (pbpMode == PbpMode.POPS)
             {
+                PopsParameters popsParameters = new PopsParameters(drmInfo, rifFile);
+                
+                foreach (string disc in discs)
+                    popsParameters.AddCd(disc);
+    
+                if(popsDiscName is not null)
+                    popsParameters.Name = popsDiscName;
+                
+                if(File.Exists(popsIcon0File))
+                    popsParameters.Icon0 = File.ReadAllBytes(popsIcon0File);
 
-                DiscInfo[] discInfs = new DiscInfo[discs.Length];
-                for (int i = 0; i < discInfs.Length; i++)
-                    discInfs[i] = new DiscInfo(discs[i], popsDiscName);
+                popsParameters.Account.Devkit = devKit;
 
-                Sfo psfo = new Sfo();
-                psfo.AddKey("BOOTABLE", 1, 4);
-                psfo.AddKey("CATEGORY", "ME", 4);
-                psfo.AddKey("DISC_ID", discInfs.First().DiscId, 16);
-                psfo.AddKey("DISC_VERSION", "1.00", 8);
-                psfo.AddKey("LICENSE", "Chovy-Sign is licensed under the GPLv3, POPS stuff was done by Li and SquallATF.", 512);
-                psfo.AddKey("PARENTAL_LEVEL", 0, 4);
-                psfo.AddKey("PSP_SYSTEM_VER", "6.60", 8);
-                psfo.AddKey("REGION", 32768, 4);
-                psfo.AddKey("TITLE", popsDiscName, 128);
-                byte[] sfo = psfo.WriteSfo();
-
-                if (discs.Length == 1)
-                {
-                    using (PbpBuilder pbpBuilder = new PbpBuilder(sfo, File.ReadAllBytes(popsIcon0File), null, (popsPic0File is not null) ? File.ReadAllBytes(popsPic0File) : null, LibChovy.Resources.PIC1, null, new PsIsoImg(drmInfo, discInfs.First()), 0))
-                    { 
-                        pbpBuilder.RegisterCallback(onProgress);
-                        pbpBuilder.CreatePsarAndPbp();
-                        pbpBuilder.PbpStream.Seek(0x00, SeekOrigin.Begin);
-
-                        byte[] ebootsig = new byte[0x200];
-                        SceNpDrm.KsceNpDrmEbootSigGenPs1(pbpBuilder.PbpStream, ebootsig, 0x3674000);
-                        File.WriteAllBytes("__sce_ebootpbp", ebootsig.ToArray());
-                        pbpBuilder.WritePbpToFile("EBOOT.PBP");
-                    }
-                }
-                else
-                {
-                    using (PbpBuilder pbpBuilder = new PbpBuilder(sfo, File.ReadAllBytes(popsIcon0File), null, (popsPic0File is not null) ? File.ReadAllBytes(popsPic0File) : null, Resources.PIC1, null, new PsTitleImg(drmInfo, discInfs), 0))
-                    {
-                        pbpBuilder.RegisterCallback(onProgress);
-                        pbpBuilder.CreatePsarAndPbp();
-                        pbpBuilder.PbpStream.Seek(0x00, SeekOrigin.Begin);
-
-                        byte[] ebootsig = new byte[0x200];
-                        pbpBuilder.WritePbpToFile("EBOOT.PBP");
-                        SceNpDrm.KsceNpDrmEbootSigGenPs1(pbpBuilder.PbpStream, ebootsig, 0x3674000);
-                        File.WriteAllBytes("__sce_ebootpbp", ebootsig.ToArray());
-                    }
-                }
+                csign.Go(popsParameters);
+                
             }
             else if(pbpMode == PbpMode.PSP)
             {
-                using (UmdInfo umd = new UmdInfo(discs.First()))
-                {
-                    using (PbpBuilder pbpBuilder = new PbpBuilder(umd.DataFiles["PARAM.SFO"], umd.DataFiles["ICON0.PNG"], umd.DataFiles["ICON1.PMF"], umd.DataFiles["PIC0.PNG"], umd.DataFiles["PIC1.PNG"], umd.DataFiles["SND0.AT3"], new NpUmdImg(drmInfo, umd, pspCompress), 1))
-                    {
-                        pbpBuilder.RegisterCallback(onProgress);
-                        pbpBuilder.CreatePsarAndPbp();
-                        pbpBuilder.PbpStream.Seek(0x00, SeekOrigin.Begin);
-
-                        byte[] ebootsig = new byte[0x200];
-                        SceNpDrm.KsceNpDrmEbootSigGenPsp(pbpBuilder.PbpStream, ebootsig, 0x3674000);
-                        File.WriteAllBytes("__sce_ebootpbp", ebootsig.ToArray());
-                        pbpBuilder.WritePbpToFile("EBOOT.PBP");
-                    }
-                }
+                PspParameters pspParameters = new PspParameters(drmInfo, rifFile);
+                pspParameters.Account.Devkit = devKit;
+                pspParameters.Compress = pspCompress;
+                pspParameters.Umd = new UmdInfo(discs.First());
+                
+                csign.Go(pspParameters);
             }
             return 0;
         }

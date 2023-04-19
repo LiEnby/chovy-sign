@@ -17,6 +17,10 @@ namespace Li.Utilities
         {
             return Encoding.UTF8.GetString(ReadBytes(len));
         }
+        public string ReadCDStr(int len)
+        {
+            return ReadStrLen(len).Trim(' ');
+        }
         public string ReadCStr()
         {
             using (MemoryStream ms = new MemoryStream())

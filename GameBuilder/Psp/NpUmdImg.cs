@@ -42,7 +42,7 @@ namespace GameBuilder.Psp
 
         }
 
-        private void patchSfo()
+        public void PatchSfo()
         {
             Sfo sfoKeys = Sfo.ReadSfo(umdImage.DataFiles["PARAM.SFO"]);
             if ((sfoKeys["CATEGORY"] as String) == "UG") // "UMD Game"
@@ -74,7 +74,7 @@ namespace GameBuilder.Psp
 
         public override void CreatePsar()
         {
-            patchSfo();
+            PatchSfo();
             createNpUmdTbl();
             byte[] tbl = encryptTable();
             this.dataKey = hashBlock(tbl);
@@ -89,7 +89,7 @@ namespace GameBuilder.Psp
             isoData.CopyTo(Psar);
         }
 
-        public byte[] signParamSfo(byte[] paramSfo)
+        private byte[] signParamSfo(byte[] paramSfo)
         {
             int paramSfoLen = paramSfo.Length;
             byte[] contentIdBytes = Encoding.UTF8.GetBytes(DrmInfo.ContentId);

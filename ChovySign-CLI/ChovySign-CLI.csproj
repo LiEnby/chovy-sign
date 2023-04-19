@@ -9,7 +9,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\GameBuilder\GameBuilder.csproj" />
     <ProjectReference Include="..\LibChovy\LibChovy.csproj" />
   </ItemGroup>
 

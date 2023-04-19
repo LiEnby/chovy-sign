@@ -1,9 +1,6 @@
 using CommunityToolkit.HighPerformance;
 using Ionic.Zlib;
-using GameBuilder.Pops;
-using GameBuilder.Psp;
 using PspCrypto;
-using PsvImage;
 using System;
 using System.Buffers.Binary;
 using System.IO;
@@ -12,6 +9,7 @@ using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Collections.Generic;
+using Vita.ContentManager;
 
 namespace PbpResign
 {
@@ -1185,7 +1183,7 @@ namespace PbpResign
             }
             var aidData = Convert.FromHexString(aid);
             SceNpDrm.Aid = BitConverter.ToUInt64(aidData);
-            var cmaKey = CmaKeys.GenerateKey(aid);
+            var cmaKey = KeyGenerator.GenerateKey(aidData);
             Console.WriteLine(Convert.ToHexString(cmaKey));
 
             var srcPbp = args[2];

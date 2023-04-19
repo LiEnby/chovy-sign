@@ -1,6 +1,7 @@
 ﻿using DiscUtils.Iso9660Ps1;
 using DiscUtils.Streams;
 using GameBuilder.Cue;
+using Li.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,8 +13,8 @@ namespace GameBuilder.Pops
     public class DiscInfo
     {
         private string cueFile;
-        private string discName;
-        private string discId;
+        private string? discName;
+        private string? discId;
 
         public string CueFile 
         { 
@@ -34,7 +35,12 @@ namespace GameBuilder.Pops
         {
             get
             {
-                return discName;
+                if (discName is null) return "";
+                else return discName;
+            }
+            set
+            {
+                discName = value;
             }
         }
 
@@ -46,16 +52,18 @@ namespace GameBuilder.Pops
             }
         }
 
-        public DiscInfo(string cueFile, string discName)
+        public DiscInfo(string cueFile)
         {
             this.cueFile = cueFile;
-            this.discName = discName;
 
             using(CueReader cue = new CueReader(cueFile))
             {
-                using (CueStream cueStream = cue.OpenTrack(cue.FirstDataTrackNo))
+                using (CueStream binStream = cue.OpenTrack(cue.FirstDataTrackNo))
                 {
-                    using (CDReader cdReader = new CDReader(cueStream, false, true, cue.GetTrackNumber(cue.FirstDataTrackNo).SectorSz))
+                    StreamUtil binUtil = new StreamUtil(binStream);
+
+                    // Get disc id from SYSTEM.CNF
+                    using (CDReader cdReader = new CDReader(binStream, false, true, cue.GetTrackNumber(cue.FirstDataTrackNo).SectorSz))
                     {
                         using (SparseStream systemCnfStream = cdReader.OpenFile("SYSTEM.CNF", FileMode.Open))
                         {
@@ -74,7 +82,11 @@ namespace GameBuilder.Pops
                                 }
                             }
                         }
+
                     }
+
+                    binStream.Seek(0x9340, SeekOrigin.Begin);
+                    discName = binUtil.ReadCDStr(0x20);
                 }
             }
 

@@ -5,7 +5,7 @@ using System.Security.Cryptography;
 using System.Text;
 namespace Vita.PsvImgTools
 {
-    class PSVMDBuilder
+    public class PSVMDBuilder
     {
         private static void memset(byte[] buf, byte content, long length)
         {

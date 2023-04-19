@@ -61,22 +61,32 @@ namespace LibChovy {
         }
         
         /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        ///   Looks up a localized resource of type System.Byte[].
         /// </summary>
-        public static System.Drawing.Bitmap PIC0 {
+        public static byte[] ICON0 {
             get {
-                object obj = ResourceManager.GetObject("PIC0", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
+                object obj = ResourceManager.GetObject("ICON0", resourceCulture);
+                return ((byte[])(obj));
             }
         }
         
         /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        ///   Looks up a localized resource of type System.Byte[].
         /// </summary>
-        public static System.Drawing.Bitmap PIC1 {
+        public static byte[] PIC0 {
+            get {
+                object obj = ResourceManager.GetObject("PIC0", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
+        public static byte[] PIC1 {
             get {
                 object obj = ResourceManager.GetObject("PIC1", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
+                return ((byte[])(obj));
             }
         }
     }

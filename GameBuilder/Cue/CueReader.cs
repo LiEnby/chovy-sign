@@ -93,7 +93,7 @@ namespace GameBuilder.Cue
             int fileSectorSz = Convert.ToInt32(track.binFileSz / track.SectorSz);
             int endSector = Convert.ToInt32(startSector + fileSectorSz);
 
-            // check if another track begins (thus ending this one)
+            // find first track to start after this one ..
             for (int i = 0; i < tracks.Length; i++)
             {
                 CueTrack? cTrack = tracks[i];

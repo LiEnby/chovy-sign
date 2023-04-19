@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Vita.ContentManager
 {
-    class KeyGenerator
+    public class KeyGenerator
     {
         static Byte[] Passphrase = Encoding.ASCII.GetBytes("Sri Jayewardenepura Kotte");
         static Byte[] Key = { 0xA9, 0xFA, 0x5A, 0x62, 0x79, 0x9F, 0xCC, 0x4C, 0x72, 0x6B, 0x4E, 0x2C, 0xE3, 0x50, 0x6D, 0x38 };
@@ -19,7 +19,7 @@ namespace Vita.ContentManager
                 byte[] AidBytes = BitConverter.GetBytes(longlong);
                 Array.Reverse(AidBytes);
 
-                byte[] DerivedKey = CmaKeys.GenerateKey(AidBytes);
+                byte[] DerivedKey = GenerateKey(AidBytes);
 
 
                  return BitConverter.ToString(DerivedKey).Replace("-", "");
@@ -46,8 +46,7 @@ namespace Vita.ContentManager
             return DerviedKey;
         }
 
-        private static byte[] Decrypt(byte[] cipherData,
-                                byte[] Key)
+        private static byte[] Decrypt(byte[] cipherData, byte[] Key)
         {
             MemoryStream ms = new MemoryStream();
             Aes alg = Aes.Create();

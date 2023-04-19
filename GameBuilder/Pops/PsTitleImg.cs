@@ -30,6 +30,12 @@ namespace GameBuilder.Pops
             this.compressors = new DiscCompressor[MAX_DISCS];
             this.discs = discs;
 
+            // ensure disc name is the same for all discs..
+            string discName = discs.First().DiscName;
+            for (int i = 0; i < discs.Length; i++)
+                discs[i].DiscName = discName;
+
+            // create compressor objects.
             for (int i = 0; i < compressors.Length; i++)
             {
                 if (i > (discs.Length - 1))

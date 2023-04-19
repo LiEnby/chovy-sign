@@ -1,17 +1,14 @@
 ﻿using Li.Progress;
 using Org.BouncyCastle.Crypto.Digests;
-using System;
-using System.IO;
 using System.Security.Cryptography;
 using System.Text;
-using System.Threading;
 using static Vita.PsvImgTools.SceIoStat;
 
 namespace Vita.PsvImgTools
 {
     public class PSVIMGBuilder : ProgressTracker
     {
-        private const Int64 BUFFER_SZ = 0x33554432;
+        private const Int64 BUFFER_SZ = 0x10000;
         private byte[] IV = new byte[0x10];
         private byte[] KEY;
         private Random rnd = new Random();
@@ -151,7 +148,30 @@ namespace Vita.PsvImgTools
             sdt.Microsecond = Convert.ToUInt32(dt.Millisecond * 1000);
             return sdt;
         }
+        internal virtual SceIoStat sceIoStat()
+        {
+            SceIoStat stats = new SceIoStat();
 
+            stats.Mode |= Modes.Directory;
+            // set size..
+            stats.Size = 0;
+
+            // fake the rest--
+            stats.Mode |= Modes.GroupRead;
+            stats.Mode |= Modes.GroupWrite;
+
+            stats.Mode |= Modes.OthersRead;
+            stats.Mode |= Modes.OthersWrite;
+
+            stats.Mode |= Modes.UserRead;
+            stats.Mode |= Modes.UserWrite;
+
+            stats.CreationTime = dateTimeToSceDateTime(DateTime.Now);
+            stats.AccessTime = dateTimeToSceDateTime(DateTime.Now);
+            stats.ModificaionTime = dateTimeToSceDateTime(DateTime.Now);
+
+            return stats;
+        }
         internal virtual SceIoStat sceIoStat(Stream str)
         {
             SceIoStat stats = new SceIoStat();
@@ -423,7 +443,7 @@ namespace Vita.PsvImgTools
             }
         }
 
-        internal virtual void writeStream(Stream dst)
+        internal virtual void writeStream(Stream dst, string file)
         {
             while(dst.Position < dst.Length)
             {
@@ -436,7 +456,7 @@ namespace Vita.PsvImgTools
                 dst.Read(work_buf, 0x00, work_buf.Length);
                 writeBlock(work_buf, true);
 
-                updateProgress(Convert.ToInt32(dst.Position), Convert.ToInt32(dst.Length), "PSVIMG Creation");
+                updateProgress(Convert.ToInt32(dst.Position), Convert.ToInt32(dst.Length), "PSVIMG Package File: " + Path.GetFileName(file));
             }
         }
         
@@ -454,12 +474,19 @@ namespace Vita.PsvImgTools
             }
             
         }
+        public void AddFile(byte[] sData, string ParentPath, string PathRel)
+        {
+            using (MemoryStream ms = new MemoryStream(sData))
+            {
+                AddFile(ms, ParentPath, PathRel);
+            }
+        }
         public void AddFile(Stream sData, string ParentPath, string PathRel)
         {
             SceIoStat stat = sceIoStat(sData);
             long sz = Convert.ToInt64(stat.Size);
             writeBlock(getHeader(stat, ParentPath, PathRel));
-            writeStream(sData);
+            writeStream(sData, PathRel);
             writeBlock(getPadding(sz));
             writeBlock(getTailer());
             contentSize += sz;
@@ -471,13 +498,18 @@ namespace Vita.PsvImgTools
             long sz = Convert.ToInt64(sceIoStat(FilePath).Size);
             writeBlock(getHeader(FilePath, ParentPath, PathRel));
             using (FileStream fs = File.OpenRead(FilePath))
-                writeStream(fs);
+                writeStream(fs, PathRel);
             writeBlock(getPadding(sz));
             writeBlock(getTailer());
             contentSize += sz;
             finished = true;
         }
-
+        public void AddDir(string ParentPath, string PathRel)
+        {
+            writeBlock(getHeader(sceIoStat(), ParentPath, PathRel));
+            writeBlock(getPadding(0));
+            writeBlock(getTailer());
+        }
         public void AddDir(string DirPath, string ParentPath, string PathRel)
         {
             writeBlock(getHeader(DirPath, ParentPath, PathRel));
@@ -491,7 +523,7 @@ namespace Vita.PsvImgTools
             mainStream.Write(footer, 0x00, footer.Length);
 
             blockStream.Dispose();
-            mainStream.Dispose();
+            //mainStream.Dispose();
             return contentSize;
         }
 
