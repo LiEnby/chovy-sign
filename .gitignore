@@ -12,6 +12,10 @@ PbpResign/obj/*
 ChovySign-CLI/bin/*
 ChovySign-CLI/obj/*
 
+ChovySign-GUI/bin/*
+ChovySign-GUI/obj/*
+
+
 DiscUtils/bin/*
 DiscUtils/obj/*
 

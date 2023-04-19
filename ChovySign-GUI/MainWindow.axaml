@@ -1,0 +1,71 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" d:DesignWidth="475" d:DesignHeight="838"
+        x:Class="ChovySign_GUI.MainWindow"
+        Title="Chovy Sign V2">
+	<TabControl>
+		<TabItem Header="PlayStation Portable">
+			<Grid Background="Black">
+				<Grid>
+					<Border BorderBrush="#FF1FFF00" BorderThickness="1" HorizontalAlignment="Left" Height="33" Margin="6,7,0,0" VerticalAlignment="Top" Width="816"/>
+					<Label Content="Rif:" HorizontalAlignment="Left" Margin="6,7,0,0" VerticalAlignment="Top" Foreground="#FF65FF00"/>
+					<TextBox Name="zRif" HorizontalAlignment="Left" Height="25" Margin="37,10,0,0" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" Width="309" Foreground="#FF1FFF00" Background="#FF717171" SelectionBrush="#FF0E4A25" BorderBrush="#FF1FFF00"/>
+					<TextBox Name="versionKey" HorizontalAlignment="Left" Height="25" Margin="395,10,0,0" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" Width="322" Background="#FF717171" Foreground="#FF1FFF00" SelectionBrush="#FF0E4A25" BorderBrush="#FF1FFF00"/>
+					<Label Content="Key:" HorizontalAlignment="Left" Margin="351,8,0,0" VerticalAlignment="Top" Foreground="#FF65FF00"/>
+					<Button Name="getKeys" Content="Get Keys" HorizontalAlignment="Left" Margin="729,9,0,0" VerticalAlignment="Top" Height="24" Width="82" Background="Black" Foreground="Red" BorderBrush="Red"/>
+				</Grid>
+				
+				<Border BorderBrush="LightGreen" BorderThickness="1" Width="800" HorizontalAlignment="Center" VerticalAlignment="Center">
+					<Grid>
+						<Grid.ColumnDefinitions>
+							<ColumnDefinition Width="2*" />
+							<ColumnDefinition Width="5*" />
+							<ColumnDefinition Width="1*" />
+						</Grid.ColumnDefinitions>
+						<Grid Grid.Column="0">
+							<Grid.RowDefinitions>
+								<RowDefinition Height="5*" />
+								<RowDefinition Height="1*" />
+							</Grid.RowDefinitions>
+							<Image HorizontalAlignment="Center" VerticalAlignment="Center" Source="/UMD.png" Grid.Row="0"/>
+							<Border BorderBrush="LightGreen" BorderThickness="1" Grid.Row="1">
+								<CheckBox Content="Compress PBP" HorizontalAlignment="Center" BorderBrush="LightGreen" Foreground="LightGreen"/>
+							</Border>
+						</Grid>
+						<Grid Grid.Column="1">
+							<Grid.RowDefinitions>
+								<RowDefinition Height="1*" />
+								<RowDefinition Height="1*" />
+							</Grid.RowDefinitions>
+							<Label Content="ISO Image:" Foreground="LightGreen" VerticalAlignment="Bottom" Grid.Row="0"/>
+							<TextBox SelectionBrush="DarkGray" Foreground="LightGreen" Background="Gray" BorderBrush="LightGreen" VerticalAlignment="Top" Grid.Row="1"/>
+						</Grid>
+						<Grid Grid.Column="2">
+							<Grid.RowDefinitions>
+								<RowDefinition Height="1*" />
+								<RowDefinition Height="1*" />
+							</Grid.RowDefinitions>
+							<Button Name="browseButton" Content="Browse" HorizontalAlignment="Center" VerticalAlignment="Top" Background="Black" BorderBrush="Red" Foreground="Red"  Grid.Row="1"/>
+						</Grid>
+					</Grid>
+				</Border>
+
+
+				<!--
+				<Grid>
+					<ProgressBar HorizontalAlignment="Left" Height="21" Margin="112,327,0,0" VerticalAlignment="Top" Width="592" Background="Black" BorderBrush="#FF1FFF00"/>
+					<Label Name="status" Content="Progress %" HorizontalAlignment="Left" Margin="21,325,0,0" VerticalAlignment="Top" Width="91" Foreground="#FF1FFF00"/>
+					<Button Content="Go!" HorizontalAlignment="Left" Margin="720,325,0,0" VerticalAlignment="Top" Width="65" Height="23" BorderBrush="Red" Foreground="Red" Background="Black"/>
+					<Label Content="100% Percent Free!" HorizontalAlignment="Left" Height="26" Margin="698,45,0,0" VerticalAlignment="Top" Width="12 />
+					<Label Content="Li, Dots-tb, Motoharu, SquallATF" HorizontalAlignment="Left" Height="25" Margin="640,392,0,0" VerticalAlignment="Top" Foreground="#FF1FFF00"/>
+				</Grid>
+				-->
+			</Grid>
+		</TabItem>
+		<TabItem Header="PlayStation 1">
+			<Grid Background="#FFE5E5E5"/>
+		</TabItem>
+	</TabControl>
+</Window>
