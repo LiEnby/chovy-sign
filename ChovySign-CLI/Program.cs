@@ -2,7 +2,6 @@
 using GameBuilder.Pops;
 using GameBuilder.Psp;
 using GameBuilder.VersionKey;
-using PspCrypto;
 using LibChovy;
 
 namespace ChovySign_CLI

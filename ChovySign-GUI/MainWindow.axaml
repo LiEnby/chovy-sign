@@ -2,27 +2,50 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        mc:Ignorable="d" d:DesignWidth="475" d:DesignHeight="838"
+        mc:Ignorable="d" d:DesignWidth="850" d:DesignHeight="850"
         x:Class="ChovySign_GUI.MainWindow"
         Title="Chovy Sign V2">
 	<TabControl>
 		<TabItem Header="PlayStation Portable">
 			<Grid Background="Black">
-				<Grid>
-					<Border BorderBrush="#FF1FFF00" BorderThickness="1" HorizontalAlignment="Left" Height="33" Margin="6,7,0,0" VerticalAlignment="Top" Width="816"/>
-					<Label Content="Rif:" HorizontalAlignment="Left" Margin="6,7,0,0" VerticalAlignment="Top" Foreground="#FF65FF00"/>
-					<TextBox Name="zRif" HorizontalAlignment="Left" Height="25" Margin="37,10,0,0" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" Width="309" Foreground="#FF1FFF00" Background="#FF717171" SelectionBrush="#FF0E4A25" BorderBrush="#FF1FFF00"/>
-					<TextBox Name="versionKey" HorizontalAlignment="Left" Height="25" Margin="395,10,0,0" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" Width="322" Background="#FF717171" Foreground="#FF1FFF00" SelectionBrush="#FF0E4A25" BorderBrush="#FF1FFF00"/>
-					<Label Content="Key:" HorizontalAlignment="Left" Margin="351,8,0,0" VerticalAlignment="Top" Foreground="#FF65FF00"/>
-					<Button Name="getKeys" Content="Get Keys" HorizontalAlignment="Left" Margin="729,9,0,0" VerticalAlignment="Top" Height="24" Width="82" Background="Black" Foreground="Red" BorderBrush="Red"/>
-				</Grid>
+				<Grid.RowDefinitions>
+								<RowDefinition Height="1*" />
+								<RowDefinition Height="5*" />
+								<RowDefinition Height="1*" />
+				</Grid.RowDefinitions>
+
+				<Border BorderBrush="LightGreen" BorderThickness="1" Width="830" HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Row="0">
+					<Grid Background="#575757">
+						<Grid.ColumnDefinitions>
+								<ColumnDefinition Width="5*" />
+								<ColumnDefinition Width="5*" />
+								<ColumnDefinition Width="1*" />
+						</Grid.ColumnDefinitions>
+						<Grid HorizontalAlignment="Stretch" Grid.Column="0">
+							<Grid.ColumnDefinitions>
+								<ColumnDefinition Width="1*" />
+								<ColumnDefinition Width="10*" />
+							</Grid.ColumnDefinitions>
+							<Label HorizontalAlignment="Left" VerticalAlignment="Center" Content="Rif:" Foreground="LightGreen" Grid.Column="0"/>
+							<TextBox HorizontalAlignment="Stretch" Name="zRif" Foreground="LightGreen" Background="Gray" SelectionBrush="DarkGreen" BorderBrush="LightGreen" Grid.Column="1"/>						
+						</Grid>
+						<Grid HorizontalAlignment="Stretch" Grid.Column="1">
+							<Grid.ColumnDefinitions>
+								<ColumnDefinition Width="1*" />
+								<ColumnDefinition Width="10*" />
+							</Grid.ColumnDefinitions>
+							<Label HorizontalAlignment="Left" VerticalAlignment="Center" Content="Key:" Foreground="LightGreen" Grid.Column="0"/>
+							<TextBox HorizontalAlignment="Stretch"  Name="vKey" Foreground="LightGreen" Background="Gray" SelectionBrush="DarkGreen" BorderBrush="LightGreen" Grid.Column="1"/>						
+						</Grid>
+						<Button Name="getKeys" Content="Get Keys" VerticalAlignment="Center" Background="Black" BorderBrush="Red" Foreground="Red"  Grid.Column="2"/>
+					</Grid>
+				</Border>
 				
-				<Border BorderBrush="LightGreen" BorderThickness="1" Width="800" HorizontalAlignment="Center" VerticalAlignment="Center">
-					<Grid>
+				<Border BorderBrush="LightGreen" BorderThickness="1" Width="830" HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Row="1">
+					<Grid Background="#575757">
 						<Grid.ColumnDefinitions>
 							<ColumnDefinition Width="2*" />
 							<ColumnDefinition Width="5*" />
-							<ColumnDefinition Width="1*" />
 						</Grid.ColumnDefinitions>
 						<Grid Grid.Column="0">
 							<Grid.RowDefinitions>
@@ -30,9 +53,7 @@
 								<RowDefinition Height="1*" />
 							</Grid.RowDefinitions>
 							<Image HorizontalAlignment="Center" VerticalAlignment="Center" Source="/UMD.png" Grid.Row="0"/>
-							<Border BorderBrush="LightGreen" BorderThickness="1" Grid.Row="1">
-								<CheckBox Content="Compress PBP" HorizontalAlignment="Center" BorderBrush="LightGreen" Foreground="LightGreen"/>
-							</Border>
+							<CheckBox Content="Compress PBP" HorizontalAlignment="Center" BorderBrush="LightGreen" Foreground="LightGreen" Grid.Row="1"/>
 						</Grid>
 						<Grid Grid.Column="1">
 							<Grid.RowDefinitions>
@@ -40,14 +61,15 @@
 								<RowDefinition Height="1*" />
 							</Grid.RowDefinitions>
 							<Label Content="ISO Image:" Foreground="LightGreen" VerticalAlignment="Bottom" Grid.Row="0"/>
-							<TextBox SelectionBrush="DarkGray" Foreground="LightGreen" Background="Gray" BorderBrush="LightGreen" VerticalAlignment="Top" Grid.Row="1"/>
-						</Grid>
-						<Grid Grid.Column="2">
-							<Grid.RowDefinitions>
-								<RowDefinition Height="1*" />
-								<RowDefinition Height="1*" />
-							</Grid.RowDefinitions>
-							<Button Name="browseButton" Content="Browse" HorizontalAlignment="Center" VerticalAlignment="Top" Background="Black" BorderBrush="Red" Foreground="Red"  Grid.Row="1"/>
+
+							<Grid Grid.Row="1">
+								<Grid.ColumnDefinitions>
+									<ColumnDefinition Width="7*" />
+									<ColumnDefinition Width="1*" />
+								</Grid.ColumnDefinitions>
+								<TextBox HorizontalAlignment="Stretch" VerticalAlignment="Top" Foreground="LightGreen" Background="Gray" SelectionBrush="DarkGreen" BorderBrush="LightGreen" Grid.Column="0"/>
+								<Button Name="browseButton" Content="Browse" HorizontalAlignment="Stretch" VerticalAlignment="Top" Background="Black" BorderBrush="Red" Foreground="Red"  Grid.Column="1"/>
+							</Grid>
 						</Grid>
 					</Grid>
 				</Border>
