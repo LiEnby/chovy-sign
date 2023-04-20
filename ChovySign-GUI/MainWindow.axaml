@@ -2,92 +2,152 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        mc:Ignorable="d" d:DesignWidth="850" d:DesignHeight="850"
+		xmlns:Global="clr-namespace:ChovySign_GUI.Global"
+		xmlns:Psp="clr-namespace:ChovySign_GUI.Psp"
+		mc:Ignorable="d" d:DesignWidth="850" d:DesignHeight="850"
         x:Class="ChovySign_GUI.MainWindow"
         Title="Chovy Sign V2">
+
+
 	<TabControl>
 		<TabItem Header="PlayStation Portable">
-			<Grid Background="Black">
-				<Grid.RowDefinitions>
-								<RowDefinition Height="1*" />
-								<RowDefinition Height="5*" />
-								<RowDefinition Height="1*" />
-				</Grid.RowDefinitions>
-
-				<Border BorderBrush="LightGreen" BorderThickness="1" Width="830" HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Row="0">
-					<Grid Background="#575757">
-						<Grid.ColumnDefinitions>
-								<ColumnDefinition Width="5*" />
-								<ColumnDefinition Width="5*" />
-								<ColumnDefinition Width="1*" />
-						</Grid.ColumnDefinitions>
-						<Grid HorizontalAlignment="Stretch" Grid.Column="0">
-							<Grid.ColumnDefinitions>
-								<ColumnDefinition Width="1*" />
-								<ColumnDefinition Width="10*" />
-							</Grid.ColumnDefinitions>
-							<Label HorizontalAlignment="Left" VerticalAlignment="Center" Content="Rif:" Foreground="LightGreen" Grid.Column="0"/>
-							<TextBox HorizontalAlignment="Stretch" Name="zRif" Foreground="LightGreen" Background="Gray" SelectionBrush="DarkGreen" BorderBrush="LightGreen" Grid.Column="1"/>						
-						</Grid>
-						<Grid HorizontalAlignment="Stretch" Grid.Column="1">
-							<Grid.ColumnDefinitions>
-								<ColumnDefinition Width="1*" />
-								<ColumnDefinition Width="10*" />
-							</Grid.ColumnDefinitions>
-							<Label HorizontalAlignment="Left" VerticalAlignment="Center" Content="Key:" Foreground="LightGreen" Grid.Column="0"/>
-							<TextBox HorizontalAlignment="Stretch"  Name="vKey" Foreground="LightGreen" Background="Gray" SelectionBrush="DarkGreen" BorderBrush="LightGreen" Grid.Column="1"/>						
-						</Grid>
-						<Button Name="getKeys" Content="Get Keys" VerticalAlignment="Center" Background="Black" BorderBrush="Red" Foreground="Red"  Grid.Column="2"/>
-					</Grid>
-				</Border>
-				
-				<Border BorderBrush="LightGreen" BorderThickness="1" Width="830" HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Row="1">
-					<Grid Background="#575757">
-						<Grid.ColumnDefinitions>
-							<ColumnDefinition Width="2*" />
-							<ColumnDefinition Width="5*" />
-						</Grid.ColumnDefinitions>
-						<Grid Grid.Column="0">
-							<Grid.RowDefinitions>
-								<RowDefinition Height="5*" />
-								<RowDefinition Height="1*" />
-							</Grid.RowDefinitions>
-							<Image HorizontalAlignment="Center" VerticalAlignment="Center" Source="/UMD.png" Grid.Row="0"/>
-							<CheckBox Content="Compress PBP" HorizontalAlignment="Center" BorderBrush="LightGreen" Foreground="LightGreen" Grid.Row="1"/>
-						</Grid>
-						<Grid Grid.Column="1">
-							<Grid.RowDefinitions>
-								<RowDefinition Height="1*" />
-								<RowDefinition Height="1*" />
-							</Grid.RowDefinitions>
-							<Label Content="ISO Image:" Foreground="LightGreen" VerticalAlignment="Bottom" Grid.Row="0"/>
-
-							<Grid Grid.Row="1">
-								<Grid.ColumnDefinitions>
-									<ColumnDefinition Width="7*" />
-									<ColumnDefinition Width="1*" />
-								</Grid.ColumnDefinitions>
-								<TextBox HorizontalAlignment="Stretch" VerticalAlignment="Top" Foreground="LightGreen" Background="Gray" SelectionBrush="DarkGreen" BorderBrush="LightGreen" Grid.Column="0"/>
-								<Button Name="browseButton" Content="Browse" HorizontalAlignment="Stretch" VerticalAlignment="Top" Background="Black" BorderBrush="Red" Foreground="Red"  Grid.Column="1"/>
-							</Grid>
-						</Grid>
-					</Grid>
-				</Border>
-
-
-				<!--
-				<Grid>
-					<ProgressBar HorizontalAlignment="Left" Height="21" Margin="112,327,0,0" VerticalAlignment="Top" Width="592" Background="Black" BorderBrush="#FF1FFF00"/>
-					<Label Name="status" Content="Progress %" HorizontalAlignment="Left" Margin="21,325,0,0" VerticalAlignment="Top" Width="91" Foreground="#FF1FFF00"/>
-					<Button Content="Go!" HorizontalAlignment="Left" Margin="720,325,0,0" VerticalAlignment="Top" Width="65" Height="23" BorderBrush="Red" Foreground="Red" Background="Black"/>
-					<Label Content="100% Percent Free!" HorizontalAlignment="Left" Height="26" Margin="698,45,0,0" VerticalAlignment="Top" Width="12 />
-					<Label Content="Li, Dots-tb, Motoharu, SquallATF" HorizontalAlignment="Left" Height="25" Margin="640,392,0,0" VerticalAlignment="Top" Foreground="#FF1FFF00"/>
-				</Grid>
-				-->
-			</Grid>
+			<Psp:PspTab Name="pspTab"/>
 		</TabItem>
 		<TabItem Header="PlayStation 1">
-			<Grid Background="#FFE5E5E5"/>
+			<Grid>
+				<Grid>
+					<Grid.RowDefinitions>
+						<RowDefinition Height="1*" />
+						<RowDefinition Height="5*" />
+						<RowDefinition Height="1*" />
+					</Grid.RowDefinitions>
+					<Grid.ColumnDefinitions>
+						<ColumnDefinition Width="1*"/>
+						<ColumnDefinition Width="5*"/>
+						<ColumnDefinition Width="1*"/>
+					</Grid.ColumnDefinitions>
+
+					<Global:KeySelector Name="keySelector" Grid.Row="0" Grid.Column="1"/>
+					<!-- ISO Image selector -->
+					<Border Padding="4 4" HorizontalAlignment="Stretch" VerticalAlignment="Center" Grid.Row="1" Grid.Column="1">
+						<Grid>
+							<Grid.ColumnDefinitions>
+								<ColumnDefinition Width="1*" />
+								<ColumnDefinition Width="5*" />
+							</Grid.ColumnDefinitions>
+							<Image HorizontalAlignment="Stretch" VerticalAlignment="Center" Source="/PS1CD.PNG" Grid.Column="0"/>
+							
+							<Grid Grid.Column="1">
+								<Grid.RowDefinitions>
+									<RowDefinition Height="1*"/>
+									<RowDefinition Height="1*"/>
+									<RowDefinition Height="1*"/>
+									<RowDefinition Height="1*"/>
+									<RowDefinition Height="1*"/>
+								</Grid.RowDefinitions>
+								
+								<Grid Grid.Row="0">
+									<Grid.RowDefinitions>
+										<RowDefinition Height="1*" />
+										<RowDefinition Height="1*" />
+									</Grid.RowDefinitions>
+									<Label Content="(Disc 1)" VerticalAlignment="Bottom" Grid.Row="0"/>
+
+									<Grid Grid.Row="1">
+										<Grid.ColumnDefinitions>
+											<ColumnDefinition Width="7*" />
+											<ColumnDefinition Width="1*" />
+										</Grid.ColumnDefinitions>
+										<TextBox Name="cueText" HorizontalAlignment="Stretch" VerticalAlignment="Top" Grid.Column="0"/>
+										<Button Name="browseButton" Content="Browse" HorizontalAlignment="Center" VerticalAlignment="Top" Grid.Column="1"/>
+									</Grid>
+								</Grid>
+
+								<Grid Grid.Row="1">
+									<Grid.RowDefinitions>
+										<RowDefinition Height="1*" />
+										<RowDefinition Height="1*" />
+									</Grid.RowDefinitions>
+									<Label Content="(Disc 2)" VerticalAlignment="Bottom" Grid.Row="0"/>
+
+									<Grid Grid.Row="1">
+										<Grid.ColumnDefinitions>
+											<ColumnDefinition Width="7*" />
+											<ColumnDefinition Width="1*" />
+										</Grid.ColumnDefinitions>
+										<TextBox Name="cueText2" HorizontalAlignment="Stretch" VerticalAlignment="Top" Grid.Column="0"/>
+										<Button Name="browseButton2" Content="Browse" HorizontalAlignment="Center" VerticalAlignment="Top" Grid.Column="1"/>
+									</Grid>
+								</Grid>
+
+
+								<Grid Grid.Row="2">
+									<Grid.RowDefinitions>
+										<RowDefinition Height="1*" />
+										<RowDefinition Height="1*" />
+									</Grid.RowDefinitions>
+									<Label Content="(Disc 3)" VerticalAlignment="Bottom" Grid.Row="0"/>
+
+									<Grid Grid.Row="1">
+										<Grid.ColumnDefinitions>
+											<ColumnDefinition Width="7*" />
+											<ColumnDefinition Width="1*" />
+										</Grid.ColumnDefinitions>
+										<TextBox Name="cueText3" HorizontalAlignment="Stretch" VerticalAlignment="Top" Grid.Column="0"/>
+										<Button Name="browseButton3" Content="Browse" HorizontalAlignment="Center" VerticalAlignment="Top" Grid.Column="1"/>
+									</Grid>
+								</Grid>
+
+
+								<Grid Grid.Row="3">
+									<Grid.RowDefinitions>
+										<RowDefinition Height="1*" />
+										<RowDefinition Height="1*" />
+									</Grid.RowDefinitions>
+									<Label Content="(Disc 4)" VerticalAlignment="Bottom" Grid.Row="0"/>
+
+									<Grid Grid.Row="1">
+										<Grid.ColumnDefinitions>
+											<ColumnDefinition Width="7*" />
+											<ColumnDefinition Width="1*" />
+										</Grid.ColumnDefinitions>
+										<TextBox Name="cueText4" HorizontalAlignment="Stretch" VerticalAlignment="Top" Grid.Column="0"/>
+										<Button Name="browseButton4" Content="Browse" HorizontalAlignment="Center" VerticalAlignment="Top" Grid.Column="1"/>
+									</Grid>
+								</Grid>
+
+
+								<Grid Grid.Row="4">
+									<Grid.RowDefinitions>
+										<RowDefinition Height="1*" />
+										<RowDefinition Height="1*" />
+									</Grid.RowDefinitions>
+									<Label Content="(Disc 5)" VerticalAlignment="Bottom" Grid.Row="0"/>
+
+									<Grid Grid.Row="1">
+										<Grid.ColumnDefinitions>
+											<ColumnDefinition Width="7*" />
+											<ColumnDefinition Width="1*" />
+										</Grid.ColumnDefinitions>
+										<TextBox Name="cueText5" HorizontalAlignment="Stretch" VerticalAlignment="Top" Grid.Column="0"/>
+										<Button Name="browseButton5" Content="Browse" HorizontalAlignment="Center" VerticalAlignment="Top" Grid.Column="1"/>
+									</Grid>
+								</Grid>
+								
+							</Grid>
+
+							
+
+						</Grid>
+					</Border>
+					<Global:ProgressStatus Name="progressStatus" Grid.Row="2" Grid.Column="1"/>
+
+				</Grid>
+
+				<!-- Credits -->
+				<Label Content="SquallATF, Li, Motoharu, Davee, Dots TB, " VerticalAlignment="Bottom" HorizontalAlignment="Right"/>
+			</Grid>
+
 		</TabItem>
 	</TabControl>
 </Window>

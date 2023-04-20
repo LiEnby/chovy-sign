@@ -3,5 +3,204 @@
              x:Class="ChovySign_GUI.App">
     <Application.Styles>
         <FluentTheme Mode="Light"/>
-    </Application.Styles>
+
+		<!-- Checkbox Styling -->
+		<Style Selector="CheckBox:checked /template/ ContentPresenter">
+			<Setter Property="TextBlock.Foreground">
+				<Setter.Value>LightGreen</Setter.Value>
+			</Setter>
+		</Style>
+
+		<Style Selector="CheckBox:checked /template/ Border#NormalRectangle">
+			<Setter Property="BorderBrush">
+				<Setter.Value>LightGreen</Setter.Value>
+			</Setter>
+			<Setter Property="Background">
+				<Setter.Value>#3f3f3f</Setter.Value>
+			</Setter>
+		</Style>
+
+		<Style Selector="CheckBox:pointerover /template/ Border#NormalRectangle">
+			<Setter Property="BorderBrush">
+				<Setter.Value>Green</Setter.Value>
+			</Setter>
+			<Setter Property="Background">
+				<Setter.Value>#1f1f1f</Setter.Value>
+			</Setter>
+		</Style>
+
+		<Style Selector="CheckBox /template/ Border#NormalRectangle">
+			<Setter Property="BorderBrush">
+				<Setter.Value>Green</Setter.Value>
+			</Setter>
+			<Setter Property="Background">
+				<Setter.Value>#3f3f3f</Setter.Value>
+			</Setter>
+		</Style>
+
+		<Style Selector="CheckBox:pointerover /template/ ContentPresenter">
+			<Setter Property="TextBlock.Foreground">
+				<Setter.Value>Green</Setter.Value>
+			</Setter>
+
+		</Style>
+
+
+		<Style Selector="CheckBox">
+			<Setter Property="BorderBrush">
+				<Setter.Value>LightGreen</Setter.Value>
+			</Setter>
+
+			<Setter Property="Foreground">
+				<Setter.Value>LightGreen</Setter.Value>
+			</Setter>
+		</Style>
+
+		<!-- Button styles -->
+		<Style Selector="Button:pointerover /template/ ContentPresenter">
+			<Setter Property="Background">
+				<Setter.Value>Red</Setter.Value>
+			</Setter>
+			<Setter Property="BorderBrush">
+				<Setter.Value>Black</Setter.Value>
+			</Setter>
+			<Setter Property="TextBlock.Foreground">
+				<Setter.Value>White</Setter.Value>
+			</Setter>
+		</Style>
+
+		<Style Selector="Button">
+			<Setter Property="BorderThickness">
+				<Setter.Value>1</Setter.Value>
+			</Setter>
+			<Setter Property="Foreground">
+				<Setter.Value>Red</Setter.Value>
+			</Setter>
+			<Setter Property="BorderBrush">
+				<Setter.Value>Red</Setter.Value>
+			</Setter>
+			<Setter Property="Background">
+				<Setter.Value>Black</Setter.Value>
+			</Setter>
+		</Style>
+
+		<!-- Textbox Styling -->
+
+		<Style Selector="TextBox:focus">
+			<Setter Property="Foreground">
+				<Setter.Value>LightGreen</Setter.Value>
+			</Setter>
+		</Style>
+
+		<Style Selector="TextBox:focus /template/ TextBlock">
+			<Setter Property="Foreground">
+				<Setter.Value>LightGreen</Setter.Value>
+			</Setter>
+		</Style>
+		<Style Selector="TextBox:focus /template/ Border">
+			<Setter Property="Background">
+				<Setter.Value>#3f3f3f</Setter.Value>
+			</Setter>
+			<Setter Property="BorderBrush">
+				<Setter.Value>LightGreen</Setter.Value>
+			</Setter>
+		</Style>
+
+		<Style Selector="TextBox:pointerover">
+			<Setter Property="Foreground">
+				<Setter.Value>Green</Setter.Value>
+			</Setter>
+		</Style>
+
+		<Style Selector="TextBox:pointerover /template/ TextBlock">
+			<Setter Property="Foreground">
+				<Setter.Value>Green</Setter.Value>
+			</Setter>
+		</Style>
+		<Style Selector="TextBox:pointerover /template/ Border">
+			<Setter Property="Background">
+				<Setter.Value>#1f1f1f</Setter.Value>
+			</Setter>
+			<Setter Property="BorderBrush">
+				<Setter.Value>Green</Setter.Value>
+			</Setter>
+		</Style>
+
+		<Style Selector="TextBox">
+			<Setter Property="Foreground">
+				<Setter.Value>LightGreen</Setter.Value>
+			</Setter>
+			<Setter Property="Background">
+				<Setter.Value>#3f3f3f</Setter.Value>
+			</Setter>
+			<Setter Property="BorderBrush">
+				<Setter.Value>LightGreen</Setter.Value>
+			</Setter>
+		</Style>
+
+
+		<!-- TabControl -->
+		<Style Selector="TabControl">
+			<Setter Property="Background">
+				<Setter.Value>Black</Setter.Value>
+			</Setter>
+		</Style>
+
+		<Style Selector="TabItem:pointerover /template/ Border">
+			<Setter Property="Background">
+				<Setter.Value>LightGreen</Setter.Value>
+			</Setter>
+		</Style>
+
+		<Style Selector="TabItem:selected">
+			<Setter Property="Foreground">
+				<Setter.Value>LightGreen</Setter.Value>
+			</Setter>
+			<Setter Property="Background">
+				<Setter.Value>Green</Setter.Value>
+			</Setter>
+		</Style>
+
+		<Style Selector="TabItem">
+			<Setter Property="Foreground">
+				<Setter.Value>LightGreen</Setter.Value>
+			</Setter>
+			<Setter Property="Background">
+				<Setter.Value>DarkGreen</Setter.Value>
+			</Setter>
+		</Style>
+
+		<!-- other -->
+
+		<Style Selector="ProgressBar">
+			<Setter Property="Foreground">
+				<Setter.Value>LightGreen</Setter.Value>
+			</Setter>
+			<Setter Property="Background">
+				<Setter.Value>#3f3f3f</Setter.Value>
+			</Setter>
+			<Setter Property="BorderBrush">
+				<Setter.Value>LightGreen</Setter.Value>
+			</Setter>
+			<Setter Property="BorderThickness">
+				<Setter.Value>1</Setter.Value>
+			</Setter>
+		</Style>
+
+		<Style Selector="Label">
+			<Setter Property="Foreground">
+				<Setter.Value>LightGreen</Setter.Value>
+			</Setter>
+		</Style>
+
+		<Style Selector="Border">
+			<Setter Property="BorderBrush">
+				<Setter.Value>LightGreen</Setter.Value>
+			</Setter>
+
+			<Setter Property="BorderThickness">
+				<Setter.Value>1</Setter.Value>
+			</Setter>
+		</Style>
+	</Application.Styles>
 </Application>

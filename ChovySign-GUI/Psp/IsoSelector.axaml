@@ -1,0 +1,40 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="200"
+             x:Class="ChovySign_GUI.Psp.IsoSelector">
+	<!-- ISO Image selector -->
+	<Border Padding="4 4" HorizontalAlignment="Stretch" VerticalAlignment="Center">
+		<Grid>
+			<Grid.ColumnDefinitions>
+				<ColumnDefinition Width="1*" />
+				<ColumnDefinition Width="5*" />
+			</Grid.ColumnDefinitions>
+			<Grid Grid.Column="0">
+				<Grid.RowDefinitions>
+					<RowDefinition Height="5*" />
+					<RowDefinition Height="1*" />
+				</Grid.RowDefinitions>
+				<Image HorizontalAlignment="Stretch" VerticalAlignment="Center" Source="/UMD.PNG" Grid.Row="0"/>
+				<CheckBox Content="Compress PBP" HorizontalAlignment="Center" Grid.Row="1"/>
+			</Grid>
+			<Grid Grid.Column="1">
+				<Grid.RowDefinitions>
+					<RowDefinition Height="1*" />
+					<RowDefinition Height="1*" />
+				</Grid.RowDefinitions>
+				<Label Content="ISO Image:" VerticalAlignment="Bottom" Grid.Row="0"/>
+
+				<Grid Grid.Row="1">
+					<Grid.ColumnDefinitions>
+						<ColumnDefinition Width="7*" />
+						<ColumnDefinition Width="1*" />
+					</Grid.ColumnDefinitions>
+					<TextBox HorizontalAlignment="Stretch" VerticalAlignment="Top" Grid.Column="0"/>
+					<Button Name="browseButton" Content="Browse" HorizontalAlignment="Center" VerticalAlignment="Top" Grid.Column="1"/>
+				</Grid>
+			</Grid>
+		</Grid>
+	</Border>
+</UserControl>

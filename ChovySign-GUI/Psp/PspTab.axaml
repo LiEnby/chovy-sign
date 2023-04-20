@@ -1,0 +1,31 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+			 xmlns:Global="clr-namespace:ChovySign_GUI.Global"
+			 xmlns:Psp="clr-namespace:ChovySign_GUI.Psp"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="ChovySign_GUI.Psp.PspTab">
+	<Grid>
+		<Grid>
+			<Grid.RowDefinitions>
+				<RowDefinition Height="1*" />
+				<RowDefinition Height="5*" />
+				<RowDefinition Height="1*" />
+			</Grid.RowDefinitions>
+			<Grid.ColumnDefinitions>
+				<ColumnDefinition Width="1*"/>
+				<ColumnDefinition Width="5*"/>
+				<ColumnDefinition Width="1*"/>
+			</Grid.ColumnDefinitions>
+
+			<Global:KeySelector Name="keySelector" Grid.Row="0" Grid.Column="1"/>
+			<Psp:IsoSelector Name="isoSelector" Grid.Row="1" Grid.Column="1"/>
+			<Global:ProgressStatus Name="progressStatus" Grid.Row="2" Grid.Column="1"/>
+
+		</Grid>
+
+		<!-- Credits -->
+		<Label Content="Li, Dots TB, Motoharu, SquallATF" VerticalAlignment="Bottom" HorizontalAlignment="Right"/>
+	</Grid>
+</UserControl>

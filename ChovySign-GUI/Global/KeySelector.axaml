@@ -1,0 +1,34 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="35"
+             x:Class="ChovySign_GUI.Global.KeySelector">
+	<!-- key selector -->
+	<Border Padding="4 4" HorizontalAlignment="Stretch" VerticalAlignment="Top">
+		<Grid>
+			<Grid.ColumnDefinitions>
+				<ColumnDefinition Width="4*" />
+				<ColumnDefinition Width="4*" />
+				<ColumnDefinition Width="1*" />
+			</Grid.ColumnDefinitions>
+			<Grid HorizontalAlignment="Stretch" Grid.Column="0">
+				<Grid.ColumnDefinitions>
+					<ColumnDefinition Width="1*" />
+					<ColumnDefinition Width="10*" />
+				</Grid.ColumnDefinitions>
+				<Label HorizontalAlignment="Left" VerticalAlignment="Center" Content="Rif:" Grid.Column="0"/>
+				<TextBox HorizontalAlignment="Stretch" Watermark="GAME.RIF" Name="zRif" Grid.Column="1"/>
+			</Grid>
+			<Grid HorizontalAlignment="Stretch" Grid.Column="1">
+				<Grid.ColumnDefinitions>
+					<ColumnDefinition Width="1*" />
+					<ColumnDefinition Width="10*" />
+				</Grid.ColumnDefinitions>
+				<Label HorizontalAlignment="Left" VerticalAlignment="Center" Content="Key:" Grid.Column="0"/>
+				<TextBox HorizontalAlignment="Stretch" Watermark="Version Key" Name="vKey" Grid.Column="1"/>
+			</Grid>
+			<Button Name="getKeys" Content="Get Keys" HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Column="2"/>
+		</Grid>
+	</Border>
+</UserControl>

@@ -5,13 +5,16 @@
     <Nullable>enable</Nullable>
     <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
     <ApplicationManifest>app.manifest</ApplicationManifest>
+    <RootNamespace>ChovySign_GUI</RootNamespace>
   </PropertyGroup>
   <ItemGroup>
     <None Remove=".gitignore" />
+    <None Remove="PS1CD.PNG" />
     <None Remove="UMD.png" />
   </ItemGroup>
   <ItemGroup>
-    <AvaloniaResource Include="UMD.png">
+    <AvaloniaResource Include="PS1CD.PNG" />
+    <AvaloniaResource Include="UMD.PNG">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </AvaloniaResource>
   </ItemGroup>
