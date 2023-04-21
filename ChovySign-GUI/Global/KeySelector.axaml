@@ -2,10 +2,10 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="35"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="40"
              x:Class="ChovySign_GUI.Global.KeySelector">
 	<!-- key selector -->
-	<Border Padding="4 4" HorizontalAlignment="Stretch" VerticalAlignment="Top">
+	<Border Padding="10 2" HorizontalAlignment="Stretch" VerticalAlignment="Top">
 		<Grid>
 			<Grid.ColumnDefinitions>
 				<ColumnDefinition Width="4*" />

@@ -1,5 +1,6 @@
 ﻿using GameBuilder.Pops;
 using GameBuilder.Psp;
+using LibChovy.Art;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -70,7 +71,7 @@ namespace LibChovy
             {
                 if (icon0 is null)
                 {
-                    byte[] coverImg = ArtDownloader.DownloadCover(FirstDisc).Result;
+                    byte[] coverImg = Downloader.DownloadCover(FirstDisc).Result;
                     icon0 = coverImg;
                     return coverImg;
                 }

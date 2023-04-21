@@ -7,6 +7,8 @@ namespace ChovySign_GUI.Psp
         public PspTab()
         {
             InitializeComponent();
+
+            this.progressStatus.IsEnabled = false;
         }
     }
 }

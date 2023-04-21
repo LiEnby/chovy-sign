@@ -57,15 +57,27 @@
 		</Style>
 
 		<!-- Button styles -->
+		<Style Selector="Button:disabled /template/ ContentPresenter">
+			<Setter Property="Background">
+				<Setter.Value>Black</Setter.Value>
+			</Setter>
+			<Setter Property="BorderBrush">
+				<Setter.Value>DarkRed</Setter.Value>
+			</Setter>
+			<Setter Property="TextBlock.Foreground">
+				<Setter.Value>DarkRed</Setter.Value>
+			</Setter>
+		</Style>
+
 		<Style Selector="Button:pointerover /template/ ContentPresenter">
 			<Setter Property="Background">
 				<Setter.Value>Red</Setter.Value>
 			</Setter>
 			<Setter Property="BorderBrush">
-				<Setter.Value>Black</Setter.Value>
+				<Setter.Value>DarkRed</Setter.Value>
 			</Setter>
 			<Setter Property="TextBlock.Foreground">
-				<Setter.Value>White</Setter.Value>
+				<Setter.Value>Black</Setter.Value>
 			</Setter>
 		</Style>
 

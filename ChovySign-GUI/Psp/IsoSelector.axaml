@@ -2,10 +2,11 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="200"
+			 xmlns:Global="clr-namespace:ChovySign_GUI.Global"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="145"
              x:Class="ChovySign_GUI.Psp.IsoSelector">
 	<!-- ISO Image selector -->
-	<Border Padding="4 4" HorizontalAlignment="Stretch" VerticalAlignment="Center">
+	<Border Padding="10 10" HorizontalAlignment="Stretch" VerticalAlignment="Center">
 		<Grid>
 			<Grid.ColumnDefinitions>
 				<ColumnDefinition Width="1*" />
@@ -16,25 +17,10 @@
 					<RowDefinition Height="5*" />
 					<RowDefinition Height="1*" />
 				</Grid.RowDefinitions>
-				<Image HorizontalAlignment="Stretch" VerticalAlignment="Center" Source="/UMD.PNG" Grid.Row="0"/>
+				<Image HorizontalAlignment="Center" VerticalAlignment="Center" Width="120" Source="/Psp/UMD.PNG" Grid.Row="0"/>
 				<CheckBox Content="Compress PBP" HorizontalAlignment="Center" Grid.Row="1"/>
 			</Grid>
-			<Grid Grid.Column="1">
-				<Grid.RowDefinitions>
-					<RowDefinition Height="1*" />
-					<RowDefinition Height="1*" />
-				</Grid.RowDefinitions>
-				<Label Content="ISO Image:" VerticalAlignment="Bottom" Grid.Row="0"/>
-
-				<Grid Grid.Row="1">
-					<Grid.ColumnDefinitions>
-						<ColumnDefinition Width="7*" />
-						<ColumnDefinition Width="1*" />
-					</Grid.ColumnDefinitions>
-					<TextBox HorizontalAlignment="Stretch" VerticalAlignment="Top" Grid.Column="0"/>
-					<Button Name="browseButton" Content="Browse" HorizontalAlignment="Center" VerticalAlignment="Top" Grid.Column="1"/>
-				</Grid>
-			</Grid>
+			<Global:BrowseButton Name="umdFile" Extension="iso" FileTypeName="Universal Media Disc 'UMD' Disc Image (ISO9660)" Label="UMD Image:" Grid.Column="1"/>
 		</Grid>
 	</Border>
 </UserControl>

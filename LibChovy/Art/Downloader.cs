@@ -6,9 +6,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace LibChovy
+namespace LibChovy.Art
 {
-    internal class ArtDownloader
+    public class Downloader
     {
         private const string coverApi = "https://raw.githubusercontent.com/xlenore/psx-covers/main/covers/";
         private static HttpClient httpClient = new HttpClient();
@@ -41,9 +41,9 @@ namespace LibChovy
                         }
                     }
                 }
-                    
+
             }
-            catch (Exception e) { Console.Error.WriteLine(e.Message); Console.Error.WriteLine(e.StackTrace); return Resources.ICON0; }
+            catch (Exception) { return Resources.ICON0; }
         }
 
     }

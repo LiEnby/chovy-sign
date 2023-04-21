@@ -1,0 +1,35 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:Global="clr-namespace:ChovySign_GUI.Global"
+			 mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="300"
+             x:Class="ChovySign_GUI.Ps1.CueSelector">
+	<!-- Bin/Cue Image selector -->
+	<Border Padding="5 5" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+		<Grid>
+			<Grid.ColumnDefinitions>
+				<ColumnDefinition Width="1*" />
+				<ColumnDefinition Width="10*" />
+			</Grid.ColumnDefinitions>
+			<Image HorizontalAlignment="Stretch" VerticalAlignment="Center" Source="/Ps1/PS1CD.PNG" Grid.Column="0"/>
+
+			<Grid Grid.Column="1">
+				<Grid.RowDefinitions>
+					<RowDefinition Height="52"/>
+					<RowDefinition Height="52"/>
+					<RowDefinition Height="52"/>
+					<RowDefinition Height="52"/>
+					<RowDefinition Height="52"/>
+				</Grid.RowDefinitions>
+
+				<Global:BrowseButton Name="discCue1" Extension="cue" FileTypeName="PS1 Cue Sheet" Label="Disc 1:" Grid.Row="0"/>
+				<Global:BrowseButton Name="discCue2" Extension="cue" FileTypeName="PS1 Cue Sheet" Label="Disc 2:" Grid.Row="1"/>
+				<Global:BrowseButton Name="discCue3" Extension="cue" FileTypeName="PS1 Cue Sheet" Label="Disc 3:" Grid.Row="2"/>
+				<Global:BrowseButton Name="discCue4" Extension="cue" FileTypeName="PS1 Cue Sheet" Label="Disc 4:" Grid.Row="3"/>
+				<Global:BrowseButton Name="discCue5" Extension="cue" FileTypeName="PS1 Cue Sheet" Label="Disc 5:" Grid.Row="4"/>
+
+			</Grid>
+		</Grid>
+	</Border>
+</UserControl>

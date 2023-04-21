@@ -4,7 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 			 xmlns:Global="clr-namespace:ChovySign_GUI.Global"
 			 xmlns:Psp="clr-namespace:ChovySign_GUI.Psp"
-             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="900"
              x:Class="ChovySign_GUI.Psp.PspTab">
 	<Grid>
 		<Grid>
@@ -15,7 +15,7 @@
 			</Grid.RowDefinitions>
 			<Grid.ColumnDefinitions>
 				<ColumnDefinition Width="1*"/>
-				<ColumnDefinition Width="5*"/>
+				<ColumnDefinition Width="10*"/>
 				<ColumnDefinition Width="1*"/>
 			</Grid.ColumnDefinitions>
 
@@ -26,6 +26,6 @@
 		</Grid>
 
 		<!-- Credits -->
-		<Label Content="Li, Dots TB, Motoharu, SquallATF" VerticalAlignment="Bottom" HorizontalAlignment="Right"/>
+		<Label Content="Li, Dots TB, SquallATF, Motoharu, Davee" VerticalAlignment="Bottom" HorizontalAlignment="Right"/>
 	</Grid>
 </UserControl>

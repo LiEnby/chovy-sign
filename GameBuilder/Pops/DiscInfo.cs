@@ -13,8 +13,8 @@ namespace GameBuilder.Pops
     public class DiscInfo
     {
         private string cueFile;
-        private string? discName;
-        private string? discId;
+        private string discName;
+        private string discId;
 
         public string CueFile 
         { 
@@ -89,7 +89,7 @@ namespace GameBuilder.Pops
                     discName = binUtil.ReadCDStr(0x20);
                 }
             }
-
+            if (discName == "") discName = Path.GetFileNameWithoutExtension(cueFile);
             if (discId is null) discId = "SLUS00001";
 
         }
