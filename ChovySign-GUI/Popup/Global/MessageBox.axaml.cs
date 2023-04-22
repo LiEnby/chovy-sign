@@ -3,7 +3,7 @@ using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 
-namespace ChovySign_GUI.Global
+namespace ChovySign_GUI.Popup.Global
 {
     partial class MessageBox : Window
     {

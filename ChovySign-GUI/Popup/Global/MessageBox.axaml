@@ -3,7 +3,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
-        x:Class="ChovySign_GUI.Global.MessageBox" SizeToContent="WidthAndHeight" CanResize="False">
+        x:Class="ChovySign_GUI.Popup.Global.MessageBox" SizeToContent="WidthAndHeight" CanResize="False">
 	<StackPanel HorizontalAlignment="Center">
 		<TextBlock HorizontalAlignment="Center" Name="Text"/>
 		<StackPanel HorizontalAlignment="Center" Orientation="Horizontal" Name="Buttons">

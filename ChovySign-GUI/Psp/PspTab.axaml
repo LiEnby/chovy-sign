@@ -19,7 +19,7 @@
 				<ColumnDefinition Width="1*"/>
 			</Grid.ColumnDefinitions>
 
-			<Global:KeySelector Name="keySelector" Grid.Row="0" Grid.Column="1"/>
+			<Global:KeySelector Name="keySelector" KeyIndex="2" Grid.Row="0" Grid.Column="1"/>
 			<Psp:IsoSelector Name="isoSelector" Grid.Row="1" Grid.Column="1"/>
 			<Global:ProgressStatus Name="progressStatus" Grid.Row="2" Grid.Column="1"/>
 

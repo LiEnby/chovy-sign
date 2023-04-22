@@ -1,6 +1,7 @@
 using Avalonia.Controls;
 using Avalonia.Media.Imaging;
 using ChovySign_GUI.Global;
+using ChovySign_GUI.Popup.Global;
 using GameBuilder.Pops;
 using LibChovy.Art;
 using System;

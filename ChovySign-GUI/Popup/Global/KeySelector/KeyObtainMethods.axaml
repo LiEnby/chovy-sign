@@ -1,0 +1,29 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" d:DesignWidth="1400" d:DesignHeight="150"
+        x:Class="ChovySign_GUI.Popup.Global.KeySelector.KeyObtainMethods"
+        Title="VersionKey Obtain Method" SizeToContent="WidthAndHeight"
+		MaxWidth="1400" MaxHeight="150">
+	<Grid>
+		<Grid.ColumnDefinitions>
+			<ColumnDefinition Width="5*"/>
+			<ColumnDefinition Width="5*"/>
+			<ColumnDefinition Width="5*"/>
+		</Grid.ColumnDefinitions>
+		<Grid.RowDefinitions>
+			<RowDefinition Height="30"/>
+			<RowDefinition Height="5*"/>
+		</Grid.RowDefinitions>
+			
+		<Button Content="EBOOT.PBP Method" Click="ebootMethodClick" Grid.Row="0" Grid.Column="0" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+		<Button Content="IDPS+RIF+ACT Method" Click="actRifMethodClick" Grid.Row="0" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+		<Button Content="KEYS.TXT Method" Click="keysTxtMethodClick" Grid.Row="0" Grid.Column="2" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+
+		<Image Name="ebootMethodPs1Graphic" Source="/Popup/Global/KeySelector/EBOOTMETHOD1.PNG" Grid.Row="1" Grid.Column="0" VerticalAlignment="Top" HorizontalAlignment="Stretch"/>
+		<Image Name="ebootMethodPspGraphic" Source="/Popup/Global/KeySelector/EBOOTMETHOD2.PNG" Grid.Row="1" Grid.Column="0" VerticalAlignment="Top" HorizontalAlignment="Stretch"/>
+		<Image Name="actRifMethodGraphic" Source="/Popup/Global/KeySelector/ACTRIFMETHOD.PNG" Grid.Row="1" Grid.Column="1" VerticalAlignment="Top" HorizontalAlignment="Stretch"/>
+		<Image Name="keysTxtMethodGraphic" Source="/Popup/Global/KeySelector/KEYSTXTMETHOD.PNG" Grid.Row="1" Grid.Column="2" VerticalAlignment="Top" HorizontalAlignment="Stretch"/>
+	</Grid>
+</Window>

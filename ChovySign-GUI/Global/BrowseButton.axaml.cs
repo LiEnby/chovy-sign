@@ -85,7 +85,10 @@ namespace ChovySign_GUI.Global
             }
             set
             {
-                this.filePath.Text = value;
+                if (File.Exists(value))
+                    this.filePath.Text = value;
+                else
+                    this.filePath.Text = "";
             }
         }
 

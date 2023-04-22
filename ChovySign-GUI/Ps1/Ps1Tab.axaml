@@ -20,7 +20,7 @@
 					<ColumnDefinition Width="1*"/>
 				</Grid.ColumnDefinitions>
 
-				<Global:KeySelector Name="keySelector" Grid.Row="0" Grid.Column="1"/>
+				<Global:KeySelector Name="keySelector" KeyIndex="1" Grid.Row="0" Grid.Column="1"/>
 				
 				<Ps1:CueSelector Name="discSelector" Grid.Row="1" Grid.Column="1"/>
 				<Ps1:GameInfoSelector Name="gameInfo" Grid.Row="2" Grid.Column="1"/>

@@ -28,7 +28,7 @@
 				<Label HorizontalAlignment="Left" VerticalAlignment="Center" Content="Key:" Grid.Column="0"/>
 				<TextBox HorizontalAlignment="Stretch" Watermark="Version Key" Name="vKey" Grid.Column="1"/>
 			</Grid>
-			<Button Name="getKeys" Content="Get Keys" HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Column="2"/>
+			<Button Name="getKeys" Click="getKeysClick" Content="Get Keys" HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Column="2"/>
 		</Grid>
 	</Border>
 </UserControl>

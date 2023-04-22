@@ -11,16 +11,16 @@ namespace GameBuilder.VersionKey
 {
     public class ActRifMethod
     {
-        public static NpDrmInfo GetVersionKey(byte[] actDat, byte[] licenseDat, byte[] consoleId, int keyType)
+        public static NpDrmInfo GetVersionKey(byte[] actDat, byte[] licenseDat, byte[] consoleId, int keyIndex)
         {
             byte[] versionKey = new byte[0x10];
             SceNpDrm.SetPSID(consoleId);
-            SceNpDrm.sceNpDrmGetVersionKey(versionKey, actDat, licenseDat, keyType);
+            SceNpDrm.sceNpDrmGetVersionKey(versionKey, actDat, licenseDat, keyIndex);
             SceNpDrm.Aid = BitConverter.ToUInt64(licenseDat, 0x8);
 
             string contentId = Encoding.UTF8.GetString(licenseDat, 0x10, 0x24);
             
-            return new NpDrmInfo(versionKey, contentId, keyType);
+            return new NpDrmInfo(versionKey, contentId, keyIndex);
         }
     }
 }

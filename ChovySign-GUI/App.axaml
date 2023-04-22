@@ -214,5 +214,14 @@
 				<Setter.Value>1</Setter.Value>
 			</Setter>
 		</Style>
+
+		<Style Selector="Window">
+			<Setter Property="Background">
+				<Setter.Value>Black</Setter.Value>
+			</Setter>
+			<Setter Property="BorderBrush">
+				<Setter.Value>Black</Setter.Value>
+			</Setter>
+		</Style>
 	</Application.Styles>
 </Application>
