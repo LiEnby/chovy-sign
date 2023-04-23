@@ -5,30 +5,31 @@
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="40"
              x:Class="ChovySign_GUI.Global.KeySelector">
 	<!-- key selector -->
-	<Border Padding="10 2" HorizontalAlignment="Stretch" VerticalAlignment="Top">
+	<Border Padding="10 3" HorizontalAlignment="Stretch" VerticalAlignment="Top">
 		<Grid>
 			<Grid.ColumnDefinitions>
-				<ColumnDefinition Width="4*" />
-				<ColumnDefinition Width="4*" />
 				<ColumnDefinition Width="1*" />
+				<ColumnDefinition Width="1*" />
+				<ColumnDefinition Width="80" />
 			</Grid.ColumnDefinitions>
 			<Grid HorizontalAlignment="Stretch" Grid.Column="0">
 				<Grid.ColumnDefinitions>
+					<ColumnDefinition Width="40" />
 					<ColumnDefinition Width="1*" />
-					<ColumnDefinition Width="10*" />
 				</Grid.ColumnDefinitions>
 				<Label HorizontalAlignment="Left" VerticalAlignment="Center" Content="Rif:" Grid.Column="0"/>
 				<TextBox HorizontalAlignment="Stretch" Watermark="GAME.RIF" Name="zRif" Grid.Column="1"/>
 			</Grid>
 			<Grid HorizontalAlignment="Stretch" Grid.Column="1">
 				<Grid.ColumnDefinitions>
+					<ColumnDefinition Width="40" />
 					<ColumnDefinition Width="1*" />
-					<ColumnDefinition Width="10*" />
 				</Grid.ColumnDefinitions>
 				<Label HorizontalAlignment="Left" VerticalAlignment="Center" Content="Key:" Grid.Column="0"/>
-				<TextBox HorizontalAlignment="Stretch" Watermark="Version Key" Name="vKey" Grid.Column="1"/>
+				<TextBox HorizontalAlignment="Stretch" MaxLength="32" Watermark="Version Key" Name="vKey" Grid.Column="1"/>
 			</Grid>
 			<Button Name="getKeys" Click="getKeysClick" Content="Get Keys" HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Column="2"/>
+			
 		</Grid>
 	</Border>
 </UserControl>

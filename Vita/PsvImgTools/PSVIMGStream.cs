@@ -5,7 +5,7 @@ using System.Security.Cryptography;
 
 namespace Vita.PsvImgTools
 {
-    class PSVIMGStream : Stream
+    public class PSVIMGStream : Stream
     {
         private Stream baseStream;
         private MemoryStream blockStream;
@@ -217,11 +217,9 @@ namespace Vita.PsvImgTools
 
         public override void Close()
         {
-            blockStream.Close();
             blockStream.Dispose();
-            baseStream.Close();
             baseStream.Dispose();
-            Dispose();
+            base.Close();
         }
         private void update()
         {

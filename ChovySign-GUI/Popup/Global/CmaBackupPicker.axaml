@@ -1,0 +1,30 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:Global="clr-namespace:ChovySign_GUI.Global"
+		mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        x:Class="ChovySign_GUI.Popup.Global.CmaBackupPicker"
+        Title="Select a Content Manager Backup." Icon="/ICON.PNG">
+  <Grid>
+	<Grid.RowDefinitions>
+		<RowDefinition Height="75"/>
+		<RowDefinition Height="1*"/>
+		<RowDefinition Height="40"/>
+
+  </Grid.RowDefinitions>
+	  
+	<Grid VerticalAlignment="Top" Grid.Row="0">
+	    <Grid.ColumnDefinitions>
+			<ColumnDefinition Width="1*"/>
+			<ColumnDefinition Width="1*"/>
+		</Grid.ColumnDefinitions>
+	    <Global:BrowseButton Name="cmaDir" Label="CMA Directory" IsDirectory="True" Grid.Column="0" HorizontalAlignment="Stretch"/>
+	    <Global:LabeledComboBox Name="accId" Label="Account ID" Grid.Column="1" HorizontalAlignment="Stretch"/>
+	</Grid>
+  
+	<ListBox Name="backupList" VerticalAlignment="Stretch" Grid.Row="1"/>
+	<Button Name="selectBtn" Click="selectBtnClick" Grid.Row="2" VerticalAlignment="Center" HorizontalAlignment="Center">Select "Content Manager" Backup</Button>
+	<Label Name="lookingInLbl" Content="Looking in:" Grid.Row="2" VerticalAlignment="Center" HorizontalAlignment="Left"/>
+  </Grid>
+</Window>

@@ -1,5 +1,4 @@
 ﻿using GameBuilder.Psp;
-using Org.BouncyCastle.Asn1.Pkcs;
 using PspCrypto;
 using System;
 using System.Collections.Generic;
@@ -7,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace GameBuilder.VersionKey
+namespace LibChovy.VersionKey
 {
     public class ActRifMethod
     {

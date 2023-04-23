@@ -26,6 +26,7 @@
 		</Grid>
 
 		<!-- Credits -->
+		<CheckBox Name="devkitAccount" Content="I have a DevKit, TestKit or IDU Vita" VerticalAlignment="Bottom" HorizontalAlignment="Left"/>
 		<Label Content="Li, Dots TB, SquallATF, Motoharu, Davee" VerticalAlignment="Bottom" HorizontalAlignment="Right"/>
 	</Grid>
 </UserControl>

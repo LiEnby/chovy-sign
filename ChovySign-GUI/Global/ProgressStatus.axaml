@@ -10,14 +10,14 @@
 			<RowDefinition Height="1*"/>
 			<RowDefinition Height="1*"/>
 		</Grid.RowDefinitions>
-		<Label Name="progressStatus" Content="Progress %" VerticalAlignment="Bottom" HorizontalAlignment="Stretch" Grid.Row="0"/>
+		<Label Name="statusLbl" Content="Progress %" VerticalAlignment="Bottom" HorizontalAlignment="Stretch" Grid.Row="0"/>
 		<Grid Grid.Row="1">
 			<Grid.ColumnDefinitions>
 				<ColumnDefinition Width="15*"/>
 				<ColumnDefinition Width="1*"/>
 			</Grid.ColumnDefinitions>
-			<ProgressBar HorizontalAlignment="Stretch" VerticalAlignment="Top" Height="30" Grid.Column="0"/>
-			<Button Name="goButton" Content="Go!" HorizontalAlignment="Center" VerticalAlignment="Top" Grid.Column="1"/>
+			<ProgressBar Name="progressVal" Maximum="100" Minimum="0" HorizontalAlignment="Stretch" VerticalAlignment="Top" Height="30" Grid.Column="0"/>
+			<Button Name="goButton" Click="goClick" Content="Go!" HorizontalAlignment="Center" VerticalAlignment="Top" Grid.Column="1"/>
 		</Grid>
 	</Grid>
 	

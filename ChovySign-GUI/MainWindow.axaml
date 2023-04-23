@@ -6,7 +6,7 @@
 		xmlns:Psp="clr-namespace:ChovySign_GUI.Psp"
 		mc:Ignorable="d" d:DesignWidth="850" d:DesignHeight="950"
         x:Class="ChovySign_GUI.MainWindow"
-        Title="Chovy Sign V2">
+        Title="Chovy Sign V2" Icon="/ICON.PNG">
 	
 	<Grid>
 	<TabControl>

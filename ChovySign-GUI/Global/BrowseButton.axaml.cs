@@ -2,6 +2,7 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
+using Org.BouncyCastle.Tls.Crypto;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -14,6 +15,7 @@ namespace ChovySign_GUI.Global
     {
         private string fileTypeName;
         private string extension;
+        private bool directory;
 
         public event EventHandler<EventArgs>? FileChanged;
 
@@ -45,6 +47,19 @@ namespace ChovySign_GUI.Global
                 fileTypeName = value;
             }
         }
+
+        public bool IsDirectory
+        {
+            get
+            {
+                return this.directory;
+            }
+            set
+            {
+                this.directory = value;
+            }
+        }
+
         public string Watermark
         {
             get
@@ -73,7 +88,10 @@ namespace ChovySign_GUI.Global
         {
             get
             {
-                return (File.Exists(this.filePath.Text) && Path.GetExtension(this.filePath.Text).Equals("." + Extension, StringComparison.InvariantCultureIgnoreCase));
+                if (!this.IsDirectory)
+                    return (File.Exists(this.filePath.Text) && Path.GetExtension(this.filePath.Text).Equals("." + Extension, StringComparison.InvariantCultureIgnoreCase));
+                else
+                    return (Directory.Exists(this.filePath.Text));
             }
         }
         public string FilePath
@@ -85,45 +103,75 @@ namespace ChovySign_GUI.Global
             }
             set
             {
-                if (File.Exists(value))
-                    this.filePath.Text = value;
+                if (!this.IsDirectory)
+                {
+                    if (File.Exists(value))
+                        this.filePath.Text = value;
+                    else
+                        this.filePath.Text = "";
+                }
                 else
-                    this.filePath.Text = "";
+                {
+                    if (Directory.Exists(value))
+                        this.filePath.Text = value;
+                    else
+                        this.filePath.Text = "";
+                }
             }
         }
 
         private async void browseClick(object sender, RoutedEventArgs e)
         {
+            Window? currentWindow = this.VisualRoot as Window;
+            if (currentWindow is not Window) throw new Exception("could not find current window");
+
             Button? btn = sender as Button;
+
             if (btn is Button)
             {
                 btn.IsEnabled = false;
-
-                OpenFileDialog browseDialog = new OpenFileDialog();
-                if (extension != "")
+    
+                if (this.IsDirectory)
                 {
-                    browseDialog.Filters = new List<FileDialogFilter>();
-                    FileDialogFilter filter = new FileDialogFilter();
-                    filter.Extensions.Add(extension);
-                    filter.Name = fileTypeName;
-                    browseDialog.Filters.Add(filter);
-                    browseDialog.Title = "Select a " + fileTypeName + " file.";
+                    // open directory
+                    OpenFolderDialog browseDialog = new OpenFolderDialog();
+
+                    if (this.ContainsFile) browseDialog.Directory = this.FilePath;
+                    
+                    browseDialog.Title = "Select directory.";
+
+                    string? directory = await browseDialog.ShowAsync(currentWindow);
+                    if(directory is not null)
+                        this.FilePath = directory;
                 }
                 else
                 {
-                    browseDialog.Title = "Select a file.";
+                    // open file
+                    OpenFileDialog browseDialog = new OpenFileDialog();
+                    if (extension != "")
+                    {
+                        browseDialog.Filters = new List<FileDialogFilter>();
+                        FileDialogFilter filter = new FileDialogFilter();
+                        filter.Extensions.Add(extension);
+                        filter.Name = fileTypeName;
+                        browseDialog.Filters.Add(filter);
+                        browseDialog.Title = "Select " + fileTypeName;
+                    }
+                    else
+                    {
+                        browseDialog.Title = "Select a file.";
+                    }
+
+                    if (this.ContainsFile) browseDialog.Directory = Path.GetDirectoryName(this.FilePath);
+
+
+                    string[]? selectedFiles = await browseDialog.ShowAsync(currentWindow);
+                    if (selectedFiles is not null && selectedFiles.Length > 0)
+                        this.FilePath = selectedFiles.First();
+
                 }
 
-
-                Window? currentWindow = this.VisualRoot as Window;
-                if (currentWindow is not Window) throw new Exception("could not find current window");
-
-                string[]? selectedFiles = await browseDialog.ShowAsync(currentWindow);
-                if (selectedFiles is not null && selectedFiles.Length > 0)
-                    this.FilePath = selectedFiles.First();
-
                 btn.IsEnabled = true;
-
                 OnFileChanged(new EventArgs());
             }
         }

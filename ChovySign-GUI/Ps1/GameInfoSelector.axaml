@@ -19,7 +19,7 @@
 					<RowDefinition Height="52"/>
 					<RowDefinition Height="52"/>
 				</Grid.RowDefinitions>
-				<Global:LabeledTextBox HorizontalAlignment="Stretch" Name="gameTitle" Label="Title:" Watermark="The BEST PlayStation 1 Game" Grid.Row="0"/>
+				<Global:LabeledTextBox HorizontalAlignment="Stretch" Name="gameTitle" Label="Title:" Watermark="The BEST PlayStation 1 Game" MaxLength="128" Grid.Row="0"/>
 				<Global:BrowseButton HorizontalAlignment="Stretch" Name="iconFile" Extension="png" FileTypeName="Portable Network Graphics" Watermark="(Default)" Label="icon0.png:" Grid.Row="1"/>
 				<Global:BrowseButton HorizontalAlignment="Stretch" Name="pic0File" Extension="png" FileTypeName="Portable Network Graphics" Watermark="(Default)" Label="pic0.png:" Grid.Row="2"/>
 				<Global:BrowseButton HorizontalAlignment="Stretch" Name="pic1File" Extension="png" FileTypeName="Portable Network Graphics" Watermark="(Default)" Label="pic1.png:" Grid.Row="3"/>

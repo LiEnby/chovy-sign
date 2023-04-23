@@ -22,10 +22,10 @@ namespace ChovySign_GUI.Ps1
                 List<string> discList = new List<string>();
 
                 if (discCue1.ContainsFile) discList.Add(discCue1.FilePath);
-                else if (discCue2.ContainsFile) discList.Add(discCue2.FilePath);
-                else if (discCue3.ContainsFile) discList.Add(discCue3.FilePath);
-                else if (discCue4.ContainsFile) discList.Add(discCue4.FilePath);
-                else if (discCue5.ContainsFile) discList.Add(discCue5.FilePath);
+                if (discCue2.ContainsFile) discList.Add(discCue2.FilePath);
+                if (discCue3.ContainsFile) discList.Add(discCue3.FilePath);
+                if (discCue4.ContainsFile) discList.Add(discCue4.FilePath);
+                if (discCue5.ContainsFile) discList.Add(discCue5.FilePath);
 
                 return discList.ToArray();
             }

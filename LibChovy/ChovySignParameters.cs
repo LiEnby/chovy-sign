@@ -1,4 +1,5 @@
 ﻿using GameBuilder.Psp;
+using LibChovy.Config;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,6 +15,7 @@ namespace LibChovy
         {
             this.DrmInfo = drmInfo;
             this.DrmRif = rif;
+
             this.Account = new Account(DrmRif.AccountId);
             this.CreatePsvImg = true;
             this.FirmwareVersion = 0x3600000;

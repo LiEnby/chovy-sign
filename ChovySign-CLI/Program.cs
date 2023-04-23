@@ -1,8 +1,8 @@
 ﻿using Li.Progress;
 using GameBuilder.Pops;
 using GameBuilder.Psp;
-using GameBuilder.VersionKey;
 using LibChovy;
+using LibChovy.VersionKey;
 
 namespace ChovySign_CLI
 {

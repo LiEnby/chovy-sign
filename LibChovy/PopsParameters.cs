@@ -93,6 +93,10 @@ namespace LibChovy
                 if (pic1 is null) return Resources.PIC1;
                 else return pic1;
             }
+            set
+            {
+                pic1 = value;
+            }
         }
 
         public void AddCd(string cd)

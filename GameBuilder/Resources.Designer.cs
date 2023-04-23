@@ -81,16 +81,6 @@ namespace GameBuilder {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to EP9000-NPEG00005_00-0000000000000001 51409FAC25DEAD80B44A9DAF0EB6A335 A0B1439B8E76B90AB2169978750B1E84 5AB0B5E2C32EE3BAFEF80ADE35BD7888 0B8450E063523674011C6B2B94829F7A
-        ///.
-        /// </summary>
-        public static string KEYSTXT {
-            get {
-                return ResourceManager.GetString("KEYSTXT", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized resource of type System.Byte[].
         /// </summary>
         public static byte[] SIMPLE {

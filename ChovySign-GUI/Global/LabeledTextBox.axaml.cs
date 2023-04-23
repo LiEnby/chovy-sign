@@ -8,9 +8,10 @@ namespace ChovySign_GUI.Global
 {
     public partial class LabeledTextBox : UserControl
     {
-        public event EventHandler<EventArgs>? TextChanged;
         private string lastTxt;
         private string? allowedChars;
+
+        public event EventHandler<EventArgs>? TextChanged;
         protected virtual void OnTextChanged(EventArgs e)
         {
             if (TextChanged is not null)
@@ -95,6 +96,7 @@ namespace ChovySign_GUI.Global
             InitializeComponent();
             lastTxt = this.txtBox.Text;
             allowedChars = null;
+            this.txtBox.KeyDown += onKeyUp;
             this.txtBox.KeyUp += onKeyUp;
         }
 

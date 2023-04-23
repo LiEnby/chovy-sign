@@ -18,7 +18,7 @@
 					<RowDefinition Height="1*" />
 				</Grid.RowDefinitions>
 				<Image HorizontalAlignment="Center" VerticalAlignment="Center" Width="120" Source="/Psp/UMD.PNG" Grid.Row="0"/>
-				<CheckBox Content="Compress PBP" HorizontalAlignment="Center" Grid.Row="1"/>
+				<CheckBox Name="compressPbp" Content="Compress PBP" HorizontalAlignment="Center" Grid.Row="1"/>
 			</Grid>
 			<Global:BrowseButton Name="umdFile" Extension="iso" FileTypeName="Universal Media Disc 'UMD' Disc Image (ISO9660)" Label="UMD Image:" Grid.Column="1"/>
 		</Grid>

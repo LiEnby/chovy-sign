@@ -1,10 +1,10 @@
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using ChovySign_GUI.Global;
-using GameBuilder.Psp;
-using GameBuilder.VersionKey;
-using Li.Utilities;
 using LibChovy.Config;
+using LibChovy.VersionKey;
+using GameBuilder.Psp;
+using Li.Utilities;
 using System;
 using System.IO;
 using static ChovySign_GUI.Popup.Global.MessageBox;
@@ -104,7 +104,7 @@ namespace ChovySign_GUI.Popup.Global.KeySelector
 
         private void keyGenClick(object sender, RoutedEventArgs e)
         {
-            byte[][] keys = new byte[0x5][];
+            NpDrmInfo[] keys = new NpDrmInfo[0x5];
 
             Window? currentWindow = this.VisualRoot as Window;
             if (currentWindow is not Window) throw new Exception("could not find current window");
@@ -118,7 +118,7 @@ namespace ChovySign_GUI.Popup.Global.KeySelector
 
                 // generate keys
                 for (int i = 0; i < 0x5; i++)
-                    keys[i] = ActRifMethod.GetVersionKey(act, rif, idps, i).VersionKey;
+                    keys[i] = ActRifMethod.GetVersionKey(act, rif, idps, i);
 
                 this.rif = new NpDrmRif(rif);
 

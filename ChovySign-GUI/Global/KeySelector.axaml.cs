@@ -1,18 +1,33 @@
 using Avalonia.Controls;
+using Avalonia.Input;
 using Avalonia.Interactivity;
+using Avalonia.Remote.Protocol.Input;
+using ChovySign_GUI.Popup.Global;
 using ChovySign_GUI.Popup.Global.KeySelector;
 using GameBuilder.Psp;
-using GameBuilder.VersionKey;
 using Ionic.Zlib;
+using Li.Utilities;
 using LibChovy.Config;
+using LibChovy.VersionKey;
+using SixLabors.ImageSharp.PixelFormats;
 using System;
+using System.ComponentModel;
+using System.IO;
+using System.IO.Compression;
+using System.Linq;
 using System.Net.Sockets;
 using System.Text;
+using System.Threading.Tasks;
+using Vita.ContentManager;
+using Vita.PsvImgTools;
+using static ChovySign_GUI.Popup.Global.MessageBox;
+using static PspCrypto.SceNpDrm;
 
 namespace ChovySign_GUI.Global
 {
     public partial class KeySelector : UserControl
     {
+
         private string licenseDataConfigKey
         {
             get
@@ -28,20 +43,83 @@ namespace ChovySign_GUI.Global
             }
         }
 
+        private bool lastValid;
         private int keyIndex = 1;
+        private NpDrmRif? npRif;
+        private byte[]? versionKey;
 
+        public bool IsValid
+        {
+            get
+            {
+                try
+                {
+                    if (vKey.Text is null) return false;
+                    if (vKey.Text.Length != 32) return false;
+
+                    if (zRif.Text is null) return false;
+                    if (zRif.Text.Length <= 0) return false;
+
+                    byte[] key = MathUtil.StringToByteArray(vKey.Text);
+                    byte[] rif = new NpDrmRif(zRif.Text).Rif;
+                    if (rif.Length <= 0) return false;
+                    return (VersionKey is not null && Rif is not null);
+                }
+                catch { return false; };
+            }
+        }
+
+        public byte[]? VersionKey
+        {
+            get
+            {
+                return versionKey;
+            }
+            set
+            {
+                if (value is null) return;
+
+                versionKey = value;
+                ChovyConfig.CurrentConfig.SetBytes(versionKeyConfigKey, versionKey);
+                vKey.Text = BitConverter.ToString(versionKey).Replace("-", "");
+
+                OnVersionKeyChanged(new EventArgs());
+            }
+        }
+        public byte[]? Rif
+        {
+            get
+            {
+                if (npRif is null) return null;
+                return npRif.Rif;
+            }
+            set
+            {
+                if (value is null) return;
+
+                npRif = new NpDrmRif(value);
+                zRif.Text = npRif.ZRif;
+                ChovyConfig.CurrentConfig.SetBytes(licenseDataConfigKey, npRif.Rif);
+
+                OnRifChanged(new EventArgs());
+            }
+        }
         private void reloadCfg()
         {
-            byte[]? licenseData = ChovyConfig.CurrentConfig.GetBytes(licenseDataConfigKey);
-            byte[]? vKeyData = ChovyConfig.CurrentConfig.GetBytes(versionKeyConfigKey);
+            byte[]? rifData = ChovyConfig.CurrentConfig.GetBytes(licenseDataConfigKey);
+            byte[]? vkeyData = ChovyConfig.CurrentConfig.GetBytes(versionKeyConfigKey);
 
+            if(vkeyData is not null)
+            {
+                vKey.Text = BitConverter.ToString(vkeyData).Replace("-", "");
+                versionKey = vkeyData;
+            }
 
-            if (licenseData is not null)
-                zRif.Text = new NpDrmRif(licenseData).ZRif;
-
-            if (vKeyData is not null)
-                vKey.Text = BitConverter.ToString(vKeyData).Replace("-", "");
-
+            if (rifData is not null)
+            {
+                npRif = new NpDrmRif(rifData);
+                zRif.Text = npRif.ZRif;
+            }
         }
 
         private async void getKeysClick(object sender, RoutedEventArgs e)
@@ -57,32 +135,68 @@ namespace ChovySign_GUI.Global
 
             KeyObtainMethods keyObt = new KeyObtainMethods();
             keyObt.KeyIndex = keyIndex;
-            VersionKeyMethod method = await keyObt.ShowDialog<VersionKeyMethod>(currentWindow);
+            VersionKeyMethod? method = await keyObt.ShowDialog<VersionKeyMethod>(currentWindow);
+            if (method is null) return;
 
-            byte[]? key = null;
+            NpDrmInfo? key = null;
             NpDrmRif? rif = null;
 
             switch (method)
             {
                 case VersionKeyMethod.ACT_RIF_METHOD:
                     ActRifMethodGUI actRifMethodGUI = new ActRifMethodGUI();
-                    byte[][]? keys = await actRifMethodGUI.ShowDialog<byte[][]>(currentWindow);
+                    NpDrmInfo[]? keys = await actRifMethodGUI.ShowDialog<NpDrmInfo[]>(currentWindow);
                     if (keys is null) break;
+
                     key = keys[keyIndex];
                     rif = actRifMethodGUI.Rif;
+                    
                     break;
+                case VersionKeyMethod.EBOOT_PBP_METHOD:
+                    CmaBackupPicker ebootBackupSelector = new CmaBackupPicker();
+                    ebootBackupSelector.BackupType = ((keyIndex == 1) ? "PSGAME" : "PGAME");
+
+                    string? gameBackupFolder = await ebootBackupSelector.ShowDialog<string>(currentWindow);
+                    string accountId = ebootBackupSelector.AccountId;
+                    if (gameBackupFolder is null) break;
+                    if (accountId == "") break;
+
+                    key = CMAVersionKeyHelper.GetKeyFromGamePsvimg(gameBackupFolder, accountId);
+                    rif = CMAVersionKeyHelper.GetRifFromLicensePsvimg(gameBackupFolder, accountId);
+                    break;
+                case VersionKeyMethod.KEYS_TXT_METHOD:
+                    CmaBackupPicker pspLicenseBackupSelector = new CmaBackupPicker();
+                    pspLicenseBackupSelector.BackupType = "PGAME";
+                    pspLicenseBackupSelector.Filter = KeysTxtMethod.TitleIds;
+
+                    gameBackupFolder = await pspLicenseBackupSelector.ShowDialog<string>(currentWindow);
+                    accountId = pspLicenseBackupSelector.AccountId;
+                    if (gameBackupFolder is null) break;
+                    if (accountId == "") break;
+
+                    rif = CMAVersionKeyHelper.GetRifFromLicensePsvimg(gameBackupFolder, accountId);
+                    if (rif is null) break;
+
+                    key = KeysTxtMethod.GetVersionKey(rif.ContentId, this.KeyIndex);
+                    break;
+
             }
+
+
 
             if (key is not null)
             {
-                ChovyConfig.CurrentConfig.SetBytes(versionKeyConfigKey, key);
-                vKey.Text = BitConverter.ToString(key).Replace("-", "");
+                if (key.KeyIndex != this.keyIndex)
+                {
+                    await MessageBox.Show(currentWindow, "VersionKey obtained, but had keyindex: " + key.KeyIndex + " however keyindex " + this.keyIndex + " was required.", "KeyIndex mismatch!", MessageBoxButtons.Ok);
+                    return;
+                }
+
+                VersionKey = key.VersionKey;
             }
+
             if (rif is not null)
-            {
-                ChovyConfig.CurrentConfig.SetBytes(licenseDataConfigKey, rif.Rif);
-                zRif.Text = rif.ZRif;
-            }
+                Rif = rif.Rif;
 
             btn.IsEnabled = true;
         }
@@ -99,10 +213,77 @@ namespace ChovySign_GUI.Global
                 reloadCfg();
             }
         }
+
+        public event EventHandler<EventArgs>? VersionKeyChanged;
+        protected virtual void OnVersionKeyChanged(EventArgs e)
+        {
+            if (IsValid != lastValid) OnValidStateChanged(new EventArgs());
+
+
+            if (VersionKeyChanged is not null)
+                VersionKeyChanged(this, e);
+        }
+        public event EventHandler<EventArgs>? RifChanged;
+        protected virtual void OnRifChanged(EventArgs e)
+        {
+            if (IsValid != lastValid) OnValidStateChanged(new EventArgs());
+
+            if (RifChanged is not null)
+                RifChanged(this, e);
+        }
+
+        public event EventHandler<EventArgs>? ValidStateChanged;
+        protected virtual void OnValidStateChanged(EventArgs e)
+        {
+            lastValid = IsValid;
+            if (ValidStateChanged is not null)
+                ValidStateChanged(this, e);
+        }
         public KeySelector()
         {
             InitializeComponent();
             reloadCfg();
+            lastValid = IsValid;
+
+            zRif.KeyDown += onZrifKeyDown;
+            zRif.KeyUp += onZrifKeyDown;
+            vKey.KeyDown += onVkeyKeyDown;
+            vKey.KeyUp += onVkeyKeyDown;
+        }
+
+        private void onVkeyKeyDown(object? sender, Avalonia.Input.KeyEventArgs e)
+        {
+            TextBox? txt = sender as TextBox;
+            if (txt is null) return;
+
+            if (lastValid != IsValid)
+                OnValidStateChanged(new EventArgs());
+            
+            try
+            {
+                if (txt.Text is null) return;
+                if (txt.Text.Length != 32) return;
+
+                this.VersionKey = MathUtil.StringToByteArray(txt.Text);
+            }
+            catch { };
+        }
+
+        private void onZrifKeyDown(object? sender, KeyEventArgs e)
+        {
+            TextBox? txt = sender as TextBox;
+            if (txt is null) return;
+
+            if (lastValid != IsValid)
+                OnValidStateChanged(new EventArgs());
+
+            try
+            {
+                byte[] rifBytes = new NpDrmRif(txt.Text).Rif;
+                if (rifBytes.Length != 0) this.Rif = rifBytes;
+            }
+            catch { };
+
         }
     }
 }

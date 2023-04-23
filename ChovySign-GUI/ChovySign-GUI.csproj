@@ -6,10 +6,14 @@
     <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <RootNamespace>ChovySign_GUI</RootNamespace>
+    <AssemblyName>ChovySign v2</AssemblyName>
+    <ApplicationIcon>ICON.ICO</ApplicationIcon>
+    <Authors>SquallATF, Li, Dots-Tb</Authors>
   </PropertyGroup>
   <ItemGroup>
     <None Remove=".gitignore" />
     <None Remove="DEFAULTICON.PNG" />
+    <None Remove="Icon.png" />
     <None Remove="Popup\Global\KeySelector\ACTRIFMETHOD.PNG" />
     <None Remove="Popup\Global\KeySelector\EBOOTMETHOD.PNG" />
     <None Remove="Popup\Global\KeySelector\EBOOTMETHOD1.png" />
@@ -19,6 +23,7 @@
     <None Remove="UMD.png" />
   </ItemGroup>
   <ItemGroup>
+    <AvaloniaResource Include="ICON.PNG" />
     <AvaloniaResource Include="Popup\Global\KeySelector\ACTRIFMETHOD.PNG" />
     <AvaloniaResource Include="Popup\Global\KeySelector\EBOOTMETHOD1.PNG" />
     <AvaloniaResource Include="Popup\Global\KeySelector\EBOOTMETHOD2.PNG" />
@@ -27,6 +32,9 @@
     <AvaloniaResource Include="Psp\UMD.PNG">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </AvaloniaResource>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="ICON.ICO" />
   </ItemGroup>
 
   <ItemGroup>

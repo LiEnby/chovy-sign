@@ -1039,8 +1039,7 @@ namespace PspCrypto
                 return -0x7f78ffff;
             }
 
-            Span<byte> secureTick = BitConverter.GetBytes(ksceRtcGetCurrentSecureTick()); //stackalloc byte[8] { 0xD4, 0x7A, 0x2C, 0x13, 0x64, 0x59, 0xE2, 0x00 };
-            //RandomNumberGenerator.Fill(secureTick);
+            Span<byte> secureTick = BitConverter.GetBytes(ksceRtcGetCurrentSecureTick()); 
 
             ebootSig.Fill(0);
             sceEbootPbp.SwVer = swVer;

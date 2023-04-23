@@ -3,9 +3,10 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
-        x:Class="ChovySign_GUI.Popup.Global.MessageBox" SizeToContent="WidthAndHeight" CanResize="False">
+        x:Class="ChovySign_GUI.Popup.Global.MessageBox" 
+		SizeToContent="WidthAndHeight" CanResize="False" Icon="/ICON.PNG">
 	<StackPanel HorizontalAlignment="Center">
-		<TextBlock HorizontalAlignment="Center" Name="Text"/>
+		<TextBlock Foreground="LightGreen" HorizontalAlignment="Center" Name="Text"/>
 		<StackPanel HorizontalAlignment="Center" Orientation="Horizontal" Name="Buttons">
 			<StackPanel.Styles>
 				<Style Selector="Button">

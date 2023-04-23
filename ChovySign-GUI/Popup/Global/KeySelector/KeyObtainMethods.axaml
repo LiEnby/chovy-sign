@@ -5,7 +5,7 @@
         mc:Ignorable="d" d:DesignWidth="1400" d:DesignHeight="150"
         x:Class="ChovySign_GUI.Popup.Global.KeySelector.KeyObtainMethods"
         Title="VersionKey Obtain Method" SizeToContent="WidthAndHeight"
-		MaxWidth="1400" MaxHeight="150">
+		MaxWidth="1400" MaxHeight="150" Icon="/ICON.PNG">
 	<Grid>
 		<Grid.ColumnDefinitions>
 			<ColumnDefinition Width="5*"/>

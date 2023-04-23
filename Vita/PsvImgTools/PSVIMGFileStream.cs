@@ -4,7 +4,7 @@ using static Vita.PsvImgTools.SceIoStat;
 
 namespace Vita.PsvImgTools
 {
-    class PSVIMGFileStream : Stream
+    public class PSVIMGFileStream : Stream
     {
 
         long length = 0;
@@ -12,11 +12,14 @@ namespace Vita.PsvImgTools
         long endPos = 0;
         long position = 0;
 
-        PSVIMGStream psvStream;
+        private PSVIMGStream psvStream;
         public PSVIMGFileStream(PSVIMGStream psv, string Path)
         {
             psvStream = psv;
-            findFile(Path);
+            if (Path.First() == '/')
+                findFile(Path);
+            else
+                findFileMatching(Path);
         }
 
         public void WriteToFile(string FilePath)
@@ -276,6 +279,12 @@ namespace Vita.PsvImgTools
             return header;
         }
 
+        public override void Close()
+        {
+            psvStream.Dispose();
+            base.Close();
+        }
+
         private PsvImgTailer readTailer()
         {
             PsvImgTailer tailer = new PsvImgTailer();
@@ -283,6 +292,33 @@ namespace Vita.PsvImgTools
             _read(tailer.Padding, 0x00, 1004);
             _read(tailer.bEnd, 0x00, 12);
             return tailer;
+        }
+
+        private void findFileMatching(string path)
+        {
+            _seek(0x00, SeekOrigin.Begin);
+            while (psvStream.Position < psvStream.Length)
+            {
+                PsvImgHeader header = readHeader();
+                long size = (long)header.Statistics.Size;
+                long padding = PSVIMGPadding.GetPadding(size);
+
+                if (header.Path.Contains(path, StringComparison.InvariantCultureIgnoreCase))
+                {
+                    length = size;
+                    startPos = psvStream.Position;
+                    endPos = startPos + length;
+                    return;
+                }
+                else
+                {
+                    _seek(size + padding, SeekOrigin.Current);
+                    PsvImgTailer tailer = readTailer();
+                }
+
+            }
+            throw new FileNotFoundException("Cannot find file specified");
+
         }
         private void findFile(string path)
         {
@@ -293,7 +329,7 @@ namespace Vita.PsvImgTools
                 long size = (long)header.Statistics.Size;
                 long padding = PSVIMGPadding.GetPadding(size);
 
-                if (header.Path == path)
+                if (header.Path.Equals(path, StringComparison.InvariantCultureIgnoreCase))
                 {
                     length = size;
                     startPos = psvStream.Position;

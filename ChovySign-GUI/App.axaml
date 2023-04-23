@@ -1,8 +1,8 @@
 <Application xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              x:Class="ChovySign_GUI.App">
-    <Application.Styles>
-        <FluentTheme Mode="Light"/>
+	<Application.Styles>
+		<FluentTheme Mode="Light"/>
 
 		<!-- Checkbox Styling -->
 		<Style Selector="CheckBox:checked /template/ ContentPresenter">
@@ -150,8 +150,148 @@
 			</Setter>
 		</Style>
 
+		<!-- ComboBox -->
+		
+		<Style Selector="ComboBox">
+			<Setter Property="Foreground">
+				<Setter.Value>LightGreen</Setter.Value>
+			</Setter>
+			<Setter Property="Background">
+				<Setter.Value>#3f3f3f</Setter.Value>
+			</Setter>
+			<Setter Property="BorderBrush">
+				<Setter.Value>LightGreen</Setter.Value>
+			</Setter>
+			<Setter Property="BorderThickness">
+				<Setter.Value>1</Setter.Value>
+			</Setter>
+		</Style>
+
+		<Style Selector="ComboBox:pointerover">
+			<Setter Property="Foreground">
+				<Setter.Value>Green</Setter.Value>
+			</Setter>
+		</Style>
+
+		<Style Selector="ComboBox:pointerover /template/ TextBlock">
+			<Setter Property="Foreground">
+				<Setter.Value>Green</Setter.Value>
+			</Setter>
+		</Style>
+		<Style Selector="ComboBox:pointerover /template/ Border">
+			<Setter Property="Background">
+				<Setter.Value>#1f1f1f</Setter.Value>
+			</Setter>
+			<Setter Property="BorderBrush">
+				<Setter.Value>Green</Setter.Value>
+			</Setter>
+		</Style>
+
+		<Style Selector="ComboBoxItem:pointerover /template/ ContentPresenter">
+			<Setter Property="TextBlock.Foreground">
+				<Setter.Value>Green</Setter.Value>
+			</Setter>
+			<Setter Property="Background">
+				<Setter.Value>#1f1f1f</Setter.Value>
+			</Setter>
+		</Style>
+
+		<Style Selector="ComboBoxItem:selected /template/ ContentPresenter">
+			<Setter Property="TextBlock.Foreground">
+				<Setter.Value>Black</Setter.Value>
+			</Setter>
+			<Setter Property="Background">
+				<Setter.Value>LightGreen</Setter.Value>
+			</Setter>
+		</Style>
+
+		<Style Selector="ComboBoxItem:selected:pointerover /template/ ContentPresenter">
+			<Setter Property="TextBlock.Foreground">
+				<Setter.Value>Black</Setter.Value>
+			</Setter>
+			<Setter Property="Background">
+				<Setter.Value>Green</Setter.Value>
+			</Setter>
+		</Style>
+
+		<Style Selector="ComboBoxItem">
+			<Setter Property="Foreground">
+				<Setter.Value>LightGreen</Setter.Value>
+			</Setter>
+			<Setter Property="Background">
+				<Setter.Value>#3f3f3f</Setter.Value>
+			</Setter>
+			<Setter Property="BorderBrush">
+				<Setter.Value>LightGreen</Setter.Value>
+			</Setter>
+			<Setter Property="BorderThickness">
+				<Setter.Value>1</Setter.Value>
+			</Setter>
+		</Style>
+
+		<!-- ListBox -->
+
+
+		<Style Selector="ListBoxItem:pointerover /template/ ContentPresenter">
+			<Setter Property="TextBlock.Foreground">
+				<Setter.Value>Green</Setter.Value>
+			</Setter>
+			<Setter Property="Background">
+				<Setter.Value>#1f1f1f</Setter.Value>
+			</Setter>
+		</Style>
+		
+		<Style Selector="ListBoxItem:selected /template/ ContentPresenter">
+			<Setter Property="TextBlock.Foreground">
+				<Setter.Value>Black</Setter.Value>
+			</Setter>
+			<Setter Property="Background">
+				<Setter.Value>LightGreen</Setter.Value>
+			</Setter>
+		</Style>
+
+		<Style Selector="ListBoxItem:selected:pointerover /template/ ContentPresenter">
+			<Setter Property="TextBlock.Foreground">
+				<Setter.Value>Black</Setter.Value>
+			</Setter>
+			<Setter Property="Background">
+				<Setter.Value>Green</Setter.Value>
+			</Setter>
+		</Style>
+		
+		<Style Selector="ListBoxItem">
+			<Setter Property="Foreground">
+				<Setter.Value>LightGreen</Setter.Value>
+			</Setter>
+			<Setter Property="Background">
+				<Setter.Value>#3f3f3f</Setter.Value>
+			</Setter>
+			<Setter Property="BorderBrush">
+				<Setter.Value>LightGreen</Setter.Value>
+			</Setter>
+			<Setter Property="BorderThickness">
+				<Setter.Value>1</Setter.Value>
+			</Setter>
+		</Style>
+		
+		<Style Selector="ListBox">
+			<Setter Property="Foreground">
+				<Setter.Value>LightGreen</Setter.Value>
+			</Setter>
+			<Setter Property="Background">
+				<Setter.Value>#3f3f3f</Setter.Value>
+			</Setter>
+			<Setter Property="BorderBrush">
+				<Setter.Value>LightGreen</Setter.Value>
+			</Setter>
+			<Setter Property="BorderThickness">
+				<Setter.Value>1</Setter.Value>
+			</Setter>
+		</Style>
+
 
 		<!-- TabControl -->
+
 		<Style Selector="TabControl">
 			<Setter Property="Background">
 				<Setter.Value>Black</Setter.Value>

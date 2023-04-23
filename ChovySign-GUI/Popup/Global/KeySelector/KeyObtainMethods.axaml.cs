@@ -1,6 +1,6 @@
 using Avalonia.Controls;
 using Avalonia.Interactivity;
-using GameBuilder.VersionKey;
+using LibChovy.VersionKey;
 
 namespace ChovySign_GUI.Popup.Global.KeySelector
 {
