@@ -1,5 +1,8 @@
-﻿using Avalonia.Controls;
+﻿using Avalonia;
+using Avalonia.Controls;
 using Avalonia.Input;
+using Avalonia.Interactivity;
+using JetBrains.Annotations;
 using Org.BouncyCastle.Asn1.X509;
 using System;
 using System.Text;
@@ -9,7 +12,7 @@ namespace ChovySign_GUI.Global
     public partial class LabeledTextBox : UserControl
     {
         private string lastTxt;
-        private string? allowedChars;
+        private string? allowedChars = null;
 
         public event EventHandler<EventArgs>? TextChanged;
         protected virtual void OnTextChanged(EventArgs e)
@@ -67,16 +70,16 @@ namespace ChovySign_GUI.Global
                 this.txtBox.Watermark = value;
             }
         }
-        public string AllowedChars
+        public string? AllowedChars
         {
             get
             {
-                if(allowedChars is null) return "";
-                return allowedChars;
+                if (allowedChars is null) return "";
+                else return allowedChars;
             }
             set
             {
-                allowedChars = value.ToUpperInvariant();
+                allowedChars = value;
             }
         }
         public string Text
@@ -95,27 +98,59 @@ namespace ChovySign_GUI.Global
         {
             InitializeComponent();
             lastTxt = this.txtBox.Text;
-            allowedChars = null;
-            this.txtBox.KeyDown += onKeyUp;
-            this.txtBox.KeyUp += onKeyUp;
+
+            this.txtBox.PastingFromClipboard += onPaste;
+            this.txtBox.AddHandler(TextInputEvent, onTxtInput, RoutingStrategies.Tunnel);
         }
 
-        private void onKeyUp(object? sender, KeyEventArgs e)
+        private string filter(string original)
+        {
+            if (allowedChars is not null)
+            {
+                string newTxt = original.ToUpperInvariant();
+                for (int i = 0; i < newTxt.Length; i++)
+                {
+                    if (!allowedChars.Contains(newTxt[i]))
+                    {
+                        newTxt = newTxt.Replace(newTxt[i].ToString(), "");
+                    }
+                }
+                return newTxt;
+            }
+            else
+            {
+                return original;
+            }
+        }
+
+        private async void onPaste(object? sender, RoutedEventArgs e)
         {
             TextBox? txt = sender as TextBox;
-            if(txt is null) return;
+            if (txt is null) return;
+            if (Application.Current is null) return;
+            if (Application.Current.Clipboard is null) return;
 
-            if(allowedChars is not null)
-            {
-                StringBuilder s = new StringBuilder();
-                foreach (char c in txt.Text.ToUpperInvariant())
-                    if (allowedChars.Contains(c)) s.Append(c);
+            e.Handled = true;
 
-                txt.Text = s.ToString().ToUpperInvariant();
-            }
+            string? newTxt = await Application.Current.Clipboard.GetTextAsync();
+            if (newTxt is null) newTxt = "";
 
-            if (txt.Text != lastTxt) OnTextChanged(new EventArgs());
-            lastTxt = txt.Text;
+            /*TextInputEventArgs txtInput = new TextInputEventArgs();
+            txtInput.Text = filter(newTxt);*/
+
+            //txt.RaiseEvent(new RoutedEventArgs(txtInput));
+        }
+
+        private void onTxtInput(object? sender, TextInputEventArgs e)
+        {       
+            string? newTxt = e.Text;
+            if (newTxt is null) newTxt = "";
+
+            newTxt = filter(newTxt);
+            e.Text = newTxt;
+
+            if (newTxt != lastTxt) OnTextChanged(new EventArgs());
+            lastTxt = newTxt;
         }
     }
 }

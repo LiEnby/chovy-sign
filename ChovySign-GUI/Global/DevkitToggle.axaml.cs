@@ -74,7 +74,9 @@ namespace ChovySign_GUI.Global
         public DevkitToggle()
         {
             InitializeComponent();
-            devkitCheckbox.IsChecked = ChovyConfig.CurrentConfig.GetBool(useDevkitModeConfigKey);
+            bool? isDevkitMode = ChovyConfig.CurrentConfig.GetBool(useDevkitModeConfigKey);
+            if (isDevkitMode is null) isDevkitMode = false;
+            devkitCheckbox.IsChecked = isDevkitMode;
             devkitCheckbox.Unchecked += onDevkitModeUnchecked;
             devkitCheckbox.Checked += onDevkitModeChecked;
 
