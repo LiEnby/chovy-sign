@@ -73,8 +73,7 @@ namespace GameBuilder.Pops
             psarUtil.WriteBytes(isoMap);
             psarUtil.PadUntil(0x00, PSISO_ALIGN);
 
-            isoPart.Seek(0x00, SeekOrigin.Begin);
-            isoPart.CopyTo(Psar);
+            copyToProgress(isoPart, Psar, "Copy ISOs to PSTITLEIMG");
 
             psarUtil.WriteBytes(StartDat);
             psarUtil.WriteBytes(SimplePgd);
@@ -136,8 +135,7 @@ namespace GameBuilder.Pops
                     psIsoImg.generatePsIsoHeader();
 
                     // Copy compressed ISO to PSISOIMG
-                    compressors[i].CompressedIso.Seek(0x00, SeekOrigin.Begin);
-                    compressors[i].CompressedIso.CopyTo(psIsoImg.Psar);
+                    copyToProgress(compressors[i].CompressedIso, psIsoImg.Psar, "Copy Compressed ISO (" + i + ") to PSISOIMG");
 
                     // read 0x400 bytes from PSAR copy iso header after that,.
                     psIsoImg.Psar.Seek(0x0, SeekOrigin.Begin);
@@ -151,8 +149,7 @@ namespace GameBuilder.Pops
                     Array.ConstrainedCopy(checksum, 0, checksums, i * 0x10, 0x10);
 
                     // copy psiso to TITLE ..
-                    psIsoImg.Psar.Seek(0x00, SeekOrigin.Begin);
-                    psIsoImg.Psar.CopyTo(isoPart);
+                    copyToProgress(psIsoImg.Psar, isoPart, "Copy PSISOIMG (" + i + ") to PSTITLEIMG");
 
                 }
 

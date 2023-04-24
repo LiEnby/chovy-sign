@@ -61,7 +61,7 @@ namespace GameBuilder.Psp
             using(FileStream pbpFile = File.OpenWrite(file))
             {
                 pbpStream.Seek(0x00, SeekOrigin.Begin);
-                copyPsarWithProgress(pbpStream, pbpFile, "Write to Disk");
+                copyToProgress(pbpStream, pbpFile, "Write to Disk");
             }
         }
 
@@ -122,22 +122,9 @@ namespace GameBuilder.Psp
             pbpUtil.WriteBytes(dataPsp);
 
             // write DATA.PSAR
-            copyPsarWithProgress(psar.Psar, pbpStream);
+            copyToProgress(psar.Psar, pbpStream, "Build PBP");
         }
 
-
-        private void copyPsarWithProgress(Stream src, Stream dst, string msg = "Build PBP")
-        {
-            src.Seek(0, SeekOrigin.Begin);
-            while (src.Position < src.Length)
-            {
-                byte[] readBuffer = new byte[0x30000];
-                int readAmt = src.Read(readBuffer, 0x00, readBuffer.Length);
-                dst.Write(readBuffer, 0x00, readAmt);
-
-                updateProgress(Convert.ToInt32(src.Position), Convert.ToInt32(src.Length), msg);
-            }
-        }
 
         public void Dispose()
         {

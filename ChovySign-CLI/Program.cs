@@ -3,6 +3,7 @@ using GameBuilder.Pops;
 using GameBuilder.Psp;
 using LibChovy;
 using LibChovy.VersionKey;
+using System.Text;
 
 namespace ChovySign_CLI
 {
@@ -19,6 +20,10 @@ namespace ChovySign_CLI
         private static PbpMode? pbpMode = null;
         private static NpDrmRif? rifFile = null;
         private static NpDrmInfo? drmInfo = null;
+
+        private static byte[]? actDat = null;
+        private static byte[]? idps = null;
+        private static string? rifFolder = null;
         enum PbpMode
         {
             PSP = 0,
@@ -35,15 +40,12 @@ namespace ChovySign_CLI
             VERSIONKEY_EXTRACT = 4,
             VERSIONKEY_GENERATOR = 5,
             POPS_INFO = 6,
-            RIF = 7
+            KEYS_TXT_GEN = 7,
+            RIF = 8
         }
         public static int Error(string errorMsg, int ret)
         {
-            ConsoleColor prevColor = Console.ForegroundColor;
-            Console.ForegroundColor = ConsoleColor.DarkRed;
             Console.Error.WriteLine("ERROR: "+errorMsg);
-            Console.ForegroundColor = prevColor;
-
             return ret;
         }
         public static byte[] StringToByteArray(string hex)
@@ -59,6 +61,40 @@ namespace ChovySign_CLI
             for (int i = 0; i < spaceLen; i++) 
                 emptySpace += " ";
             Console.Write(msg + emptySpace + "\r");
+        }
+
+        private static void generateKeysTxt()
+        {
+            if (rifFolder is null || actDat is null || idps is null) return;
+            UInt64 accountId = BitConverter.ToUInt64(actDat, 0x8);
+
+            if (File.Exists("KEYS.TXT"))
+                KeysTxtMethod.KeysTxt = File.ReadAllText("KEYS.TXT");
+            else
+                File.WriteAllText("KEYS.TXT", KeysTxtMethod.KeysTxt);
+
+            HashSet<string> knownKeys = new HashSet<string>();
+            foreach (string contentId in KeysTxtMethod.ContentIds)
+                knownKeys.Add(contentId);
+
+            StringBuilder addKeys = new StringBuilder();
+            foreach (string rifFile in Directory.GetFiles(rifFolder, "*.rif"))
+            {
+                NpDrmRif rif = new NpDrmRif(File.ReadAllBytes(rifFile));
+                if (knownKeys.Contains(rif.ContentId)) continue;
+
+                if(rif.AccountId != accountId) { Error(rif.ContentId + " account id does not match: " + accountId.ToString("X") + " (was " + rif.AccountId.ToString("X") + ")", 10); continue; }
+                string[] keys = new string[4];
+                for (int i = 0; i < keys.Length; i++)
+                    keys[i] = BitConverter.ToString(ActRifMethod.GetVersionKey(actDat, rif.Rif, idps, i).VersionKey).Replace("-", "");
+
+                string[] keysTxtLine = new string[] { rif.ContentId, keys[0], keys[1], keys[2], keys[3] };
+                string keysTxt = String.Join(' ', keysTxtLine);
+
+                addKeys.AppendLine(keysTxt);
+                Console.WriteLine(keysTxt);
+            }
+            File.AppendAllText("KEYS.TXT", addKeys.ToString());
         }
 
         private static int complete()
@@ -103,6 +139,12 @@ namespace ChovySign_CLI
                     if (parameters.Count > 2) 
                         popsPic0File = parameters[2];
                     break;
+                case ArgumentParsingMode.KEYS_TXT_GEN:
+                    if (parameters.Count != 3) return Error("--keys-txt-gen takes 3 arguments, (" + parameters.Count + " given)", 4);
+                    actDat = File.ReadAllBytes(parameters[0]);
+                    idps = StringToByteArray(parameters[1]);
+                    rifFolder = parameters[2];
+                    break;
                 case ArgumentParsingMode.RIF:
                     if (parameters.Count != 1) return Error("--rif expects only 1 argument,", 4);
                     rifFile = new NpDrmRif(File.ReadAllBytes(parameters[0]));
@@ -127,6 +169,7 @@ namespace ChovySign_CLI
                 Console.WriteLine("--vkey [versionkey] [contentid] [key_index]");
                 Console.WriteLine("--vkey-extract [eboot.pbp]");
                 Console.WriteLine("--vkey-gen [act.dat] [license.rif] [console_id] [key_index]");
+                Console.WriteLine("--keys-txt-gen [act.dat] [console_id] [psp_license_folder]");
             }
 
 
@@ -180,6 +223,12 @@ namespace ChovySign_CLI
                                     return Error("versionkey is already set", 3);
 
                                 break;
+                            case "--keys-txt-gen":
+                                mode = ArgumentParsingMode.KEYS_TXT_GEN;
+
+                                if (rifFolder is not null)
+                                    return Error("rif folder already set", 3);
+                                break;
                             case "--rif":
                                 mode = ArgumentParsingMode.RIF;
 
@@ -209,9 +258,11 @@ namespace ChovySign_CLI
             int res = complete();
             if(res != 0) return res;
 
+            generateKeysTxt();
+
             if (drmInfo is null) return Error("no versionkey was found, exiting", 6);
 
-            Console.WriteLine("Version Key: " + BitConverter.ToString(drmInfo.VersionKey).Replace("-", "") + ", " + drmInfo.KeyIndex);
+            //Console.WriteLine("Version Key: " + BitConverter.ToString(drmInfo.VersionKey).Replace("-", "") + ", " + drmInfo.KeyIndex);
 
             if (pbpMode is null) return Error("no pbp mode was set, exiting", 7);
             

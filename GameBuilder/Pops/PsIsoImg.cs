@@ -51,8 +51,7 @@ namespace GameBuilder.Pops
             generatePsIsoHeader();
 
             // Copy compressed ISO to PSAR stream..
-            compressor.CompressedIso.Seek(0x00, SeekOrigin.Begin);
-            compressor.CompressedIso.CopyTo(Psar);
+            copyToProgress(compressor.CompressedIso, Psar, "Copy Compressed ISO to PSISOIMG");
 
             // write STARTDAT
             Int64 startDatLocation = Psar.Position;

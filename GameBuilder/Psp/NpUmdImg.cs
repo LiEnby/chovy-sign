@@ -1,6 +1,4 @@
-﻿using Org.BouncyCastle.Crypto.Paddings;
-using Org.BouncyCastle.Ocsp;
-using GameBuilder.Pops;
+﻿using GameBuilder.Pops;
 using PspCrypto;
 using System;
 using System.Collections.Generic;
@@ -85,8 +83,7 @@ namespace GameBuilder.Psp
             psarUtil.WriteBytes(npHdrBuf);
             psarUtil.WriteBytes(tbl);
 
-            isoData.Seek(0x00, SeekOrigin.Begin);
-            isoData.CopyTo(Psar);
+            copyToProgress(isoData, Psar, "Copy UMD Image to NPUMDIMG");
         }
 
         private byte[] signParamSfo(byte[] paramSfo)
@@ -120,54 +117,58 @@ namespace GameBuilder.Psp
             }
         }
 
+        private int compressAndWriteBlock(Int64 isoOffset)
+        {
+            int wsize = 0;
+            byte[] isoBuf = new byte[BLOCK_SZ];
+            wsize = umdImage.IsoStream.Read(isoBuf, 0x00, BLOCK_SZ);
+
+            byte[] wbuf = isoBuf;
+
+            if (this.compress) // Compress data.
+            {
+                byte[] lzRcBuf = Lz.compress(isoBuf, true);
+                //memset(lzrc_buf + lzrc_size, 0, 16);
+
+                int ratio = (lzRcBuf.Length * 100) / BLOCK_SZ;
+
+                if (ratio < RATIO_LIMIT)
+                {
+                    wbuf = lzRcBuf;
+
+                    wsize = lzRcBuf.Length;
+                    wsize += MathUtil.CalculatePaddingAmount(wsize, 16);
+                    Array.Resize(ref lzRcBuf, wsize);
+                }
+            }
+
+            int unpaddedSz = wsize;
+            wsize += MathUtil.CalculatePaddingAmount(wsize, 16);
+            Array.Resize(ref wbuf, wsize);
+            encryptBlock(wbuf, Convert.ToInt32(isoOffset));
+            byte[] hash = hashBlock(wbuf);
+
+            npTblUtil.WriteBytes(hash);
+            npTblUtil.WriteUInt32(Convert.ToUInt32(isoOffset));
+            npTblUtil.WriteUInt32(Convert.ToUInt32(unpaddedSz));
+            npTblUtil.WriteInt32(0);
+            npTblUtil.WriteInt32(0);
+
+            isoData.Write(wbuf, 0, wsize);
+
+            return wsize;
+
+        }
+
         private void createNpUmdTbl()
         {
             Int64 tableSz = isoBlocks * 0x20;
             Int64 isoSz = umdImage.IsoStream.Length;
-            int wsize = 0;
             Int64 isoOffset = 0x100 + tableSz;
 
             for (int i = 0; i < isoBlocks; i++)
             {
-                byte[] isoBuf = new byte[BLOCK_SZ];
-                wsize = umdImage.IsoStream.Read(isoBuf, 0x00, BLOCK_SZ);
-
-                byte[] wbuf = isoBuf;
-
-                if (this.compress) // Compress data.
-                {
-                    byte[] lzRcBuf = Lz.compress(isoBuf, true);
-                    //memset(lzrc_buf + lzrc_size, 0, 16);
-
-                    int ratio = (lzRcBuf.Length * 100) / BLOCK_SZ;
-
-                    if (ratio < RATIO_LIMIT)
-                    {
-                        wbuf = lzRcBuf;
-
-                        wsize = lzRcBuf.Length;
-                        wsize += MathUtil.CalculatePaddingAmount(wsize, 16);
-                        Array.Resize(ref lzRcBuf, wsize);
-                    }
-                }
-
-                int unpaddedSz = wsize;
-                wsize += MathUtil.CalculatePaddingAmount(wsize, 16);
-                Array.Resize(ref wbuf, wsize);
-                encryptBlock(wbuf, Convert.ToInt32(isoOffset));
-                byte[] hash = hashBlock(wbuf);
-
-                npTblUtil.WriteBytes(hash);
-                npTblUtil.WriteUInt32(Convert.ToUInt32(isoOffset));
-                npTblUtil.WriteUInt32(Convert.ToUInt32(unpaddedSz));
-                npTblUtil.WriteInt32(0);
-                npTblUtil.WriteInt32(0);
-
-
-                isoData.Write(wbuf, 0, wsize);
-
-                isoOffset += wsize;
-
+                isoOffset += compressAndWriteBlock(isoOffset);
                 updateProgress(Convert.ToInt32(umdImage.IsoStream.Position), Convert.ToInt32(umdImage.IsoStream.Length), "Compress & Encrypt UMD Image");
             }
 

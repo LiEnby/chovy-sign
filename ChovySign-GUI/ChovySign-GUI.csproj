@@ -53,4 +53,8 @@
     <ProjectReference Include="..\GameBuilder\GameBuilder.csproj" />
     <ProjectReference Include="..\LibChovy\LibChovy.csproj" />
   </ItemGroup>
+
+  <ItemGroup>
+    <UpToDateCheckInput Remove="Global\DevkitToggle.axaml" />
+  </ItemGroup>
 </Project>

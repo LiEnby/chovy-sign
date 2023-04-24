@@ -10,7 +10,7 @@ namespace LibChovy.VersionKey
 {
     public class KeysTxtMethod
     {
-
+        public static string KeysTxt = Resources.KEYSTXT;
         public static string[] TitleIds
         {
             get
@@ -29,7 +29,7 @@ namespace LibChovy.VersionKey
             {
                 List<string> contentIds = new List<string>();
 
-                using (TextReader txt = new StringReader(Resources.KEYSTXT))
+                using (TextReader txt = new StringReader(KeysTxt))
                 {
                     for (string? line = txt.ReadLine();
                         line is not null;
@@ -37,7 +37,7 @@ namespace LibChovy.VersionKey
                     {
                         line = line.ReplaceLineEndings("");
                         string[] data = line.Split(' ');
-                        if (data.Length != 4) continue;
+                        if (data.Length != 5) continue;
 
                         contentIds.Add(data[0]);
                     }
@@ -49,7 +49,7 @@ namespace LibChovy.VersionKey
 
         public static NpDrmInfo GetVersionKey(string contentId, int keyIndex)
         {
-            using (TextReader txt = new StringReader(Resources.KEYSTXT))
+            using (TextReader txt = new StringReader(KeysTxt))
             {
                 for(string? line = txt.ReadLine();
                     line is not null;
