@@ -57,7 +57,7 @@ namespace LibChovy.VersionKey
                 {
                     line = line.ReplaceLineEndings("");
                     string[] data = line.Split(' ');
-                    if (data.Length != 4) continue;
+                    if (data.Length != 5) continue;
 
                     if (data[0].Equals(contentId, StringComparison.InvariantCultureIgnoreCase))
                         return new NpDrmInfo(MathUtil.StringToByteArray(data[1 + keyIndex]), contentId, keyIndex);

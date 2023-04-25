@@ -60,7 +60,6 @@ namespace ChovySign_GUI.Global
                     if (zRif.Text is null) return false;
                     if (zRif.Text.Length <= 0) return false;
 
-                    byte[] key = MathUtil.StringToByteArray(vKey.Text);
                     byte[] rif = new NpDrmRif(zRif.Text).Rif;
                     if (rif.Length <= 0) return false;
                     return (VersionKey is not null && Rif is not null);
@@ -245,15 +244,13 @@ namespace ChovySign_GUI.Global
             reloadCfg();
             lastValid = IsValid;
 
-            zRif.KeyDown += onZrifKeyDown;
-            zRif.KeyUp += onZrifKeyDown;
-            vKey.KeyDown += onVkeyKeyDown;
-            vKey.KeyUp += onVkeyKeyDown;
+            zRif.TextChanged += onZrifChanged;
+            vKey.TextChanged += onVkeyChanged;
         }
 
-        private void onVkeyKeyDown(object? sender, Avalonia.Input.KeyEventArgs e)
+        private void onVkeyChanged(object? sender, EventArgs e)
         {
-            TextBox? txt = sender as TextBox;
+            FilteredTextBox? txt = sender as FilteredTextBox;
             if (txt is null) return;
 
             if (lastValid != IsValid)
@@ -269,9 +266,9 @@ namespace ChovySign_GUI.Global
             catch { };
         }
 
-        private void onZrifKeyDown(object? sender, KeyEventArgs e)
+        private void onZrifChanged(object? sender, EventArgs e)
         {
-            TextBox? txt = sender as TextBox;
+            FilteredTextBox? txt = sender as FilteredTextBox;
             if (txt is null) return;
 
             if (lastValid != IsValid)

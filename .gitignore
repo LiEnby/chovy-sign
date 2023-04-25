@@ -4,6 +4,7 @@
 *.7z
 *.pdn
 *.user
+*launchSettings.json
 *Thumbs.db
 
 PbpResign/bin/*

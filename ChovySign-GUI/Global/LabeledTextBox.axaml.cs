@@ -2,17 +2,16 @@
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
-using JetBrains.Annotations;
-using Org.BouncyCastle.Asn1.X509;
 using System;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace ChovySign_GUI.Global
 {
+
     public partial class LabeledTextBox : UserControl
     {
-        private string lastTxt;
-        private string? allowedChars = null;
 
         public event EventHandler<EventArgs>? TextChanged;
         protected virtual void OnTextChanged(EventArgs e)
@@ -20,7 +19,6 @@ namespace ChovySign_GUI.Global
             if (TextChanged is not null)
                 TextChanged(this, e);
         }
-
         public int MaxLength
         {
             get
@@ -37,25 +35,11 @@ namespace ChovySign_GUI.Global
         {
             get
             {
-                return this.txtBox.PasswordChar == default(char);
+                return this.txtBox.Password;
             }
             set
             {
-                if (value) this.txtBox.PasswordChar = 'X';
-                else this.txtBox.PasswordChar = default(char);
-            }
-        }
-        public string Label
-        {
-            get
-            {
-                string? lbl = this.lblTxt.Content as string;
-                if (lbl is null) return "";
-                else return lbl;
-            }
-            set
-            {
-                this.lblTxt.Content = value;
+                this.txtBox.Password = value;
             }
         }
 
@@ -74,19 +58,17 @@ namespace ChovySign_GUI.Global
         {
             get
             {
-                if (allowedChars is null) return "";
-                else return allowedChars;
+                return this.txtBox.AllowedChars;
             }
             set
             {
-                allowedChars = value;
+                this.txtBox.AllowedChars = value;
             }
         }
         public string Text
         {
             get
             {
-                if (this.txtBox.Text is null) return "";
                 return this.txtBox.Text;
             }
             set
@@ -94,63 +76,29 @@ namespace ChovySign_GUI.Global
                 this.txtBox.Text = value;
             }
         }
+        public string Label
+        {
+            get
+            {
+                string? lbl = this.lblTxt.Content as string;
+                if (lbl is null) return "";
+                else return lbl;
+            }
+            set
+            {
+                this.lblTxt.Content = value;
+            }
+        }
+
         public LabeledTextBox()
         {
             InitializeComponent();
-            lastTxt = this.txtBox.Text;
-
-            this.txtBox.PastingFromClipboard += onPaste;
-            this.txtBox.AddHandler(TextInputEvent, onTxtInput, RoutingStrategies.Tunnel);
+            this.txtBox.TextChanged += onTxtBoxTextChange;
         }
 
-        private string filter(string original)
+        private void onTxtBoxTextChange(object? sender, EventArgs e)
         {
-            if (allowedChars is not null)
-            {
-                string newTxt = original.ToUpperInvariant();
-                for (int i = 0; i < newTxt.Length; i++)
-                {
-                    if (!allowedChars.Contains(newTxt[i]))
-                    {
-                        newTxt = newTxt.Replace(newTxt[i].ToString(), "");
-                    }
-                }
-                return newTxt;
-            }
-            else
-            {
-                return original;
-            }
-        }
-
-        private async void onPaste(object? sender, RoutedEventArgs e)
-        {
-            TextBox? txt = sender as TextBox;
-            if (txt is null) return;
-            if (Application.Current is null) return;
-            if (Application.Current.Clipboard is null) return;
-
-            e.Handled = true;
-
-            string? newTxt = await Application.Current.Clipboard.GetTextAsync();
-            if (newTxt is null) newTxt = "";
-
-            /*TextInputEventArgs txtInput = new TextInputEventArgs();
-            txtInput.Text = filter(newTxt);*/
-
-            //txt.RaiseEvent(new RoutedEventArgs(txtInput));
-        }
-
-        private void onTxtInput(object? sender, TextInputEventArgs e)
-        {       
-            string? newTxt = e.Text;
-            if (newTxt is null) newTxt = "";
-
-            newTxt = filter(newTxt);
-            e.Text = newTxt;
-
-            if (newTxt != lastTxt) OnTextChanged(new EventArgs());
-            lastTxt = newTxt;
+            OnTextChanged(e);
         }
     }
 }

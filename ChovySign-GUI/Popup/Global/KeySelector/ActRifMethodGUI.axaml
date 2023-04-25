@@ -17,8 +17,8 @@
 			<RowDefinition Height="1*"/>
 		</Grid.RowDefinitions>
 
-		<Global:LabeledTextBox Name="idpsInput" MaxLength="32" AllowedChars="1234567890ABCDEF" Label="IDPS / ConsoleID:" Watermark="00000001010200140C00000000000000" Grid.Row="0" VerticalAlignment="Center" HorizontalAlignment="Stretch"/>
-		<Global:BrowseButton Name="rifFile" Extension="rif" FileTypeName="Rights Information" Label="LICENSE.RIF: (found @ ux0:/pspemu/PSP/LICENSE)" Grid.Row="1" VerticalAlignment="Center" HorizontalAlignment="Stretch"/>
+		<Global:LabeledTextBox Name="idpsInput" MaxLength="32" AllowedChars="1234567890ABCDEFabcdef" Label="IDPS / ConsoleID:" Watermark="00000001010200140C00025753578942" Grid.Row="0" VerticalAlignment="Center" HorizontalAlignment="Stretch"/>
+		<Global:BrowseButton Name="rifFile" Extension="rif" FileTypeName="Rights Information File" Label="LICENSE.RIF: (found @ ux0:/pspemu/PSP/LICENSE)" Grid.Row="1" VerticalAlignment="Center" HorizontalAlignment="Stretch"/>
 		<Global:BrowseButton Name="actFile" Extension="dat" FileTypeName="Activation Data" Label="ACT.DAT: (found @ tm0:/npdrm/act.dat)" Grid.Row="2" VerticalAlignment="Center" HorizontalAlignment="Stretch"/>
 			
 		<Button Name="keyGen" Click="keyGenClick" Content="Generate Keys" Grid.Row="3" HorizontalAlignment="Center"/>
