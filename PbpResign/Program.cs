@@ -1070,22 +1070,6 @@ namespace PbpResign
                     return false;
                 }
                 type = 0;
-                /*
-                Console.WriteLine("VersionKey: " + BitConverter.ToString(NewVersionKey.ToArray()));
-
-                UmdInfo disc = new UmdInfo("fft.iso");
-                NpUmdImg npumd = new NpUmdImg(new NpDrmInfo(NewVersionKey.ToArray(), CId, npHdr.NpFlags), disc, false);
-
-                npumd.CreatePsar();
-
-                PbpBuilder.CreatePbp(disc.DataFiles["PARAM.SFO"],
-                                    disc.DataFiles["ICON0.PNG"], 
-                                    disc.DataFiles["ICON1.PMF"], 
-                                    disc.DataFiles["PIC0.PNG"], 
-                                    disc.DataFiles["PIC1.PNG"],
-                                    disc.DataFiles["SND0.AT3"],
-                                    npumd,
-                                    "FFT.PBP"); */
                 
                 return CopyNpUmdImg(input, output, pbpHdr, psarBuff, npHdr);
             }
@@ -1100,20 +1084,6 @@ namespace PbpResign
                     return false;
                 }
                 type = 1;
-                /*DiscInfo[] discs = new DiscInfo[2];
-                discs[0] = new DiscInfo("ABEE\\D1.CUE", "Oddworld: Abe's Exoddus", "SLES01480");
-                discs[1] = new DiscInfo("ABEE\\D2.CUE", "Oddworld: Abe's Exoddus", "SLES11480");
-                PsTitleImg title = new PsTitleImg(NewVersionKey.ToArray(), CId, discs);
-                title.CreatePsar();
-                PbpBuilder.CreatePbp(File.ReadAllBytes("TEST\\PARAM.SFO"), File.ReadAllBytes("TEST\\ICON0.PNG"), null,
-                                     File.ReadAllBytes("TEST\\PIC0.PNG"), File.ReadAllBytes("TEST\\PIC1.PNG"), null,
-                                     title.GenerateDataPsp(), title, "ABE-EBOOT.PBP");
-                //PsIsoImg i = new PsIsoImg("ROLLCAGE\\ROLLCAGE.CUE", "SLUS00800", "ROLLCAGE", CId, NewVersionKey.ToArray(),
-                //     File.ReadAllBytes("TEST\\PARAM.SFO"), File.ReadAllBytes("TEST\\ICON0.PNG"), null,
-                //     File.ReadAllBytes("TEST\\PIC0.PNG"), File.ReadAllBytes("TEST\\PIC1.PNG"), null);
-                //File.WriteAllBytes("TEST.BIN", i.GetIsoHeader());
-                //File.WriteAllBytes("TEST.ISOc", i.GetIso());*/
-
 
                  return CopyPsIsoImg(input, output, pbpHdr);
             }
@@ -1208,8 +1178,8 @@ namespace PbpResign
 
             var srcPath = Path.GetDirectoryName(srcPbp);
 
-           // try
-           // {
+            try
+            {
                 using var input = File.OpenRead(srcPbp);
                 var hdr = new byte[Marshal.SizeOf<PbpHeader>()];
                 var len = input.Read(hdr);
@@ -1374,11 +1344,11 @@ namespace PbpResign
                     //}
                 }
 
-            //}
-            //catch (Exception e)
-            //{
-            //    Console.WriteLine(e);
-            //}
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+            }
 
         }
     }
