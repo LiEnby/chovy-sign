@@ -316,64 +316,54 @@ namespace GameBuilder.Cue
                 {
                     string[] cueLn = cueData.Trim().Replace("\r", "").Replace("\n", "").Split(' ');
 
-                    if (cueData.StartsWith("    ")) // index of track
+                    if (cueLn[0] == "INDEX")
                     {
-                        if (cueLn[0] == "INDEX")
+                        if (curTrack is null) throw new Exception("tried to create new index, when track was null");
+
+                        int indexNumber = Convert.ToByte(int.Parse(cueLn[1]));
+                        string[] msf = cueLn[2].Split(':');
+
+                        curTrack.TrackIndex[indexNumber].Mrel = Convert.ToByte(Int32.Parse(msf[0]));
+                        curTrack.TrackIndex[indexNumber].Srel = Convert.ToByte(Int32.Parse(msf[1]));
+                        curTrack.TrackIndex[indexNumber].Frel = Convert.ToByte(Int32.Parse(msf[2]));
+
+                        setTrackNumber(curTrack.TrackNo, ref curTrack);
+                    }
+                    else if (cueLn[0] == "TRACK")
+                    {
+                        if (curTrack is null) throw new Exception("tried to create new track, when track was null");
+
+                        if (curTrack.TrackNo != 0xFF)
                         {
-                            if (curTrack is null) throw new Exception("tried to create new index, when track was null");
-
-                            int indexNumber = Convert.ToByte(int.Parse(cueLn[1]));
-                            string[] msf = cueLn[2].Split(':');
-
-                            curTrack.TrackIndex[indexNumber].Mrel = Convert.ToByte(Int32.Parse(msf[0]));
-                            curTrack.TrackIndex[indexNumber].Srel = Convert.ToByte(Int32.Parse(msf[1]));
-                            curTrack.TrackIndex[indexNumber].Frel = Convert.ToByte(Int32.Parse(msf[2]));
-
                             setTrackNumber(curTrack.TrackNo, ref curTrack);
+                            curTrack = new CueTrack(curTrack.binFileName);
                         }
+
+                        curTrack.TrackNo = Convert.ToByte(int.Parse(cueLn[1]));
+                        if (cueLn[2] == "MODE2/2352")
+                            curTrack.TrackType = TrackType.TRACK_MODE2_2352;
+                        else if (cueLn[2] == "AUDIO")
+                            curTrack.TrackType = TrackType.TRACK_CDDA;
+                        setTrackNumber(curTrack.TrackNo, ref curTrack);
                     }
-                    else if (cueData.StartsWith("  ")) // start of new track
+                    else if (cueLn[0] == "FILE")
                     {
-                        if (cueLn[0] == "TRACK")
-                        {
-                            if (curTrack is null) throw new Exception("tried to create new track, when track was null");
+                        if (curTrack != null) setTrackNumber(curTrack.TrackNo, ref curTrack);
 
-                            if (curTrack.TrackNo != 0xFF)
-                            {
-                                setTrackNumber(curTrack.TrackNo, ref curTrack);
-                                curTrack = new CueTrack(curTrack.binFileName);
-                            }
+                        // parse out filename..
+                        string[] cueFnameParts = new string[cueLn.Length - 2];
+                        Array.ConstrainedCopy(cueLn, 1, cueFnameParts, 0, cueFnameParts.Length);
+                        string cueFname = String.Join(' ', cueFnameParts);
 
-                            curTrack.TrackNo = Convert.ToByte(int.Parse(cueLn[1]));
-                            if (cueLn[2] == "MODE2/2352")
-                                curTrack.TrackType = TrackType.TRACK_MODE2_2352;
-                            else if (cueLn[2] == "AUDIO")
-                                curTrack.TrackType = TrackType.TRACK_CDDA;
-                            setTrackNumber(curTrack.TrackNo, ref curTrack);
-                        }
+                        // open file ..
+                        string binFileName = cueFname.Substring(1, cueFname.Length - 2);
+                        string? folderContainingCue = Path.GetDirectoryName(cueFile);
+
+                        if (folderContainingCue != null)
+                            binFileName = Path.Combine(folderContainingCue, binFileName);
+
+                        curTrack = new CueTrack(binFileName);
                     }
-                    else // new file
-                    {
-                        if (cueLn[0] == "FILE")
-                        {
-                            if (curTrack != null) setTrackNumber(curTrack.TrackNo, ref curTrack);
-
-                            // parse out filename..
-                            string[] cueFnameParts = new string[cueLn.Length - 2];
-                            Array.ConstrainedCopy(cueLn, 1, cueFnameParts, 0, cueFnameParts.Length);
-                            string cueFname = String.Join(' ', cueFnameParts);
-
-                            // open file ..
-                            string binFileName = cueFname.Substring(1, cueFname.Length - 2);
-                            string? folderContainingCue = Path.GetDirectoryName(cueFile);
-                            
-                            if (folderContainingCue != null)
-                                binFileName = Path.Combine(folderContainingCue, binFileName);
-
-                            curTrack = new CueTrack(binFileName);
-                        }
-                    }
-
                 }
             }
 

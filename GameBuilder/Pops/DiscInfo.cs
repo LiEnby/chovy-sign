@@ -48,7 +48,7 @@ namespace GameBuilder.Pops
         {
             get
             {
-                return discId.Replace("-", "").Replace("_", "").ToUpperInvariant();
+                return discId.Replace("-", "").Replace("_", "").ToUpperInvariant().PadRight(9, '0').Substring(0, 9).ToUpperInvariant();                
             }
         }
 

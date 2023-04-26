@@ -1,6 +1,7 @@
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
+using System;
 using System.Media;
 using System.Threading.Tasks;
 
@@ -10,6 +11,7 @@ namespace ChovySign_GUI
     {
         public static async Task PlayFinishSound()
         {
+            if (!OperatingSystem.IsWindows()) return;
             await Task.Run(() =>
             {
                 using (SoundPlayer player = new SoundPlayer(Resource.FINISHSND))
