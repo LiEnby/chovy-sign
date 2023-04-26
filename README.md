@@ -94,7 +94,7 @@ RupertAvery (For their fork of DiscUtils to add PS1 Support)
 
 
 SquallATF's PBPResigner and PSPCrypto were derived from :
-RupertAvery (For [PSXPackager](https://github.com/RupertAvery/PSXPackager) and his fork of DiscUtils)                  
-swarzesherz (For [sign_np](https://github.com/swarzesherz/sign_np))             
-tpunix (For [kirk_engine](https://github.com/tpunix/kirk_engine))             
+xdotnano ([PSXTract](https://github.com/xdotnano/PSXtract))             
+swarzesherz ([sign_np](https://github.com/swarzesherz/sign_np))             
+tpunix ([kirk_engine](https://github.com/tpunix/kirk_engine))             
 	
