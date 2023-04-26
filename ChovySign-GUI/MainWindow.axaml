@@ -1,0 +1,22 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+		xmlns:Ps1="clr-namespace:ChovySign_GUI.Ps1"
+		xmlns:Psp="clr-namespace:ChovySign_GUI.Psp"
+		mc:Ignorable="d" d:DesignWidth="850" d:DesignHeight="950"
+        x:Class="ChovySign_GUI.MainWindow"
+        Title="Chovy Sign V2" Icon="/ICON.PNG">
+	
+	<Grid>
+	<TabControl>
+		<TabItem Header="PlayStation Portable">
+			<Psp:PspTab Name="pspTab"/>
+		</TabItem>
+		<TabItem Header="PlayStation 1">
+			<Ps1:Ps1Tab Name="ps1Tab"/>
+		</TabItem>
+	</TabControl>		
+	</Grid>
+
+</Window>

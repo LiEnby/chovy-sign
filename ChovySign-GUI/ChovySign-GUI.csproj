@@ -1,0 +1,75 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net6.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <RootNamespace>ChovySign_GUI</RootNamespace>
+    <AssemblyName>ChovySign v2</AssemblyName>
+    <ApplicationIcon>ICON.ICO</ApplicationIcon>
+    <Authors>SquallATF, Li, Dots-Tb</Authors>
+  </PropertyGroup>
+  <ItemGroup>
+    <None Remove=".gitignore" />
+    <None Remove="DEFAULTICON.PNG" />
+    <None Remove="Icon.png" />
+    <None Remove="Popup\Global\KeySelector\ACTRIFMETHOD.PNG" />
+    <None Remove="Popup\Global\KeySelector\EBOOTMETHOD.PNG" />
+    <None Remove="Popup\Global\KeySelector\EBOOTMETHOD1.png" />
+    <None Remove="Popup\Global\KeySelector\EBOOTMETHOD2.png" />
+    <None Remove="Popup\Global\KeySelector\KEYSTXTMETHOD.PNG" />
+    <None Remove="PS1CD.PNG" />
+    <None Remove="UMD.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <AvaloniaResource Include="ICON.PNG" />
+    <AvaloniaResource Include="Popup\Global\KeySelector\ACTRIFMETHOD.PNG" />
+    <AvaloniaResource Include="Popup\Global\KeySelector\EBOOTMETHOD1.PNG" />
+    <AvaloniaResource Include="Popup\Global\KeySelector\EBOOTMETHOD2.PNG" />
+    <AvaloniaResource Include="Popup\Global\KeySelector\KEYSTXTMETHOD.PNG" />
+    <AvaloniaResource Include="Ps1\PS1CD.PNG" />
+    <AvaloniaResource Include="Psp\UMD.PNG">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </AvaloniaResource>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="ICON.ICO" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <TrimmerRootDescriptor Include="Roots.xml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Avalonia" Version="0.10.19" />
+    <PackageReference Include="Avalonia.Desktop" Version="0.10.19" />
+    <!--Condition below is needed to remove Avalonia.Diagnostics package from build output in Release configuration.-->
+    <PackageReference Condition="'$(Configuration)' == 'Debug'" Include="Avalonia.Diagnostics" Version="0.10.19" />
+    <PackageReference Include="XamlNameReferenceGenerator" Version="1.6.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\GameBuilder\GameBuilder.csproj" />
+    <ProjectReference Include="..\LibChovy\LibChovy.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <UpToDateCheckInput Remove="Global\DevkitToggle.axaml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Resource.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resource.resx</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Update="Resource.resx">
+      <Generator>PublicResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resource.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+</Project>

@@ -1,0 +1,24 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="60"
+             x:Class="ChovySign_GUI.Global.ProgressStatus">
+
+	<Grid HorizontalAlignment="Stretch" VerticalAlignment="Top">
+		<Grid.RowDefinitions>
+			<RowDefinition Height="1*"/>
+			<RowDefinition Height="1*"/>
+		</Grid.RowDefinitions>
+		<Label Name="statusLbl" Content="Progress %" VerticalAlignment="Bottom" HorizontalAlignment="Stretch" Grid.Row="0"/>
+		<Grid Grid.Row="1">
+			<Grid.ColumnDefinitions>
+				<ColumnDefinition Width="15*"/>
+				<ColumnDefinition Width="1*"/>
+			</Grid.ColumnDefinitions>
+			<ProgressBar Name="progressVal" Maximum="100" Minimum="0" HorizontalAlignment="Stretch" VerticalAlignment="Top" Height="30" Grid.Column="0"/>
+			<Button Name="goButton" Click="goClick" Content="Go!" HorizontalAlignment="Center" VerticalAlignment="Top" Grid.Column="1"/>
+		</Grid>
+	</Grid>
+	
+</UserControl>

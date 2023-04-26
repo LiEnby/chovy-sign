@@ -1,0 +1,26 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+			 xmlns:Global="clr-namespace:ChovySign_GUI.Global"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="145"
+             x:Class="ChovySign_GUI.Psp.IsoSelector">
+	<!-- ISO Image selector -->
+	<Border Padding="10 10" HorizontalAlignment="Stretch" VerticalAlignment="Center">
+		<Grid>
+			<Grid.ColumnDefinitions>
+				<ColumnDefinition Width="1*" />
+				<ColumnDefinition Width="5*" />
+			</Grid.ColumnDefinitions>
+			<Grid Grid.Column="0">
+				<Grid.RowDefinitions>
+					<RowDefinition Height="5*" />
+					<RowDefinition Height="1*" />
+				</Grid.RowDefinitions>
+				<Image HorizontalAlignment="Center" VerticalAlignment="Center" Width="120" Source="/Psp/UMD.PNG" Grid.Row="0"/>
+				<CheckBox Name="compressPbp" Content="Compress PBP" HorizontalAlignment="Center" Grid.Row="1"/>
+			</Grid>
+			<Global:BrowseButton Name="umdFile" Extension="iso" FileTypeName="Universal Media Disc 'UMD' Disc Image (ISO9660)" Label="UMD Image:" Grid.Column="1"/>
+		</Grid>
+	</Border>
+</UserControl>

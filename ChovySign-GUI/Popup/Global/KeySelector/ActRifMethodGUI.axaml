@@ -1,0 +1,27 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:Global="clr-namespace:ChovySign_GUI.Global"
+		mc:Ignorable="d" d:DesignWidth="450" d:DesignHeight="200"
+        x:Class="ChovySign_GUI.Popup.Global.KeySelector.ActRifMethodGUI"
+		SizeToContent="Height" Width="450" Height="200" 
+		MinWidth="450" MinHeight="200" CanResize="False"
+        Title="Act/Rif Method" Icon="/ICON.PNG">
+
+	<Grid>
+		<Grid.RowDefinitions>
+			<RowDefinition Height="1*"/>
+			<RowDefinition Height="1*"/>
+			<RowDefinition Height="1*"/>
+			<RowDefinition Height="1*"/>
+		</Grid.RowDefinitions>
+
+		<Global:LabeledTextBox Name="idpsInput" MaxLength="32" AllowedChars="1234567890ABCDEFabcdef" Label="IDPS / ConsoleID:" Watermark="00000001010200140C00025753578942" Grid.Row="0" VerticalAlignment="Center" HorizontalAlignment="Stretch"/>
+		<Global:BrowseButton Name="rifFile" Extension="rif" FileTypeName="Rights Information File" Label="LICENSE.RIF: (found @ ux0:/pspemu/PSP/LICENSE)" Grid.Row="1" VerticalAlignment="Center" HorizontalAlignment="Stretch"/>
+		<Global:BrowseButton Name="actFile" Extension="dat" FileTypeName="Activation Data" Label="ACT.DAT: (found @ tm0:/npdrm/act.dat)" Grid.Row="2" VerticalAlignment="Center" HorizontalAlignment="Stretch"/>
+			
+		<Button Name="keyGen" Click="keyGenClick" Content="Generate Keys" Grid.Row="3" HorizontalAlignment="Center"/>
+		<CheckBox Name="hideConsoleId" Content="Hide ConsoleID" Grid.Row="3" VerticalAlignment="Bottom"/>
+	</Grid>
+</Window>
