@@ -5,6 +5,8 @@ using GameBuilder.Psp;
 using LibChovy;
 using LibChovy.Config;
 using System;
+using System.Media;
+using System.Threading.Tasks;
 using Vita.ContentManager;
 using static ChovySign_GUI.Popup.Global.MessageBox;
 
@@ -29,6 +31,7 @@ namespace ChovySign_GUI.Psp
             check();
         }
 
+
         private async void onProcessFinished(object? sender, EventArgs e)
         {
             keySelector.IsEnabled = true;
@@ -38,6 +41,7 @@ namespace ChovySign_GUI.Psp
             Window? currentWindow = this.VisualRoot as Window;
             if (currentWindow is not Window) throw new Exception("could not find current window");
 
+            _ = App.PlayFinishSound();
             await MessageBox.Show(currentWindow, "Finished creating PSP Game!\nCan now go restore it to your PSVita using Content Manager.", "Done!", MessageBoxButtons.Ok);
         }
 

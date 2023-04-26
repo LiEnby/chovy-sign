@@ -1,11 +1,23 @@
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
+using System.Media;
+using System.Threading.Tasks;
 
 namespace ChovySign_GUI
 {
     public partial class App : Application
     {
+        public static async Task PlayFinishSound()
+        {
+            await Task.Run(() =>
+            {
+                using (SoundPlayer player = new SoundPlayer(Resource.FINISHSND))
+                {
+                    player.Play();
+                }
+            });
+        }
         public override void Initialize()
         {
             AvaloniaXamlLoader.Load(this);

@@ -39,8 +39,8 @@ namespace ChovySign_GUI.Ps1
             Window? currentWindow = this.VisualRoot as Window;
             if (currentWindow is not Window) throw new Exception("could not find current window");
 
+            _ = App.PlayFinishSound();
             await MessageBox.Show(currentWindow, "Finished creating PS1 Game!\nCan now go restore it to your PSVita using Content Manager.", "Done!", MessageBoxButtons.Ok);
-
         }
 
         private void onProcessStarting(object? sender, EventArgs e)
