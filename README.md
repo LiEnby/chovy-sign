@@ -1,5 +1,5 @@
 #ChovyProject v2
-Created by SquallATF, and Li! 
+Now with PS1 Support !
 
 \- chovy-sign is an application to allow you to convert PSP and PS1 ISO's to be playable on unmodified PSVita's
 
