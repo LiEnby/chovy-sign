@@ -53,8 +53,10 @@ this will populate the key and rif field;
 now do the same thing for the PS1 Option, using the same license and activation file as before.
 
 
+
 a diagram explaining the 3 key obtaining methods is below:
-![image](https://user-images.githubusercontent.com/39113159/100169414-55d2ae80-2f28-11eb-834b-5206388d20cd.png)
+
+![image](https://silica.codes/SilicaAndPina/chovy-sign/raw/branch/master/Methods.png)
 
 -- 
 
