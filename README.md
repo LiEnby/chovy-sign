@@ -62,21 +62,18 @@ a diagram explaining the 3 key obtaining methods is below:
 
 
 Credits:    
-SquallATF		(for "PspCrypto" and "PBPResigner", and making PS1 Game signing possible,
+SquallATF (for "PspCrypto" and "PBPResigner", and making PS1 Game signing possible,
 And discovering a bug in \_\_sce_ebootpbp handling that makes it possible to use multi-disc games.)
 
-Li:             (for writing the original chovy-sign, 
-Developing the GUI, finding the original psp bubbles method and
-
-[Sfo.NET](https://github.com/KuromeSan/Sfo.NET/blob/master/README.md) A Simple SFO Parser.             
-Writing the PS1 Disc Compresison algorithm, making it possible to use custom ISOs
-Writing C# Implementation of PSVIMGTOOLS..
-
+Li: (for writing the original chovy-sign,
+Developing the GUI, finding the original psp bubbles method and,
+[Sfo.NET](https://github.com/KuromeSan/Sfo.NET/blob/master/README.md) A Simple SFO Parser,             
+Writing the PS1 Disc Compresison algorithm, making it possible to use custom ISOs,
+Writing C# Implementation of PSVIMGTOOLS,
 Being transgender)
 
 				
-dots-tb			(for [chovy-gen](https://github.com/dots-tb/chovy-gen) (\_\_sce_ebootpbp signing)         
-
+dots-tb (for [chovy-gen](https://github.com/dots-tb/chovy-gen) (\_\_sce_ebootpbp signing)         
 
 Sony Computer Enterainment: (For at3tool)
 
