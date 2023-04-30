@@ -146,8 +146,7 @@ namespace GameBuilder.Pops
         private void writeLibCryptData()
         {
             // obfuscated libcrypt magic word
-            int obfuscatedMagicWord = obfuscateMagicWord();
-            isoHeaderUtil.WriteInt32(obfuscatedMagicWord);
+            isoHeaderUtil.WriteInt32(obfuscateMagicWord());
             isoHeaderUtil.WriteInt32(0);
             isoHeaderUtil.WriteInt32(0);
             isoHeaderUtil.WriteInt32(0);

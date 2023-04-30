@@ -30,20 +30,22 @@ namespace GameBuilder.Pops.LibCrypt
         public static int GenMagicWord(SbiEntry[] Sbi)
         {
             bool[] bits = new bool[16];
-            int sbiI = 0;
 
-            if (Sbi.Length % 2 != 0) return 0;
+            HashSet<int> sbiSectors = new HashSet<int>();
+            foreach(SbiEntry sbiEntry in Sbi)
+                sbiSectors.Add(sbiEntry.Sector);
+            
+            for (int i = 0; i < bits.Length; i++)
+                bits[i] = (sbiSectors.Contains(LIBCRYPT_PAIRS[i][0]) && sbiSectors.Contains(LIBCRYPT_PAIRS[i][1]));
+
 
             int magicWord = 0;
 
             for (int i = 0; i < bits.Length; i++)
             {
-                bool isSet = (Sbi[sbiI].Sector == LIBCRYPT_PAIRS[i][0] && Sbi[sbiI + 1].Sector == LIBCRYPT_PAIRS[i][1]);
-                if (isSet) sbiI += 2;
-                bits[i] = isSet;
-
-                if (isSet) magicWord |= 1;
-                if (i + 1 < bits.Length)
+                if (bits[i]) magicWord |= 1;
+                
+                if(i+1 < bits.Length)
                     magicWord <<= 1;
             }
 
