@@ -30,24 +30,28 @@ namespace GameBuilder.Cue
             return totalTracks;
         }
 
-        public static byte BinaryDecimalConv(int i)
+        public static byte BinaryDecimalToDecimal(int i)
+        {
+            return Convert.ToByte(Convert.ToInt32(10 * (i - i % 16) / 16 + i % 16));
+        }
+        public static byte DecimalToBinaryDecimal(int i)
         {
             return Convert.ToByte(Convert.ToInt32((i % 10) + 16 * ((i / 10) % 10)));
         }
-        public int IdxToSectorRel(CueIndex index)
+        public static int IdxToSectorRel(DiscIndex index)
         {
             int offset = (((index.Mrel * 60) + index.Srel) * 75 + index.Frel);
             return offset;
         }
-        public int IdxToSector(CueIndex index)
+        public static int IdxToSector(DiscIndex index)
         {
             int offset = (((index.m * 60) + index.s) * 75 + index.f);
             return offset;
         }
 
-        public CueIndex SectorToIdx(int sector)
+        public static DiscIndex SectorToIdx(int sector)
         {
-            CueIndex idx = new CueIndex(1);
+            DiscIndex idx = new DiscIndex(1);
 
             int x = sector;
             int f = sector % 75;
@@ -55,11 +59,6 @@ namespace GameBuilder.Cue
             x = Convert.ToInt32(Math.Floor(Convert.ToDouble(x) / 75.0));
             int s = x % 60;
             int m = Convert.ToInt32(Math.Floor(Convert.ToDouble(x) / 60.0));
-
-            //idx.Mrel = Convert.ToByte(Convert.ToInt32(((sector / 75) / 60)));
-            //idx.Srel = Convert.ToByte(Convert.ToInt32(((sector / 75) % 60)));
-            //idx.Frel = Convert.ToByte(Convert.ToInt32(((sector % 75))));
-            //idx.Sdelta = 2; // why?
 
             idx.Mrel = Convert.ToInt16(m);
             idx.Srel = Convert.ToInt16(s);
@@ -185,11 +184,11 @@ namespace GameBuilder.Cue
             byte[] tocA0Entry = new byte[10] { 0x41, 0x00, 0xA0, 0x00, 0x00, 0x00, 0x00, 0x01, 0x20, 0x00 };
 
             // And an A1 track (determines how many tracks there are)
-            byte[] tocA1Entry = new byte[10] { 0x41, 0x00, 0xA1, 0x00, 0x00, 0x00, 0x00, BinaryDecimalConv(GetTotalTracks()), 0x00, 0x00 };
+            byte[] tocA1Entry = new byte[10] { 0x41, 0x00, 0xA1, 0x00, 0x00, 0x00, 0x00, DecimalToBinaryDecimal(GetTotalTracks()), 0x00, 0x00 };
 
             // the A2 track is a bit more complicated ..
             int totalSectors = getTotalSectorSz();
-            CueIndex idx = SectorToIdx(totalSectors);
+            DiscIndex idx = SectorToIdx(totalSectors);
             idx.Sdelta = 2;
 
             byte[] tocA2Entry = new byte[10] { 0x41, 0x00, 0xA2, 0x00, 0x00, 0x00, 0x00, idx.M, idx.S, idx.F };
@@ -246,7 +245,7 @@ namespace GameBuilder.Cue
                 if (tracks[i] is null) continue;
                 int pos = positions[tracks[i].binFileName];
 
-                CueIndex idx = this.SectorToIdx(pos);
+                DiscIndex idx = SectorToIdx(pos);
                 // pregap not included on first track
 
                 if (tracks[i].TrackNo == 1) tracks[i].TrackIndex[0].Sdelta = 0;

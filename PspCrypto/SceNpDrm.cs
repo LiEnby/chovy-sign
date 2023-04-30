@@ -1038,7 +1038,7 @@ namespace PspCrypto
                 return -0x7f78ffff;
             }
 
-            Span<byte> secureTick = BitConverter.GetBytes(ksceRtcGetCurrentSecureTick());
+            Span<byte> secureTick = BitConverter.GetBytes(SceRtc.ksceRtcGetCurrentSecureTick());
 
             ebootSig.Fill(0);
             sceEbootPbp.SwVer = swVer;
@@ -1279,14 +1279,6 @@ namespace PspCrypto
             var signature = ecdsa.SignHash(digest.ToArray());
             signature.CopyTo(sig);
             return 0;
-        }
-
-        private static ulong ksceRtcGetCurrentSecureTick()
-        {
-            DateTime epoch = new DateTime(1, 1, 1, 0, 0, 0);
-            DateTime now = DateTime.UtcNow;
-            TimeSpan ts = now.Subtract(epoch);
-            return Convert.ToUInt64(Math.Floor(ts.TotalMilliseconds)) * 1000;
         }
 
         private static int SceSblGcAuthMgrDrmBBForDriver_4B506BE7(ReadOnlySpan<byte> digest, ReadOnlySpan<byte> sig, int keyType)

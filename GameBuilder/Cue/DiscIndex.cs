@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace GameBuilder.Cue
 {
-    public class CueIndex
+    public class DiscIndex
     {
         public byte IndexNumber;
         public short Mrel;
@@ -73,7 +73,7 @@ namespace GameBuilder.Cue
         { 
             get
             {
-                return CueReader.BinaryDecimalConv(m);
+                return CueReader.DecimalToBinaryDecimal(m);
             } 
         }
 
@@ -81,7 +81,7 @@ namespace GameBuilder.Cue
         {
             get
             {
-                return CueReader.BinaryDecimalConv(s);
+                return CueReader.DecimalToBinaryDecimal(s);
             }
         }
 
@@ -89,11 +89,11 @@ namespace GameBuilder.Cue
         {
             get
             {
-                return CueReader.BinaryDecimalConv(f);
+                return CueReader.DecimalToBinaryDecimal(f);
             }
         }
 
-        internal CueIndex(byte indexNumber)
+        internal DiscIndex(byte indexNumber)
         {
             IndexNumber = indexNumber;
             Mrel = 0;

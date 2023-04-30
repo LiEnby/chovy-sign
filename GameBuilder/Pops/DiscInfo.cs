@@ -1,4 +1,5 @@
 ﻿using DiscUtils.Iso9660Ps1;
+using DiscUtils.Raw;
 using DiscUtils.Streams;
 using GameBuilder.Cue;
 using Li.Utilities;
@@ -16,6 +17,15 @@ namespace GameBuilder.Pops
         private string discName;
         private string discId;
 
+        public string? SbiFile
+        {
+            get
+            {
+                string sbiFileName = Path.ChangeExtension(CueFile, ".sbi");
+                if(File.Exists(sbiFileName)) return sbiFileName;
+                else return null;
+            }
+        }
         public string CueFile 
         { 
             get

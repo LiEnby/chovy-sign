@@ -14,7 +14,7 @@ namespace GameBuilder.Cue
 
         public TrackType TrackType;
         public byte TrackNo;
-        public CueIndex[] TrackIndex;
+        public DiscIndex[] TrackIndex;
 
         public int TrackLength;
         public int SectorSz
@@ -30,9 +30,9 @@ namespace GameBuilder.Cue
 
         internal CueTrack(string binFile)
         {
-            TrackIndex = new CueIndex[2];
+            TrackIndex = new DiscIndex[2];
             for (int i = 0; i < TrackIndex.Length; i++)
-                TrackIndex[i] = new CueIndex(Convert.ToByte(i));
+                TrackIndex[i] = new DiscIndex(Convert.ToByte(i));
 
             binFileName = binFile;
             binFileSz = new FileInfo(binFileName).Length;
@@ -47,7 +47,7 @@ namespace GameBuilder.Cue
 
             tocEntry[0] = Convert.ToByte(this.TrackType);
             tocEntry[1] = 0;
-            tocEntry[2] = CueReader.BinaryDecimalConv(this.TrackNo);
+            tocEntry[2] = CueReader.DecimalToBinaryDecimal(this.TrackNo);
             
 
             tocEntry[3] = this.TrackIndex[0].M;

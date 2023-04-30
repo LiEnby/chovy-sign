@@ -10,6 +10,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using Li.Utilities;
+using GameBuilder.Pops.LibCrypt;
 
 namespace GameBuilder.Pops
 {
@@ -24,6 +25,9 @@ namespace GameBuilder.Pops
             this.srcImg = srcImg;
             this.disc = disc;
             this.cue = new CueReader(disc.CueFile);
+
+            if (disc.SbiFile is not null)
+                this.sbi = new SbiReader(disc.SbiFile);
 
             this.IsoHeader = new MemoryStream();
             this.CompressedIso = new MemoryStream();
@@ -115,6 +119,7 @@ namespace GameBuilder.Pops
             writeTOC();
             writeIsoLocation();
             writeName();
+            writeLibCryptData();
 
             writeCompressedIso();
 
@@ -129,6 +134,28 @@ namespace GameBuilder.Pops
             IsoHeader.Seek(0xE20, SeekOrigin.Begin);
             isoHeaderUtil.WriteInt64(location); 
         }
+
+        private int obfuscateMagicWord()
+        {
+            int magicWord = 0;
+
+            if (sbi is not null) magicWord = MagicWord.GenMagicWord(sbi.Entries);
+
+            return magicWord ^ 0x72d0ee59;
+        }
+        private void writeLibCryptData()
+        {
+            // obfuscated libcrypt magic word
+            int obfuscatedMagicWord = obfuscateMagicWord();
+            isoHeaderUtil.WriteInt32(obfuscatedMagicWord);
+            isoHeaderUtil.WriteInt32(0);
+            isoHeaderUtil.WriteInt32(0);
+            isoHeaderUtil.WriteInt32(0);
+
+
+            isoHeaderUtil.WritePadding(0, 0x2D40);
+
+        }
         private void writeName()
         {
             // copied from crash bandicoot warped
@@ -137,14 +164,9 @@ namespace GameBuilder.Pops
 
             isoHeaderUtil.WriteInt32(2047); // unk
             isoHeaderUtil.WriteStrWithPadding(disc.DiscName, 0x00, 0x80);
-            isoHeaderUtil.WriteInt32(3); // unk
+            isoHeaderUtil.WriteInt32(3); // PARENTAL_LEVEL ?
 
-            isoHeaderUtil.WriteInt32(0x72d0ee59); // appears to be constant?
-            isoHeaderUtil.WriteInt32(0);
-            isoHeaderUtil.WriteInt32(0);
-            isoHeaderUtil.WriteInt32(0);
 
-            isoHeaderUtil.WritePadding(0, 0x2D40);
         }
 
         private void writeCDAEntry(int position, int length, uint key)
@@ -229,6 +251,7 @@ namespace GameBuilder.Pops
 
         private DiscInfo disc;
         private CueReader cue;
+        private SbiReader sbi;
         private PopsImg srcImg;
 
         public MemoryStream IsoHeader;
