@@ -762,7 +762,7 @@ namespace PspCrypto
 
         static int kirk_CMD0(Span<byte> outbuff, ReadOnlySpan<byte> inbuff, int size, bool generate_trash)
         {
-            KIRK_CMD1_HEADER header = Utils.AsRef<KIRK_CMD1_HEADER>(outbuff);
+            KIRK_CMD1_HEADER header = MemoryMarshal.AsRef<KIRK_CMD1_HEADER>(outbuff);
             // header_keys keys = Utils.AsRef<header_keys>(outbuff);
             int chk_size;
             Aes k1;
@@ -817,7 +817,7 @@ namespace PspCrypto
 
         static int kirk_CMD1(Span<byte> outbuff, ReadOnlySpan<byte> inbuff, int size)
         {
-            KIRK_CMD1_HEADER header = Utils.AsRef<KIRK_CMD1_HEADER>(inbuff);
+            KIRK_CMD1_HEADER header = MemoryMarshal.AsRef<KIRK_CMD1_HEADER>(inbuff);
             // header_keys keys; //0-15 AES key, 16-31 CMAC key
             Aes k1;
 
@@ -831,7 +831,7 @@ namespace PspCrypto
 
             if (header.ecdsa_hash == 1)
             {
-                KIRK_CMD1_ECDSA_HEADER eheader = Utils.AsRef<KIRK_CMD1_ECDSA_HEADER>(inbuff);
+                KIRK_CMD1_ECDSA_HEADER eheader = MemoryMarshal.AsRef<KIRK_CMD1_ECDSA_HEADER>(inbuff);
                 var curve = ECDsaHelper.SetCurve(KeyVault.ec_p, KeyVault.ec_a, KeyVault.ec_b1, KeyVault.ec_N1, KeyVault.Gx1,
                     KeyVault.Gy1);
                 unsafe
@@ -867,7 +867,7 @@ namespace PspCrypto
 
         static int kirk_CMD4(Span<byte> outbuff, ReadOnlySpan<byte> inbuff, int size)
         {
-            KIRK_AES128CBC_HEADER header = Utils.AsRef<KIRK_AES128CBC_HEADER>(inbuff);
+            KIRK_AES128CBC_HEADER header = MemoryMarshal.AsRef<KIRK_AES128CBC_HEADER>(inbuff);
             byte[] key;
             Aes aes;
 
@@ -892,7 +892,7 @@ namespace PspCrypto
 
         static int kirk_CMD7(Span<byte> outbuff, ReadOnlySpan<byte> inbuff, int size)
         {
-            KIRK_AES128CBC_HEADER header = Utils.AsRef<KIRK_AES128CBC_HEADER>(inbuff);
+            KIRK_AES128CBC_HEADER header = MemoryMarshal.AsRef<KIRK_AES128CBC_HEADER>(inbuff);
             byte[] key;
             Aes aes;
 
@@ -915,7 +915,7 @@ namespace PspCrypto
 
         static int kirk_CMD10(ReadOnlySpan<byte> inbuff, int insize)
         {
-            KIRK_CMD1_HEADER header = Utils.AsRef<KIRK_CMD1_HEADER>(inbuff);
+            KIRK_CMD1_HEADER header = MemoryMarshal.AsRef<KIRK_CMD1_HEADER>(inbuff);
             // header_keys keys; //0-15 AES key, 16-31 CMAC key
             Span<byte> cmac_header_hash = stackalloc byte[16];
             Span<byte> cmac_data_hash = stackalloc byte[16];
@@ -951,7 +951,7 @@ namespace PspCrypto
 
         static int kirk_CMD11(Span<byte> outbuff, ReadOnlySpan<byte> inbuff, int size)
         {
-            KIRK_SHA1_HEADER header = Utils.AsRef<KIRK_SHA1_HEADER>(inbuff);
+            KIRK_SHA1_HEADER header = MemoryMarshal.AsRef<KIRK_SHA1_HEADER>(inbuff);
             if (!is_kirk_initialized) return KIRK_NOT_INITIALIZED;
             if (header.data_size == 0 || size == 0) return KIRK_DATA_SIZE_ZERO;
 
@@ -1044,7 +1044,7 @@ namespace PspCrypto
         static int kirk_CMD16(Span<byte> outbuff, int outsize, ReadOnlySpan<byte> inbuff, int insize)
         {
             byte[] dec_private = new byte[0x20];
-            KIRK_CMD16_BUFFER signbuf = Utils.AsRef<KIRK_CMD16_BUFFER>(inbuff);
+            KIRK_CMD16_BUFFER signbuf = MemoryMarshal.AsRef<KIRK_CMD16_BUFFER>(inbuff);
             //ECDSA_SIG sig = BufferToStruct<ECDSA_SIG>(outbuff);
 
             if (insize != 0x34) return KIRK_INVALID_SIZE;
@@ -1071,7 +1071,7 @@ namespace PspCrypto
 
         static int kirk_CMD17(ReadOnlySpan<byte> inbuff, int insize)
         {
-            KIRK_CMD17_BUFFER sig = Utils.AsRef<KIRK_CMD17_BUFFER>(inbuff);
+            KIRK_CMD17_BUFFER sig = MemoryMarshal.AsRef<KIRK_CMD17_BUFFER>(inbuff);
 
             if (insize != 0x64) return KIRK_INVALID_SIZE;
 

@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using PspCrypto.Security.Cryptography;
+using System;
 using System.Security.Cryptography;
-using System.Text;
-using PspCrypto.Security.Cryptography;
 
 namespace PspCrypto
 {
@@ -66,17 +63,6 @@ namespace PspCrypto
                 Q = { X = pubx, Y = puby }
             };
             return new ECDsaManaged(par, ebootPbp, type);
-        }
-
-        public static ECDsa CreateNet(ECCurve curve, byte[] privateKey, byte[] pubx, byte[] puby)
-        {
-            var par = new ECParameters
-            {
-                Curve = curve,
-                D = privateKey,
-                Q = { X = pubx, Y = puby }
-            };
-            return ECDsa.Create(par);
         }
 
         public static void SignNpImageHeader(Span<byte> npHdr)

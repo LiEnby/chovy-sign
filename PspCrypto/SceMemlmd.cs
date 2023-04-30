@@ -438,7 +438,7 @@ namespace PspCrypto
         static int Kirk8(Span<byte> buf, int size, int use_polling)
         {
             int retv;
-            ref var hdr = ref Utils.AsRef<KIRKEngine.KIRK_AES128CBC_HEADER>(buf);
+            ref var hdr = ref MemoryMarshal.AsRef<KIRKEngine.KIRK_AES128CBC_HEADER>(buf);
             hdr.mode = KIRKEngine.KIRK_MODE_DECRYPT_CBC;
             hdr.keyseed = 0x0100;
             hdr.data_size = size;

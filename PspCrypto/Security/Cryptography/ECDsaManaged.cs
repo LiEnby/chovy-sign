@@ -77,7 +77,7 @@ namespace PspCrypto.Security.Cryptography
 
         protected override byte[] HashData(byte[] data, int offset, int count, System.Security.Cryptography.HashAlgorithmName hashAlgorithm)
         {
-            var dataSpan = data.AsSpan().Slice(offset, count);
+            var dataSpan = new ReadOnlySpan<byte>(data, offset, count);
             if (hashAlgorithm == System.Security.Cryptography.HashAlgorithmName.SHA256)
             {
                 return System.Security.Cryptography.SHA256.HashData(dataSpan);
@@ -127,8 +127,8 @@ namespace PspCrypto.Security.Cryptography
                 Cofactor = _fpCurve.Cofactor.ToByteArrayUnsigned(),
                 G = new System.Security.Cryptography.ECPoint
                 {
-                    X = normalG.XCoord.ToBigInteger().ToByteArrayUnsigned(),
-                    Y = normalG.YCoord.ToBigInteger().ToByteArrayUnsigned()
+                    X = normalG.AffineXCoord.ToBigInteger().ToByteArrayUnsigned(),
+                    Y = normalG.AffineYCoord.ToBigInteger().ToByteArrayUnsigned()
                 }
             };
             var parameters = new System.Security.Cryptography.ECParameters
@@ -138,21 +138,20 @@ namespace PspCrypto.Security.Cryptography
             if (includePrivateParameters && _ecKeyParameters is ECPrivateKeyParameters privateKeyParameters)
             {
                 parameters.D = privateKeyParameters.D.ToByteArrayUnsigned();
-                Console.WriteLine(privateKeyParameters.D.ToString(16).ToUpper());
-                var publicKey = privateKeyParameters.Parameters.G.Multiply(privateKeyParameters.D).Normalize();
+                var publicKey = _ecKeyParameters.Parameters.G.Multiply(privateKeyParameters.D).Normalize();
                 parameters.Q = new System.Security.Cryptography.ECPoint
                 {
-                    X = publicKey.XCoord.ToBigInteger().ToByteArrayUnsigned(),
-                    Y = publicKey.YCoord.ToBigInteger().ToByteArrayUnsigned()
+                    X = publicKey.AffineXCoord.ToBigInteger().ToByteArrayUnsigned(),
+                    Y = publicKey.AffineYCoord.ToBigInteger().ToByteArrayUnsigned()
                 };
             }
             else if (_ecKeyParameters is ECPublicKeyParameters publicKeyParameters)
             {
-                var publicKey = publicKeyParameters.Q;
+                var publicKey = publicKeyParameters.Q.Normalize();
                 parameters.Q = new System.Security.Cryptography.ECPoint
                 {
-                    X = publicKey.XCoord.ToBigInteger().ToByteArrayUnsigned(),
-                    Y = publicKey.YCoord.ToBigInteger().ToByteArrayUnsigned()
+                    X = publicKey.AffineXCoord.ToBigInteger().ToByteArrayUnsigned(),
+                    Y = publicKey.AffineYCoord.ToBigInteger().ToByteArrayUnsigned()
                 };
             }
             return parameters;

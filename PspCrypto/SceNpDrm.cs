@@ -1,13 +1,11 @@
-﻿using System;
+﻿using PspCrypto.Security.Cryptography;
+using System;
 using System.Buffers.Binary;
-using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 using System.Text;
-using PspCrypto.Security.Cryptography;
 
 namespace PspCrypto
 {
@@ -142,7 +140,7 @@ namespace PspCrypto
             }
         }
 
-        unsafe struct sceDiscInfo
+        unsafe struct SceDiscInfo
         {
             private fixed byte _id[0x30];
 
@@ -757,7 +755,7 @@ namespace PspCrypto
             Span<byte> pbpHdrDigest = stackalloc byte[32];
             Span<byte> discsDigest = stackalloc byte[32];
             Span<byte> ebootSigtmp = stackalloc byte[512];
-            ref var sceEbootPbp = ref Utils.AsRef<SceEbootPbp>(ebootSigtmp);
+            ref var sceEbootPbp = ref MemoryMarshal.AsRef<SceEbootPbp>(ebootSigtmp);
             if ((blockSize & 0x3F) != 0)
             {
                 blockSize &= unchecked((int)0xFFFFFFC0);
@@ -775,7 +773,7 @@ namespace PspCrypto
             ebootSig.Fill(0);
             sceEbootPbp.SwVer = swVer;
             sceEbootPbp.Aid = Aid;
-            sceEbootPbp.SecureTick = Utils.AsRef<ulong>(secureTick);
+            sceEbootPbp.SecureTick = MemoryMarshal.AsRef<ulong>(secureTick);
 
             var sha224 = SHA224.Create();
             var hash = sha224.ComputeHash(sceDiskInfo[..200].ToArray());
@@ -785,7 +783,7 @@ namespace PspCrypto
                 return ret;
             }
 
-            var discInfo = Utils.AsRef<sceDiscInfo>(sceDiskInfo);
+            var discInfo = MemoryMarshal.AsRef<SceDiscInfo>(sceDiskInfo);
             ret = unchecked((int)0x80870005);
             if (discInfo.DiscCount > 6)
             {
@@ -854,7 +852,7 @@ namespace PspCrypto
                         return ret;
                     }
                     discInfo.DiscsSig.CopyTo(sceEbootPbp.NpUmdImgSig);
-                    var ebootsigDigst = sha224.ComputeHash(ebootSigtmp.Slice(0, 0x1C8).ToArray());
+                    var ebootsigDigst = sha224.ComputeHash(ebootSigtmp[..0x1C8].ToArray());
                     ret = SceSblGcAuthMgrDrmBBForDriver_050DC6DF(ebootsigDigst, sceEbootPbp.Sig, 1);
                     if (ret != 0)
                     {
@@ -874,13 +872,13 @@ namespace PspCrypto
             var sha224 = SHA224.Create();
             var ret = unchecked((int)0x80870005);
             stream.Seek(0, SeekOrigin.Begin);
-            buffer = buffer.Slice(0, blockSize);
+            buffer = buffer[..blockSize];
             var readSize = stream.Read(buffer);
             if (readSize < 0x28)
             {
                 return ret;
             }
-            var pbpHeader = Utils.AsRef<PbpHeader>(buffer);
+            var pbpHeader = MemoryMarshal.AsRef<PbpHeader>(buffer);
             if (pbpHeader.Sig != 0x50425000)
             {
                 return ret;
@@ -925,7 +923,7 @@ namespace PspCrypto
                     toRead = blockSize;
                 }
 
-                readSize = stream.Read(buffer.Slice(0, toRead));
+                readSize = stream.Read(buffer[..toRead]);
                 if (readSize == 0)
                 {
                     return -1;
@@ -968,7 +966,7 @@ namespace PspCrypto
                                     toRead = blockSize;
                                 }
 
-                                readSize = stream.Read(buffer.Slice(0, toRead));
+                                readSize = stream.Read(buffer[..toRead]);
                                 if (readSize == 0)
                                 {
                                     return -1;
@@ -997,7 +995,7 @@ namespace PspCrypto
             sha224.Hash.CopyTo(dataDigest);
 
             stream.Seek(pbpHeader.DataPsarOff, SeekOrigin.Begin);
-            readSize = stream.Read(buffer.Slice(0, 0x100));
+            readSize = stream.Read(buffer[..0x100]);
             if (readSize == 0x100)
             {
                 ret = 0;
@@ -1012,13 +1010,14 @@ namespace PspCrypto
 
         private static int SceNpDrmEbootSigGen(string fileName, int type, Span<byte> ebootSig, int swVer, Span<byte> buffer, int blockSize)
         {
-            if(string.IsNullOrWhiteSpace(fileName)) return -0x7f78ffff;
+            if (string.IsNullOrWhiteSpace(fileName)) return -0x7f78ffff;
             var fi = new FileInfo(fileName);
             if (!fi.Exists)
             {
                 return -1;
             }
-            using(FileStream fstream = fi.OpenRead()){
+            using (FileStream fstream = fi.OpenRead())
+            {
                 return SceNpDrmEbootSigGen(fstream, type, ebootSig, swVer, buffer, blockSize);
             }
 
@@ -1028,7 +1027,7 @@ namespace PspCrypto
             Span<byte> pbpHdrDigest = stackalloc byte[32];
             Span<byte> npUmdImgDigest = stackalloc byte[32];
             Span<byte> ebootSigtmp = stackalloc byte[512];
-            ref var sceEbootPbp = ref Utils.AsRef<SceEbootPbp>(ebootSigtmp);
+            ref var sceEbootPbp = ref MemoryMarshal.AsRef<SceEbootPbp>(ebootSigtmp);
             if ((blockSize & 0x3F) != 0)
             {
                 blockSize &= unchecked((int)0xFFFFFFC0);
@@ -1039,12 +1038,12 @@ namespace PspCrypto
                 return -0x7f78ffff;
             }
 
-            Span<byte> secureTick = BitConverter.GetBytes(ksceRtcGetCurrentSecureTick()); 
+            Span<byte> secureTick = BitConverter.GetBytes(ksceRtcGetCurrentSecureTick());
 
             ebootSig.Fill(0);
             sceEbootPbp.SwVer = swVer;
             sceEbootPbp.Aid = Aid;
-            sceEbootPbp.SecureTick = Utils.AsRef<ulong>(secureTick);
+            sceEbootPbp.SecureTick = MemoryMarshal.AsRef<ulong>(secureTick);
 
             long flen = ebootStream.Length;
             int ret = SceEbootPbpDigest(ebootStream, flen, pbpHdrDigest, npUmdImgDigest, buffer, blockSize);
@@ -1052,14 +1051,14 @@ namespace PspCrypto
             {
                 return ret;
             }
-            
+
             sceEbootPbp.KeyType = 1;
             sceEbootPbp.PbpSize = flen;
             sceEbootPbp.Type = type;
-            var psarSig = Encoding.ASCII.GetString(buffer.Slice(0, 8));
+            var psarSig = Encoding.ASCII.GetString(buffer[..8]);
             if (type == 3)
             {
-                if (psarSig != "PSISOIMG")
+                if (psarSig != "PSISOIMG" && psarSig != "PSTITLEI")
                 {
                     return -0x7f78fffb;
                 }
@@ -1089,7 +1088,7 @@ namespace PspCrypto
             }
 
             var sha224 = SHA224.Create();
-            var ebootsigDigst = sha224.ComputeHash(ebootSigtmp.Slice(0, 0x1C8).ToArray());
+            var ebootsigDigst = sha224.ComputeHash(ebootSigtmp[..0x1C8].ToArray());
             ret = SceSblGcAuthMgrDrmBBForDriver_050DC6DF(ebootsigDigst, sceEbootPbp.Sig, 1);
             if (ret < 0)
             {
@@ -1106,14 +1105,14 @@ namespace PspCrypto
             var sha224 = SHA224.Create();
             var ret = unchecked((int)0x80870005);
             stream.Seek(0, SeekOrigin.Begin);
-            buffer = buffer.Slice(0, blockSize);
+            buffer = buffer[..blockSize];
             var readSize = stream.Read(buffer);
             if (readSize < 0x28)
             {
                 return ret;
             }
 
-            var pbpHeader = Utils.AsRef<PbpHeader>(buffer);
+            var pbpHeader = MemoryMarshal.AsRef<PbpHeader>(buffer);
             if (fileSize < pbpHeader.DataPsarOff + 0xFF || pbpHeader.Sig != 0x50425000)
             {
                 return ret;
@@ -1182,7 +1181,7 @@ namespace PspCrypto
                 sha224.TransformFinalBlock(buffer.ToArray(), 0, 0);
                 sha224.Hash.CopyTo(npUmdImgDigest);
                 stream.Seek(pbpHeader.DataPsarOff, SeekOrigin.Begin);
-                readSize = stream.Read(buffer.Slice(0, 0x100));
+                readSize = stream.Read(buffer[..0x100]);
                 if (readSize == 0x100)
                 {
                     ret = 0;
@@ -1199,7 +1198,7 @@ namespace PspCrypto
 
         private static int SceNpDrmPspEbootSigGen(string fileName, Span<byte> ebootSig, Span<byte> buffer, int blockSize)
         {
-            if(string.IsNullOrWhiteSpace(fileName))
+            if (string.IsNullOrWhiteSpace(fileName))
                 return -0x7f78ffff;
 
             var fi = new FileInfo(fileName);
@@ -1207,18 +1206,18 @@ namespace PspCrypto
             {
                 return -1;
             }
-            using(FileStream fs = fi.OpenRead())
+            using (FileStream fs = fi.OpenRead())
             {
                 return SceNpDrmPspEbootSigGen(fs, ebootSig, buffer, blockSize);
             }
         }
 
-        private static int SceNpDrmPspEbootSigGen(Stream ebootStream, Span<byte> ebootSig, Span<byte> buffer,int blockSize)
+        private static int SceNpDrmPspEbootSigGen(Stream ebootStream, Span<byte> ebootSig, Span<byte> buffer, int blockSize)
         {
             Span<byte> pbpHdrDigest = stackalloc byte[32];
             Span<byte> npUmdImgDigest = stackalloc byte[32];
             Span<byte> ebootSigtmp = stackalloc byte[0x100];
-            ref var sceEbootPbp = ref Utils.AsRef<SceEbootPbp100>(ebootSigtmp);
+            ref var sceEbootPbp = ref MemoryMarshal.AsRef<SceEbootPbp100>(ebootSigtmp);
             if ((blockSize & 0x3F) != 0)
             {
                 blockSize &= unchecked((int)0xFFFFFFC0);
@@ -1236,11 +1235,11 @@ namespace PspCrypto
                 return ret;
             }
 
-            if (Encoding.ASCII.GetString(buffer.Slice(0, 8)) != "NPUMDIMG")
+            if (Encoding.ASCII.GetString(buffer[..8]) != "NPUMDIMG")
             {
                 return -0x7f78fffb;
             }
-            buffer.Slice(0, 0x40).CopyTo(ebootSigtmp);
+            buffer[..0x40].CopyTo(ebootSigtmp);
             sceEbootPbp.Type = 0;
             sceEbootPbp.Magic = 0x474953444D55504E;
 
@@ -1257,7 +1256,7 @@ namespace PspCrypto
             }
 
             var sha224 = SHA224.Create();
-            var ebootsigDigst = sha224.ComputeHash(ebootSigtmp.Slice(0, 0xC8).ToArray());
+            var ebootsigDigst = sha224.ComputeHash(ebootSigtmp[..0xC8].ToArray());
             ret = SceSblGcAuthMgrDrmBBForDriver_050DC6DF(ebootsigDigst, sceEbootPbp.Sig, 1);
             if (ret < 0)
             {
