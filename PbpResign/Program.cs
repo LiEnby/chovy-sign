@@ -369,7 +369,7 @@ namespace PbpResign
             AMCTRL.sceDrmBBCipherInit(out var ckey, 1, 2, npHdr.HeaderKey, vkey, 0);
             AMCTRL.sceDrmBBCipherUpdate(ref ckey, psarBuff[0x40..], 0x60);
             AMCTRL.sceDrmBBCipherFinal(ref ckey);
-            npHdr = Utils.AsRef<NpUmdImgHdr>(psarBuff);
+            npHdr = MemoryMarshal.AsRef<NpUmdImgHdr>(psarBuff);
 
             var lbasize = npHdr.Body.LbaEnd - npHdr.Body.LbaStart + 1;
             if (npHdr.BlockBasis == 0)
@@ -1059,7 +1059,7 @@ namespace PbpResign
                 return false;
             }
 
-            ref var npHdr = ref Utils.AsRef<NpUmdImgHdr>(psarBuff);
+            ref var npHdr = ref MemoryMarshal.AsRef<NpUmdImgHdr>(psarBuff);
 
             if (npHdr.Magic0 == 0x4d55504e && npHdr.Magic1 == 0x474d4944)
             {
@@ -1189,7 +1189,7 @@ namespace PbpResign
                     return;
                 }
 
-                var pbpHdr = Utils.AsRef<PbpHeader>(hdr);
+                var pbpHdr = MemoryMarshal.AsRef<PbpHeader>(hdr);
                 if (pbpHdr.Sig != 0x50425000)
                 {
                     Console.WriteLine("Wrong pbp sig");

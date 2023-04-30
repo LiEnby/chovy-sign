@@ -169,7 +169,7 @@ namespace PspCrypto
             {
                 throw new ArgumentException("stream too small", nameof(stream));
             }
-            var header = Utils.AsRef<PgdHeader>(hdr);
+            var header = MemoryMarshal.AsRef<PgdHeader>(hdr);
             _keyIndex = header.KeyIndex;
             if (_keyIndex == 1)
             {
@@ -234,7 +234,7 @@ namespace PspCrypto
                 throw new IOException("Wrong MAC 0x80");
             }
 
-            if (!Utils.isEmpty(_versionKey, 0x10))
+            if (!Utils.IsEmpty(_versionKey, 0x10))
             {
                 ret = CheckBBMac(hdr, 0x70, _versionKey, header.Hash70, macType);
             }
@@ -253,7 +253,7 @@ namespace PspCrypto
             {
                 throw new IOException($"Error 0x{ret:X8}");
             }
-            var desc = Utils.AsRef<PgdDesc>(header.PgdDesc);
+            var desc = MemoryMarshal.AsRef<PgdDesc>(header.PgdDesc);
             if (desc.Version != 0)
             {
                 throw new IOException($"Error 0x{8051020:X8}");

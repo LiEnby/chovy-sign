@@ -67,7 +67,7 @@ namespace PspCrypto
         static int Kirk4(Span<byte> buf, int size, int type)
         {
             int retv;
-            ref var hdr = ref Utils.AsRef<KIRKEngine.KIRK_AES128CBC_HEADER>(buf);
+            ref var hdr = ref MemoryMarshal.AsRef<KIRKEngine.KIRK_AES128CBC_HEADER>(buf);
             hdr.mode = KIRKEngine.KIRK_MODE_ENCRYPT_CBC;
             hdr.keyseed = type;
             hdr.data_size = size;
@@ -83,7 +83,7 @@ namespace PspCrypto
         static int Kirk5(Span<byte> buf, int size)
         {
             int retv;
-            ref var hdr = ref Utils.AsRef<KIRKEngine.KIRK_AES128CBC_HEADER>(buf);
+            ref var hdr = ref MemoryMarshal.AsRef<KIRKEngine.KIRK_AES128CBC_HEADER>(buf);
             hdr.mode = KIRKEngine.KIRK_MODE_ENCRYPT_CBC;
             hdr.keyseed = 0x0100;
             hdr.data_size = size;
@@ -99,7 +99,7 @@ namespace PspCrypto
         static int Kirk7(Span<byte> buf, int size, int type)
         {
             int retv;
-            ref var hdr = ref Utils.AsRef<KIRKEngine.KIRK_AES128CBC_HEADER>(buf);
+            ref var hdr = ref MemoryMarshal.AsRef<KIRKEngine.KIRK_AES128CBC_HEADER>(buf);
             hdr.mode = KIRKEngine.KIRK_MODE_DECRYPT_CBC;
             hdr.keyseed = type;
             hdr.data_size = size;
@@ -115,7 +115,7 @@ namespace PspCrypto
         static int Kirk8(Span<byte> buf, int size)
         {
             int retv;
-            ref var hdr = ref Utils.AsRef<KIRKEngine.KIRK_AES128CBC_HEADER>(buf);
+            ref var hdr = ref MemoryMarshal.AsRef<KIRKEngine.KIRK_AES128CBC_HEADER>(buf);
             hdr.mode = KIRKEngine.KIRK_MODE_DECRYPT_CBC;
             hdr.keyseed = 0x0100;
             hdr.data_size = size;
@@ -553,7 +553,7 @@ namespace PspCrypto
 
         public static int sceDrmBBMacFinal2(Span<byte> mkey, ReadOnlySpan<byte> hash, ReadOnlySpan<byte> vkey)
         {
-            int i, retv, type;
+            int retv, type;
             byte[] tmp = new byte[16];
             int kbuf;
             ref MAC_KEY macKey = ref MemoryMarshal.AsRef<MAC_KEY>(mkey);

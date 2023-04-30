@@ -35,7 +35,7 @@ namespace PspCrypto
 
             data[..dataSize].CopyTo(pgdData[dataOffset..]);
 
-            ref var pgdHdr = ref Utils.AsRef<PgdHeader>(pgdData);
+            ref var pgdHdr = ref MemoryMarshal.AsRef<PgdHeader>(pgdData);
             pgdHdr.Magic = 0x44475000;
             pgdHdr.KeyIndex = keyIndex;
             pgdHdr.DrmType = drmType;
@@ -81,7 +81,7 @@ namespace PspCrypto
             }
 
             // Set the decryption parameters in the decrypted header.
-            ref var pgdDesc = ref Utils.AsRef<PgdDesc>(pgdHdr.PgdDesc);
+            ref var pgdDesc = ref MemoryMarshal.AsRef<PgdDesc>(pgdHdr.PgdDesc);
             pgdDesc.DataSize = dataSize;
             pgdDesc.BlockSize = blockSize;
             pgdDesc.DataOffset = dataOffset;
