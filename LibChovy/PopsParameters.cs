@@ -16,16 +16,16 @@ namespace LibChovy
         public PopsParameters(NpDrmInfo drmInfo, NpDrmRif rif) : base(drmInfo, rif)
         {
             Type = ChovyTypes.POPS;
-            discList = new List<DiscInfo>();
+            discList = new List<PSInfo>();
         }
         private string? nameOverride;
-        private List<DiscInfo> discList;
+        private List<PSInfo> discList;
 
         private byte[]? pic0;
         private byte[]? pic1;
         private byte[]? icon0;
 
-        public DiscInfo FirstDisc
+        public PSInfo FirstDisc
         {
             get
             {
@@ -101,7 +101,7 @@ namespace LibChovy
 
         public void AddCd(string cd)
         {
-            DiscInfo disc = new DiscInfo(cd);
+            PSInfo disc = new PSInfo(cd);
             if (nameOverride is not null) disc.DiscName = nameOverride;
             else discList.Add(disc);
         }
@@ -116,7 +116,7 @@ namespace LibChovy
                 }
             }
         }
-        public DiscInfo[] Discs
+        public PSInfo[] Discs
         {
             get
             {

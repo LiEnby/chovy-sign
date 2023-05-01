@@ -49,9 +49,9 @@ namespace GameBuilder.Cue
             return offset;
         }
 
-        public static DiscIndex SectorToIdx(int sector)
+        public static DiscIndex SectorToIdx(int sector, byte index=1)
         {
-            DiscIndex idx = new DiscIndex(1);
+            DiscIndex idx = new DiscIndex(index);
 
             int x = sector;
             int f = sector % 75;

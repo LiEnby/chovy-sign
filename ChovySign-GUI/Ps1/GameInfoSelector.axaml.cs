@@ -84,7 +84,7 @@ namespace ChovySign_GUI.Ps1
         {
             try
             {
-                DiscInfo disc = new DiscInfo(cueFile);
+                PSInfo disc = new PSInfo(cueFile);
                 Title = disc.DiscName;
 
                 byte[] newCover = await Downloader.DownloadCover(disc);

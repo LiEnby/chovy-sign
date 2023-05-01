@@ -2,6 +2,7 @@
 using DiscUtils.Raw;
 using DiscUtils.Streams;
 using GameBuilder.Cue;
+using GameBuilder.Pops.LibCrypt;
 using Li.Utilities;
 using System;
 using System.Collections.Generic;
@@ -11,12 +12,20 @@ using System.Threading.Tasks;
 
 namespace GameBuilder.Pops
 {
-    public class DiscInfo
+    public class PSInfo
     {
         private string cueFile;
         private string discName;
         private string discId;
+        private LibCryptInfo lc;
 
+        public LibCryptInfo LibCrypt
+        {
+            get
+            {
+                return lc;
+            }
+        }
         public string? SbiFile
         {
             get
@@ -62,7 +71,7 @@ namespace GameBuilder.Pops
             }
         }
 
-        public DiscInfo(string cueFile)
+        public PSInfo(string cueFile)
         {
             this.cueFile = cueFile;
 
@@ -102,6 +111,10 @@ namespace GameBuilder.Pops
             if (discName == "") discName = Path.GetFileNameWithoutExtension(cueFile);
             if (discId is null) discId = "SLUS00001";
 
+            if (this.SbiFile is not null)
+                this.lc = new LibCryptInfo(new SbiReader(this.SbiFile), LibCryptMethod.METHOD_MAGIC_WORD);
+            else
+                this.lc = new LibCryptInfo(null, LibCryptMethod.METHOD_MAGIC_WORD);
         }
     }
 }

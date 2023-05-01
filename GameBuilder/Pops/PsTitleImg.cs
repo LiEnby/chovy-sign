@@ -24,7 +24,7 @@ namespace GameBuilder.Pops
             this.updateProgress(inf.Done, inf.Remain, inf.CurrentProcess + " (disc " + discNumber + ")");
         }
 
-        public PsTitleImg(NpDrmInfo drmInfo, DiscInfo[] discs) : base(drmInfo)
+        public PsTitleImg(NpDrmInfo drmInfo, PSInfo[] discs) : base(drmInfo)
         {
             if (discs.Length > MAX_DISCS) throw new Exception("Sorry, multi disc games only support up to 5 discs... (i dont make the rules)");
             this.compressors = new DiscCompressor[MAX_DISCS];
@@ -171,7 +171,7 @@ namespace GameBuilder.Pops
             base.Dispose();
         }
 
-        private DiscInfo[] discs;
+        private PSInfo[] discs;
         private DiscCompressor[] compressors;
 
         private MemoryStream isoPart;

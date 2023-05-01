@@ -13,7 +13,7 @@ namespace LibChovy.Art
         private const string coverApi = "https://raw.githubusercontent.com/xlenore/psx-covers/main/covers/";
         private static HttpClient httpClient = new HttpClient();
 
-        public static async Task<byte[]> DownloadCover(DiscInfo game)
+        public static async Task<byte[]> DownloadCover(PSInfo game)
         {
             string discIdDash = game.DiscId.Substring(0, 4) + "-" + game.DiscId.Substring(4, 5);
 

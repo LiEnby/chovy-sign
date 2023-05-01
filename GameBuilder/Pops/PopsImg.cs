@@ -1,4 +1,5 @@
 ﻿using GameBuilder;
+using GameBuilder.Cue;
 using GameBuilder.Psp;
 using Li.Utilities;
 using PspCrypto;
@@ -21,16 +22,10 @@ namespace GameBuilder.Pops
 
             this.StartDat = NpDrmPsar.CreateStartDat(Resources.STARTDATPOPS);
             this.createSimpleDat();
-            this.SimplePgd = generateSimplePgd();
+            this.SimplePgd = CreatePgd(simple.ToArray());
 
         }
-
-        private MemoryStream simple;
-        private StreamUtil simpleUtil;
-        public byte[] StartDat;
-        public byte[] SimplePgd;
-
-        private void createSimpleDat()
+        internal void createSimpleDat()
         {
             simpleUtil.WriteStr("SIMPLE  ");
             simpleUtil.WriteInt32(100);
@@ -41,17 +36,15 @@ namespace GameBuilder.Pops
 
             simpleUtil.WriteBytes(Resources.SIMPLE);
         }
-        private byte[] generateSimplePgd()
+        public byte[] CreatePgd(byte[] buffer)
         {
-            simple.Seek(0x0, SeekOrigin.Begin);
-            byte[] simpleData = simple.ToArray();
 
-            int simpleSz = DNASHelper.CalculateSize(simpleData.Length, 0x400);
-            byte[] simpleEnc = new byte[simpleSz];
+            int bufferSz = DNASHelper.CalculateSize(buffer.Length, 0x400);
+            byte[] bufferEnc = new byte[bufferSz];
 
             // get pgd
-            int sz = DNASHelper.Encrypt(simpleEnc, simpleData, DrmInfo.VersionKey, simpleData.Length, DrmInfo.KeyIndex, 1, blockSize: 0x400);
-            byte[] pgd = simpleEnc.ToArray();
+            int sz = DNASHelper.Encrypt(bufferEnc, buffer, DrmInfo.VersionKey, buffer.Length, DrmInfo.KeyIndex, 1, blockSize: 0x400);
+            byte[] pgd = bufferEnc.ToArray();
             Array.Resize(ref pgd, sz);
 
             return pgd;
@@ -80,7 +73,11 @@ namespace GameBuilder.Pops
             return loaderEnc.ToArray();
         }
 
+        private MemoryStream simple;
+        private StreamUtil simpleUtil;
 
+        public byte[] StartDat;
+        public byte[] SimplePgd;
 
     }
 }

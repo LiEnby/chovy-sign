@@ -15,13 +15,13 @@ namespace GameBuilder.Pops
             this.compressor = discCompressor;
         }
 
-        public PsIsoImg(NpDrmInfo versionKey, DiscInfo disc, IAtracEncoderBase encoder) : base(versionKey)
+        public PsIsoImg(NpDrmInfo versionKey, PSInfo disc, IAtracEncoderBase encoder) : base(versionKey)
         {
             this.compressor = new DiscCompressor(this, disc, encoder);
             this.compressor.RegisterCallback(onProgress);
         }
 
-        public PsIsoImg(NpDrmInfo versionKey, DiscInfo disc) : base(versionKey)
+        public PsIsoImg(NpDrmInfo versionKey, PSInfo disc) : base(versionKey)
         {
             this.compressor = new DiscCompressor(this, disc, new Atrac3ToolEncoder());
             this.compressor.RegisterCallback(onProgress);
@@ -34,7 +34,7 @@ namespace GameBuilder.Pops
 
             psarUtil.WritePadding(0x00, 0x3ec); // Skip forwards
 
-            byte[] isoHdrPgd = compressor.GenerateIsoPgd();
+            byte[] isoHdrPgd = this.CreatePgd(compressor.IsoHeader.ToArray());
             psarUtil.WriteBytes(isoHdrPgd);
             psarUtil.PadUntil(0x00, compressor.IsoOffset);
         }
@@ -45,7 +45,8 @@ namespace GameBuilder.Pops
             compressor.GenerateIsoHeaderAndCompress();
 
             // write STARTDAT location
-            compressor.WriteSimpleDatLocation((compressor.IsoOffset + compressor.CompressedIso.Length) + StartDat.Length);
+            UInt32 simpleDatLocation = Convert.ToUInt32((compressor.IsoOffset + compressor.CompressedIso.Length) + StartDat.Length);
+            compressor.WriteSimpleDatLocation(simpleDatLocation);
             
             // write general PSISO header
             generatePsIsoHeader();

@@ -138,6 +138,21 @@ namespace Li.Utilities
         {
             WriteBytes(BitConverter.GetBytes(v).Reverse().ToArray());
         }
+        public void WriteInt32At(Int32 v, long location)
+        {
+            long oldPos = s.Position;
+            s.Seek(location, SeekOrigin.Begin);
+            WriteInt32(v);
+            s.Seek(oldPos, SeekOrigin.Begin);
+        }
+        public void WriteUInt32At(UInt32 v, long location)
+        {
+            long oldPos = s.Position;
+            s.Seek(location, SeekOrigin.Begin);
+            WriteUInt32(v);
+            s.Seek(oldPos, SeekOrigin.Begin);
+        }
+
         public void WriteInt32(Int32 v)
         {
             WriteBytes(BitConverter.GetBytes(v));

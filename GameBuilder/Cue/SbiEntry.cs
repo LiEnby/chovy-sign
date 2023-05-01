@@ -9,7 +9,7 @@ namespace GameBuilder.Cue
     public class SbiEntry
     {
         public DiscIndex MSF;
-        byte[] TOC;
+        public DiscTrack TOC;
         public int Sector
         {
             get
@@ -18,7 +18,7 @@ namespace GameBuilder.Cue
             }
         }
 
-        public SbiEntry(DiscIndex Msf, byte[] Toc)
+        public SbiEntry(DiscIndex Msf, DiscTrack Toc)
         {
             MSF = Msf;
             TOC = Toc;

@@ -20,14 +20,11 @@ namespace GameBuilder.Pops
         const int DEFAULT_ISO_OFFSET = 0x100000;
         public int IsoOffset;
 
-        internal DiscCompressor(PopsImg srcImg, DiscInfo disc, IAtracEncoderBase encoder, int offset = DEFAULT_ISO_OFFSET)
+        internal DiscCompressor(PopsImg srcImg, PSInfo disc, IAtracEncoderBase encoder, int offset = DEFAULT_ISO_OFFSET)
         {
             this.srcImg = srcImg;
             this.disc = disc;
             this.cue = new CueReader(disc.CueFile);
-
-            if (disc.SbiFile is not null)
-                this.sbi = new SbiReader(disc.SbiFile);
 
             this.IsoHeader = new MemoryStream();
             this.CompressedIso = new MemoryStream();
@@ -71,23 +68,6 @@ namespace GameBuilder.Pops
         {
             isoHeaderUtil.WriteStrWithPadding(disc.DiscIdHdr, 0x00, 0x400);
         }
-
-
-        public byte[] GenerateIsoPgd()
-        {
-            IsoHeader.Seek(0x0, SeekOrigin.Begin);
-            byte[] isoHdr = IsoHeader.ToArray();
-
-            int headerSize = DNASHelper.CalculateSize(isoHdr.Length, 0x400);
-            byte[] headerEnc = new byte[headerSize];
-
-            int sz = DNASHelper.Encrypt(headerEnc, isoHdr, srcImg.DrmInfo.VersionKey, isoHdr.Length, srcImg.DrmInfo.KeyIndex, 1, blockSize: 0x400);
-            byte[] isoHdrPgd = headerEnc.ToArray();
-            Array.Resize(ref isoHdrPgd, sz);
-
-            return isoHdrPgd;
-        }
-
         private void writeIsoLocation()
         {
             isoHeaderUtil.WriteInt32(0);
@@ -96,7 +76,7 @@ namespace GameBuilder.Pops
 
             isoHeaderUtil.WriteInt32(IsoOffset); // always 0x100000 on single disc game
 
-            isoHeaderUtil.WritePadding(0x00, 0x620);
+            isoHeaderUtil.WritePadding(0x00, 0x628);
         }
 
         private void writeCompressedIso()
@@ -113,59 +93,68 @@ namespace GameBuilder.Pops
                 }
             }
         }
+
+        private void writeSubChannelPgd()
+        {
+            if(disc.LibCrypt.Method == LibCryptMethod.METHOD_SUB_CHANNEL)
+            {
+                byte[] subChannelsData = disc.LibCrypt.Subchannels;
+                
+                int sz = subChannelsData.Length / 0xC;
+                uint location = Convert.ToUInt32(IsoOffset + CompressedIso.Position);
+                writeSubchannelDatLocation(location, sz);
+
+                byte[] pgdData = srcImg.CreatePgd(subChannelsData);
+
+                CompressedIso.Write(pgdData, 0, pgdData.Length);
+            }
+        }
+
         public void GenerateIsoHeaderAndCompress()
         {
             writeHeader();
             writeTOC();
             writeIsoLocation();
-            writeName();
+            writeDiscInfo();
             writeLibCryptData();
 
             writeCompressedIso();
 
             isoHeaderUtil.PadUntil(0x0, 0xb3880);
 
-            // now write CD-Audio data.
+            // write CD Audio data.
             writeCompressedCDATracks();
+
+            // write subchannels
+            writeSubChannelPgd();
         }
 
-        public void WriteSimpleDatLocation(Int64 location)
+        private void writeSubchannelDatLocation(uint location, int totalSubchannels)
         {
-            IsoHeader.Seek(0xE20, SeekOrigin.Begin);
-            isoHeaderUtil.WriteInt64(location); 
+            isoHeaderUtil.WriteUInt32At(location, 0xED4);
+            isoHeaderUtil.WriteInt32At(totalSubchannels, 0xED8);
         }
 
-        private int obfuscateMagicWord()
+        public void WriteSimpleDatLocation(uint location)
         {
-            int magicWord = 0;
-
-            if (sbi is not null) magicWord = MagicWord.GenMagicWord(sbi.Entries);
-
-            return magicWord ^ 0x72d0ee59;
+            isoHeaderUtil.WriteUInt32At(location, 0xE20); 
         }
+
         private void writeLibCryptData()
         {
-            // obfuscated libcrypt magic word
-            isoHeaderUtil.WriteInt32(obfuscateMagicWord());
+            isoHeaderUtil.WriteInt32(disc.LibCrypt.ObfuscatedMagicWord);
             isoHeaderUtil.WriteInt32(0);
             isoHeaderUtil.WriteInt32(0);
             isoHeaderUtil.WriteInt32(0);
-
 
             isoHeaderUtil.WritePadding(0, 0x2D40);
 
         }
-        private void writeName()
+        private void writeDiscInfo()
         {
-            // copied from crash bandicoot warped
-
-            isoHeaderUtil.WriteInt64(0x00); // SIMPLE.DAT location
-
-            isoHeaderUtil.WriteInt32(2047); // unk
-            isoHeaderUtil.WriteStrWithPadding(disc.DiscName, 0x00, 0x80);
+            isoHeaderUtil.WriteUInt32(Convert.ToUInt32(disc.LibCrypt.Method)); // libcrypt method
+            isoHeaderUtil.WriteStrWithPadding(disc.DiscName, 0x00, 0x80);  // disc title
             isoHeaderUtil.WriteInt32(3); // PARENTAL_LEVEL ?
-
-
         }
 
         private void writeCDAEntry(int position, int length, uint key)
@@ -248,7 +237,7 @@ namespace GameBuilder.Pops
             cue.Dispose();
         }
 
-        private DiscInfo disc;
+        private PSInfo disc;
         private CueReader cue;
         private SbiReader sbi;
         private PopsImg srcImg;

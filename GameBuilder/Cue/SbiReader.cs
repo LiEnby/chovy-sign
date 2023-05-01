@@ -19,6 +19,20 @@ namespace GameBuilder.Cue
             }
         }
 
+        private DiscIndex readMsfi()
+        {
+            byte m = CueReader.BinaryDecimalToDecimal(sbiUtil.ReadByte());
+            byte s = CueReader.BinaryDecimalToDecimal(sbiUtil.ReadByte());
+            byte f = CueReader.BinaryDecimalToDecimal(sbiUtil.ReadByte());
+            byte i = CueReader.BinaryDecimalToDecimal(sbiUtil.ReadByte());
+
+            DiscIndex idx = new DiscIndex(i);
+            idx.Mrel = m;
+            idx.Srel = s;
+            idx.Frel = f;
+            return idx;
+        }
+
         private void init(Stream sbiFile)
         {
             sbiEntries = new List<SbiEntry>();
@@ -30,16 +44,9 @@ namespace GameBuilder.Cue
 
             do
             {
-                byte m = CueReader.BinaryDecimalToDecimal(sbiUtil.ReadByte());
-                byte s = CueReader.BinaryDecimalToDecimal(sbiUtil.ReadByte());
-                byte f = CueReader.BinaryDecimalToDecimal(sbiUtil.ReadByte());
-                byte i = CueReader.BinaryDecimalToDecimal(sbiUtil.ReadByte());
-                byte[] toc = sbiUtil.ReadBytes(0xA);
+                DiscIndex idx = readMsfi();
+                DiscTrack toc = DiscTrack.FromTocEntry(sbiUtil.ReadBytes(0xA));
 
-                DiscIndex idx = new DiscIndex(i);
-                idx.Mrel = m;
-                idx.Srel = s;
-                idx.Frel = f;
                 sbiEntries.Add(new SbiEntry(idx, toc));
             } while (sbiFile.Position < sbiFile.Length);
         }
