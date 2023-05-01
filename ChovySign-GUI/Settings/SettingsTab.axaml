@@ -1,0 +1,31 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:Settings="clr-namespace:ChovySign_GUI.Settings"
+			 mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+			 x:Class="ChovySign_GUI.Settings.SettingsTab">
+	<Grid>
+		<Grid.ColumnDefinitions>
+			<ColumnDefinition Width="1*"/>
+			<ColumnDefinition Width="10*"/>
+			<ColumnDefinition Width="1*"/>
+		</Grid.ColumnDefinitions>
+		<Grid Grid.Column="1">
+			<Grid.RowDefinitions>
+				<RowDefinition Height="1*"/>
+				<RowDefinition Height="1*"/>
+				<RowDefinition Height="1*"/>
+			</Grid.RowDefinitions>
+			<Settings:ConfigToggle Name="devkitAccount" ConfigKey="USE_DEVKIT_ACCOUNT_ID" Label="Devkit Mode (Use 0x0000000000000000 Account ID)"
+								   Prompt="This option will force the CMA Account ID to be all 0's&#x0a;Which is how it is on Devkit, Testkit and IDU Firmware&#x0a;Enabling this if you have a retail firmware will result in the games just *not* showing up&#x0a;&#x0a;If you DON'T know what this means, DON'T enable this.&#x0a;do you want to continue?"
+								   HorizontalAlignment="Stretch" Grid.Row="0"/>
+			
+			<Settings:ConfigPath Name="cmaDirectory" ConfigKey="USE_CMA_DIRECTORY" IsDirectory="True" Label="Output Folder:" HorizontalAlignment="Stretch" Grid.Row="1"/>
+
+			<Settings:ConfigDropDown Name="libCryptMode" ConfigKey="USE_LIBCRYPT_METHOD" Label="LibCrypt Method:" HorizontalAlignment="Stretch" Grid.Row="2"/>
+
+		</Grid>
+	</Grid>
+	
+</UserControl>

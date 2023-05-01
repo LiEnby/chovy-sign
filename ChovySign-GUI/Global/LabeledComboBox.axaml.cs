@@ -52,6 +52,12 @@ namespace ChovySign_GUI.Global
 
         public string[] Items
         {
+            get
+            {
+                string[]? strings = this.comboBox.Items as string[];
+                if (strings is null) return new string[0];
+                return strings;
+            }
             set
             {
                 this.comboBox.Items = value;

@@ -1,11 +1,13 @@
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using ChovySign_GUI.Popup.Global;
+using ChovySign_GUI.Settings;
 using GameBuilder.Psp;
 using LibChovy;
 using LibChovy.Config;
 using System;
 using System.Media;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using Vita.ContentManager;
 using static ChovySign_GUI.Popup.Global.MessageBox;
@@ -36,7 +38,7 @@ namespace ChovySign_GUI.Psp
         {
             keySelector.IsEnabled = true;
             isoSelector.IsEnabled = true;
-            devkitAccount.IsEnabled = true;
+            SettingsTab.Settings.IsEnabled = false;
 
             Window? currentWindow = this.VisualRoot as Window;
             if (currentWindow is not Window) throw new Exception("could not find current window");
@@ -48,8 +50,9 @@ namespace ChovySign_GUI.Psp
         private void onProcessStarting(object? sender, EventArgs e)
         {
             keySelector.IsEnabled = false;
-            devkitAccount.IsEnabled = false;
             isoSelector.IsEnabled = false;
+            SettingsTab.Settings.IsEnabled = false;
+
             if (keySelector.Rif is null) return;
             if (keySelector.VersionKey is null) return;
 
@@ -63,8 +66,9 @@ namespace ChovySign_GUI.Psp
             pspParameters.Umd = umd;
             pspParameters.Compress = isoSelector.Compress;
 
-            if (devkitAccount.IsDevkitMode)
-                pspParameters.Account = new Account(0);
+            // read settings from settings tab.
+            if (SettingsTab.Settings.DevkitMode) pspParameters.Account = new Account(0);
+            SettingsReader.BackupsFolder = SettingsTab.Settings.CmaDirectory;
 
             progressStatus.Parameters = pspParameters;
         }

@@ -81,6 +81,47 @@ namespace GameBuilder {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to SCES00311 87AA
+        ///SCES01431 6547
+        ///SCES01444 BD44
+        ///SCES01492 D16A
+        ///SCES01493 197A
+        ///SCES01494 AAA6
+        ///SCES01495 0E57
+        ///SCES01516 44F6
+        ///SCES01517 AE85
+        ///SCES01518 9C27
+        ///SCES01519 364B
+        ///SCES01564 CEC1
+        ///SCES01695 89EA
+        ///SCES01700 4717
+        ///SCES01701 C49E
+        ///SCES01702 672A
+        ///SCES01703 883F
+        ///SCES01704 CE32
+        ///SCES01763 096F
+        ///SCES01882 B364
+        ///SCES01909 E788
+        ///SCES01979 0D9D
+        ///SCES02004 C437
+        ///SCES02005 9137
+        ///SCES02006 7554
+        ///SCES02007 E686
+        ///SCES02028 9AD4
+        ///SCES02029 26B6
+        ///SCES02030 23D9
+        ///SCES02031 D325
+        ///SCES02080 9DE0
+        ///SCES02104 744B
+        /// [rest of string was truncated]&quot;;.
+        /// </summary>
+        public static string MAGICWORDS {
+            get {
+                return ResourceManager.GetString("MAGICWORDS", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized resource of type System.Byte[].
         /// </summary>
         public static byte[] SIMPLE {

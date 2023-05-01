@@ -69,6 +69,10 @@ namespace GameBuilder.Pops
             {
                 return discId.Replace("-", "").Replace("_", "").ToUpperInvariant().PadRight(9, '0').Substring(0, 9).ToUpperInvariant();                
             }
+            set
+            {
+                this.discId = value.Replace("-", "").Replace("_", "").ToUpperInvariant().PadRight(9, '0').Substring(0, 9).ToUpperInvariant();
+            }
         }
 
         public PSInfo(string cueFile)
@@ -112,9 +116,10 @@ namespace GameBuilder.Pops
             if (discId is null) discId = "SLUS00001";
 
             if (this.SbiFile is not null)
-                this.lc = new LibCryptInfo(new SbiReader(this.SbiFile), LibCryptMethod.METHOD_MAGIC_WORD);
+                this.lc = new SbiLibCrypt(new SbiReader(this.SbiFile), LibCryptMethod.METHOD_MAGIC_WORD);
             else
-                this.lc = new LibCryptInfo(null, LibCryptMethod.METHOD_MAGIC_WORD);
+                this.lc = new DbLibCrypt(discId, LibCryptMethod.METHOD_MAGIC_WORD);
+
         }
     }
 }

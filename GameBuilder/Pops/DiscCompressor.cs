@@ -239,7 +239,6 @@ namespace GameBuilder.Pops
 
         private PSInfo disc;
         private CueReader cue;
-        private SbiReader sbi;
         private PopsImg srcImg;
 
         public MemoryStream IsoHeader;

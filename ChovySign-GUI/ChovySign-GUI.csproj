@@ -55,10 +55,12 @@
   </ItemGroup>
 
   <ItemGroup>
-    <UpToDateCheckInput Remove="Global\DevkitToggle.axaml" />
-  </ItemGroup>
-
-  <ItemGroup>
+    <Compile Update="Settings\ConfigPath.axaml.cs">
+      <DependentUpon>ConfigPath.axaml</DependentUpon>
+    </Compile>
+    <Compile Update="Settings\ConfigToggle.axaml.cs">
+      <DependentUpon>ConfigToggle.axaml</DependentUpon>
+    </Compile>
     <Compile Update="Resource.Designer.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>

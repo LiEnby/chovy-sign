@@ -1,52 +1,43 @@
-﻿using GameBuilder.Cue;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-using static GameBuilder.Pops.LibCrypt.MagicWord;
-using static GameBuilder.Pops.LibCrypt.SubChannel;
-
 namespace GameBuilder.Pops.LibCrypt
 {
-    public class LibCryptInfo
+    public abstract class LibCryptInfo
     {
-        public LibCryptMethod Method;
-        private SbiReader? sbiReader;
-        public int MagicWord
+        private LibCryptMethod method;
+        public virtual LibCryptMethod Method
         {
             get
             {
-                if (sbiReader is null) return 0;
-                return GenerateMagicWord(sbiReader.Entries);
+                return method;
+            }
+            set
+            {
+                if (MagicWord == 0) return;
+                method = value;
             }
         }
+        public abstract int MagicWord { get; }
 
-        public int ObfuscatedMagicWord
+        public virtual int ObfuscatedMagicWord
         {
             get
             {
                 if (Method == LibCryptMethod.METHOD_SUB_CHANNEL) return 0;
-                return ObfuscateMagicWord(this.MagicWord);
+                return LibCrypt.MagicWord.ObfuscateMagicWord(this.MagicWord);
             }
         }
 
-        public byte[] Subchannels
+        public virtual byte[] Subchannels
         {
             get
             {
-                if (sbiReader is null) throw new Exception("Cannot create subchannels, if there is no SBI data.");
-                return CreateSubchannelDat(MagicWord);
+                return LibCrypt.SubChannel.CreateSubchannelDat(this.MagicWord);
             }
-        }
-        public LibCryptInfo(SbiReader? sbi, LibCryptMethod method)
-        {
-            this.sbiReader = sbi;
-
-            if (sbi is null) Method = LibCryptMethod.METHOD_MAGIC_WORD;
-            else Method = method;
-            
         }
     }
 }

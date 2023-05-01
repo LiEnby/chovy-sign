@@ -1,4 +1,5 @@
 ﻿using GameBuilder.Pops;
+using GameBuilder.Pops.LibCrypt;
 using GameBuilder.Psp;
 using LibChovy.Art;
 using System;
@@ -17,9 +18,15 @@ namespace LibChovy
         {
             Type = ChovyTypes.POPS;
             discList = new List<PSInfo>();
+
+            discIdOverride = null;
+            nameOverride = null;
+            libCryptMethod = LibCryptMethod.METHOD_MAGIC_WORD;
         }
+        private string? discIdOverride;
         private string? nameOverride;
         private List<PSInfo> discList;
+        private LibCryptMethod libCryptMethod;
 
         private byte[]? pic0;
         private byte[]? pic1;
@@ -102,8 +109,12 @@ namespace LibChovy
         public void AddCd(string cd)
         {
             PSInfo disc = new PSInfo(cd);
-            if (nameOverride is not null) disc.DiscName = nameOverride;
-            else discList.Add(disc);
+            
+            if (nameOverride is not null) disc.DiscName = this.nameOverride;
+            if (discIdOverride is not null) disc.DiscId = this.discIdOverride;
+            if (disc.SbiFile is not null) disc.LibCrypt.Method = this.CrackMethod;
+
+            discList.Add(disc);
         }
         public void RemoveCd(string cd)
         {
@@ -121,6 +132,24 @@ namespace LibChovy
             get
             {
                 return discList.ToArray();
+            }
+        }
+        public string DiscId
+        {
+            get
+            {
+                if (discIdOverride is not null && discIdOverride.Length == 9) return discIdOverride;
+                return FirstDisc.DiscId;
+            }
+            set
+            {
+                if (value.Equals(FirstDisc.DiscId, StringComparison.InvariantCultureIgnoreCase)) { discIdOverride = null; return; };
+                if (value.Length != 9) { discIdOverride = null; return; };
+
+                for (int i = 0; i < discList.Count; i++)
+                    discList[i].DiscId = value;
+
+                discIdOverride = value;
             }
         }
         public string Name
@@ -143,6 +172,20 @@ namespace LibChovy
             }
         }
         
+        public LibCryptMethod CrackMethod
+        {
+            get
+            {
+                return libCryptMethod;
+            }
+            set
+            {
+                libCryptMethod = value;
+
+                for (int i = 0; i < discList.Count; i++)
+                    discList[i].LibCrypt.Method = value;
+            }
+        }
         public bool MultiDisc
         {
             get

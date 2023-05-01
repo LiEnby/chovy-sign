@@ -83,10 +83,24 @@ namespace ChovySign_GUI.Global
         public FilteredTextBox()
         {
             InitializeComponent();
-            this.txtBox.PastingFromClipboard += onPaste;
+            this.txtBox.PropertyChanged += onPropertyChanged;
             this.txtBox.AddHandler(TextInputEvent, onTxtInput, RoutingStrategies.Tunnel);
         }
 
+        private void onPropertyChanged(object? sender, AvaloniaPropertyChangedEventArgs e)
+        {
+            TextBox? txt = sender as TextBox;
+            if (txt is null) return;
+
+            if (e.Property.Name == "Text")
+            {
+                if (txt.Text is null) return;
+                txt.Text = filter(txt.Text);
+
+                OnTextChanged(new EventArgs());
+            }
+
+        }
 
         private string filter(string original)
         {
@@ -103,36 +117,6 @@ namespace ChovySign_GUI.Global
                 return str.ToString();
             }
             return original;
-        }
-        private async Task<bool> setClipboardText(string text)
-        {
-            if (Application.Current is null) return false;
-            if (Application.Current.Clipboard is null) return false;
-            await Application.Current.Clipboard.SetTextAsync(text);
-            return true;
-        }
-        private async Task<string> getClipboardText()
-        {
-            if (Application.Current is null) return "";
-            if (Application.Current.Clipboard is null) return "";
-            string? clipboard = await Application.Current.Clipboard.GetTextAsync();
-            if (clipboard is null) return "";
-            return clipboard;
-        }
-
-        private async void onPaste(object? sender, RoutedEventArgs e)
-        {
-            TextBox? txt = sender as TextBox;
-            if (txt is null) return;
-
-            string clipboard = getClipboardText().Result;
-            clipboard = filter(clipboard);
-            _ = setClipboardText(clipboard).Result;
-            
-            // annoyingly, the text being pasted isnt actually in the textbox yet
-            // and it wont trigger a textInput event when pasting; t-this really is the best can do 
-            await Task.Delay(100);
-            OnTextChanged(new EventArgs());
         }
 
         private void onTxtInput(object? sender, TextInputEventArgs e)

@@ -4,7 +4,9 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 		xmlns:Ps1="clr-namespace:ChovySign_GUI.Ps1"
 		xmlns:Psp="clr-namespace:ChovySign_GUI.Psp"
-		mc:Ignorable="d" d:DesignWidth="850" d:DesignHeight="950"
+		xmlns:Settings="clr-namespace:ChovySign_GUI.Settings"
+		mc:Ignorable="d" d:DesignWidth="850" d:DesignHeight="760"
+		MinHeight="760"
         x:Class="ChovySign_GUI.MainWindow"
         Title="Chovy Sign V2" Icon="/ICON.PNG">
 	
@@ -13,8 +15,11 @@
 		<TabItem Header="PlayStation Portable">
 			<Psp:PspTab Name="pspTab"/>
 		</TabItem>
-		<TabItem Header="PlayStation 1">
+		<TabItem Header="PlayStation One">
 			<Ps1:Ps1Tab Name="ps1Tab"/>
+		</TabItem>
+		<TabItem Header="Settings">
+			<Settings:SettingsTab Name="settingsTab"/>
 		</TabItem>
 	</TabControl>		
 	</Grid>

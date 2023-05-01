@@ -9,6 +9,7 @@ namespace Vita.ContentManager
 {
     public class SettingsReader
     {
+        private static string? overrideBackupsFolder = null;
         public static string AppFolder
         {
             get
@@ -56,6 +57,8 @@ namespace Vita.ContentManager
         {
             get
             {
+                if (overrideBackupsFolder is not null) return overrideBackupsFolder;
+
                 string? cmaFolder = getQcmaPSVitaFolder();
                 if (cmaFolder is not null) return cmaFolder;
                 cmaFolder = getDevkitCmaPSVitaFolder();
@@ -63,6 +66,10 @@ namespace Vita.ContentManager
                 cmaFolder = getSonyCmaPSVitaFolder();
                 if (cmaFolder is not null) return cmaFolder;
                 return getDefaultCmaPSVitaFolder();
+            }
+            set
+            {
+                overrideBackupsFolder = value;
             }
         }
 

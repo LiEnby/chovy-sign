@@ -19,7 +19,18 @@ namespace ChovySign_GUI.Ps1
         private byte[] iconCache;
         private byte[] pic0Cache;
         private byte[] pic1Cache;
-
+        public string DiscId
+        {
+            get
+            {
+                if (this.discId.Text is null) return "";
+                return this.discId.Text;
+            }
+            set
+            {
+                this.discId.Text = value;
+            }
+        }
         public string Title
         {
             get
@@ -86,6 +97,7 @@ namespace ChovySign_GUI.Ps1
             {
                 PSInfo disc = new PSInfo(cueFile);
                 Title = disc.DiscName;
+                DiscId = disc.DiscId;
 
                 byte[] newCover = await Downloader.DownloadCover(disc);
                 loadIcon(newCover);
@@ -147,6 +159,13 @@ namespace ChovySign_GUI.Ps1
             if (TitleChanged is not null)
                 TitleChanged(this, e);
         }
+        public event EventHandler<EventArgs>? DiscIdChanged;
+        protected virtual void OnDiscIdChanged(EventArgs e)
+        {
+            if (DiscIdChanged is not null)
+                DiscIdChanged(this, e);
+        }
+
         public GameInfoSelector()
         {
             InitializeComponent();
@@ -161,6 +180,13 @@ namespace ChovySign_GUI.Ps1
             this.pic1File.FileChanged += onPic1Change;
 
             this.gameTitle.TextChanged += onTitleChange;
+            this.discId.TextChanged += onDiscIdChange;
+
+        }
+
+        private void onDiscIdChange(object? sender, EventArgs e)
+        {
+            OnDiscIdChanged(new EventArgs());
         }
 
         private void onTitleChange(object? sender, EventArgs e)

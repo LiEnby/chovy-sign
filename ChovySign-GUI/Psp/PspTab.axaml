@@ -26,7 +26,6 @@
 		</Grid>
 
 		<!-- Credits -->
-		<Global:DevkitToggle Name="devkitAccount" VerticalAlignment="Bottom" HorizontalAlignment="Left"/>
 		<Label Content="Li, Dots TB, SquallATF, Motoharu, Davee" VerticalAlignment="Bottom" HorizontalAlignment="Right"/>
 	</Grid>
 </UserControl>
