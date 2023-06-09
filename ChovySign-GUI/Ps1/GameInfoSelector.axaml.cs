@@ -103,7 +103,12 @@ namespace ChovySign_GUI.Ps1
                 loadIcon(newCover);
                 iconCache = newCover;
             }
-            catch (Exception) { }
+            catch (Exception e) {
+                Window? currentWindow = this.VisualRoot as Window;
+                if (currentWindow is not Window) throw new Exception("could not find current window");
+
+                await MessageBox.Show(currentWindow, "unable to read cue sheet: " + Path.GetFileName(cueFile) + "\n" + e.Message + "\n\nSTACKTRACE: " + e.StackTrace, "cannot load cue sheet", MessageBox.MessageBoxButtons.Ok);  
+            }
         }
 
         private async Task<byte[]?> doLoad(BrowseButton imgFile, int width, int height)

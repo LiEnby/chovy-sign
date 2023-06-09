@@ -30,7 +30,7 @@ namespace LibChovy.Art
                     using (Image psnBorder = Image.Load(Resources.ICON0))
                     {
 
-                        coverImage.Mutate(x => x.Crop(new Rectangle(80, 0, coverImage.Width - 80, coverImage.Height)));
+                        //coverImage.Mutate(x => x.Crop(new Rectangle(80, 0, coverImage.Width - 80, coverImage.Height)));
                         coverImage.Mutate(x => x.Resize(58, 58));
                         psnBorder.Mutate(x => x.DrawImage(coverImage, new Point(13, 11), 1.0f));
 

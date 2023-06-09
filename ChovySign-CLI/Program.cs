@@ -4,6 +4,8 @@ using GameBuilder.Psp;
 using LibChovy;
 using LibChovy.VersionKey;
 using System.Text;
+using Vita.ContentManager;
+using PspCrypto;
 
 namespace ChovySign_CLI
 {
@@ -11,19 +13,29 @@ namespace ChovySign_CLI
     {
         private static ArgumentParsingMode mode = ArgumentParsingMode.ARG;
         private static List<string> parameters = new List<string>();
-        private static string[] discs;
+        private static string[] discs = new string[] { };
         private static bool pspCompress = false;
-        private static bool devKit = false;
         private static string? popsDiscName;
-        private static string? popsIcon0File;
-        private static string? popsPic0File;
+        private static byte[]? popsIcon0File;
+        private static byte[]? popsPic0File;
         private static PbpMode? pbpMode = null;
         private static NpDrmRif? rifFile = null;
         private static NpDrmInfo? drmInfo = null;
 
+        // cma
+        private static bool devKit = false;
+        private static bool packagePsvImg = true;
+        private static string? outputFolder = null; 
+
+        // --vkey-gen
         private static byte[]? actDat = null;
         private static byte[]? idps = null;
         private static string? rifFolder = null;
+
+        // --pops-eboot-sign
+        private static byte[]? ebootElf = null;
+        private static byte[]? configBin = null;
+
         enum PbpMode
         {
             PSP = 0,
@@ -33,15 +45,23 @@ namespace ChovySign_CLI
         }
         enum ArgumentParsingMode
         {
-            ARG = 0,
-            POPS_DISC = 1,
-            PSP_UMD = 2,
-            VERSIONKEY = 3,
-            VERSIONKEY_EXTRACT = 4,
-            VERSIONKEY_GENERATOR = 5,
-            POPS_INFO = 6,
-            KEYS_TXT_GEN = 7,
-            RIF = 8
+            ARG,
+            POPS_DISC,
+            PSP_UMD,
+            
+            VERSIONKEY,
+            VERSIONKEY_EXTRACT,
+            VERSIONKEY_GENERATOR,
+            
+            CMA_DEVKIT,
+            CMA_OUTPUT_FOLDER,
+            CMA_PACKAGE_PSVIMG,
+
+            POPS_INFO,
+            POPS_EBOOT,
+
+            KEYS_TXT_GEN,
+            RIF
         }
         public static int Error(string errorMsg, int ret)
         {
@@ -102,13 +122,13 @@ namespace ChovySign_CLI
             switch (mode)
             {
                 case ArgumentParsingMode.POPS_DISC:
-                    if (parameters.Count > 5) return Error("--pops: no more than 5 disc images allowed in a single game (sony's rules, not mine)", 5);
-                    if (parameters.Count < 1) return Error("--pops: at least 1 disc image file is required.", 5);
+                    if (parameters.Count > 5) return Error("--pops: no more than 5 disc images allowed in a single game (sony's rules, not mine)", 4);
+                    if (parameters.Count < 1) return Error("--pops: at least 1 disc image file is required.", 4);
                     discs = parameters.ToArray();
                     break;
                 case ArgumentParsingMode.PSP_UMD:
-                    if (parameters.Count < 1) return Error("--psp: a path to a disc image is required", 5);
-                    if (parameters.Count > 2) return Error("--psp: no more than 2 arguments. ("+parameters.Count+" given)", 5);
+                    if (parameters.Count < 1) return Error("--psp: a path to a disc image is required", 4);
+                    if (parameters.Count > 2) return Error("--psp: no more than 2 arguments. ("+parameters.Count+" given)", 4);
                     discs = new string[1];
                     discs[0] = parameters[0];
                     
@@ -134,16 +154,33 @@ namespace ChovySign_CLI
                     if (parameters.Count < 2) return Error("--pops-info takes at least 1 arguments ("+parameters.Count+" given)", 4);
                     if (parameters.Count > 3) return Error("--pops-info takes no more than 3 arguments("+parameters.Count+" given)", 4);
                     popsDiscName = parameters[0];
-                    if (parameters.Count > 1)
-                        popsIcon0File = parameters[1];
-                    if (parameters.Count > 2) 
-                        popsPic0File = parameters[2];
+                    if (parameters.Count > 1 && File.Exists(parameters[1]))
+                        popsIcon0File = File.ReadAllBytes(parameters[1]);
+                    if (parameters.Count > 2 && File.Exists(parameters[2])) 
+                        popsPic0File = File.ReadAllBytes(parameters[2]);
                     break;
                 case ArgumentParsingMode.KEYS_TXT_GEN:
                     if (parameters.Count != 3) return Error("--keys-txt-gen takes 3 arguments, (" + parameters.Count + " given)", 4);
                     actDat = File.ReadAllBytes(parameters[0]);
                     idps = StringToByteArray(parameters[1]);
                     rifFolder = parameters[2];
+                    break;
+                case ArgumentParsingMode.POPS_EBOOT:
+                    if (parameters.Count < 1) return Error("--pops-eboot-sign expects at most 1 arguments", 4);
+                    if (!File.Exists(parameters[0])) return Error("--pops-eboot-sign: file not found", 4);
+                    ebootElf = File.ReadAllBytes(parameters[0]);
+
+                    if (parameters.Count >= 2 && File.Exists(parameters[1]))
+                        configBin = File.ReadAllBytes(parameters[1]);
+                    else
+                        configBin = GameBuilder.Resources.DATAPSPSDCFG;
+                    
+                    break;
+                case ArgumentParsingMode.CMA_OUTPUT_FOLDER:
+                    if (parameters.Count < 1) return Error("--output-folder expects 1 output", 4);
+                    if (!Directory.Exists(parameters[0])) return Error("--output-folder: directory not found", 4);
+                    
+                    SettingsReader.BackupsFolder = parameters[0];
                     break;
                 case ArgumentParsingMode.RIF:
                     if (parameters.Count != 1) return Error("--rif expects only 1 argument,", 4);
@@ -163,12 +200,20 @@ namespace ChovySign_CLI
                 Console.WriteLine("Chovy-Sign v2 (CLI)");
                 Console.WriteLine("--pops [disc1.cue] [disc2.cue] [disc3.cue] ... (up to 5)");
                 Console.WriteLine("--pops-info [game title] [icon0.png] (optional) [pic1.png] (optional)");
+                Console.WriteLine("--pops-eboot [eboot.elf] [config.bin] (optional)");
+
                 Console.WriteLine("--psp [umd.iso] [compress; true/false] (optional)");
+                
                 Console.WriteLine("--rif [GAME.RIF]");
+                
                 Console.WriteLine("--devkit (Use 000000000000 account id)");
+                Console.WriteLine("--no-psvimg (Disable creating a .psvimg file)");
+                Console.WriteLine("--output-folder [output_folder]");
+
                 Console.WriteLine("--vkey [versionkey] [contentid] [key_index]");
                 Console.WriteLine("--vkey-extract [eboot.pbp]");
                 Console.WriteLine("--vkey-gen [act.dat] [license.rif] [console_id] [key_index]");
+                
                 Console.WriteLine("--keys-txt-gen [act.dat] [console_id] [psp_license_folder]");
             }
 
@@ -236,6 +281,17 @@ namespace ChovySign_CLI
                                     return Error("rif is already set", 3);
 
                                 break;
+                            case "--pops-eboot":
+                                mode = ArgumentParsingMode.POPS_EBOOT;
+                                break;
+                            case "--output-folder":
+                                mode = ArgumentParsingMode.CMA_OUTPUT_FOLDER;
+                                break;
+
+                            case "--no-psvimg":
+                                packagePsvImg = false;
+                                break;
+
                             case "--devkit":
                                 devKit = true;
                                 break;
@@ -248,6 +304,7 @@ namespace ChovySign_CLI
                     case ArgumentParsingMode.VERSIONKEY_EXTRACT:
                     case ArgumentParsingMode.PSP_UMD:
                     case ArgumentParsingMode.POPS_DISC:
+                    case ArgumentParsingMode.POPS_EBOOT:
                     case ArgumentParsingMode.POPS_INFO:
                     case ArgumentParsingMode.RIF:
                     default:
@@ -267,14 +324,14 @@ namespace ChovySign_CLI
             if (pbpMode is null) return Error("no pbp mode was set, exiting", 7);
             
             if (pbpMode == PbpMode.PSP && drmInfo.KeyIndex != 2)
-                return Error("KeyType is "+drmInfo.KeyIndex+", but PBP mode is PSP, you cant do that .. please use a type 1 versionkey.", 8);
+                return Error("KeyType is "+drmInfo.KeyIndex+", but PBP mode is PSP, you cant do that .. please use a type 2 versionkey.", 8);
 
             if (pbpMode == PbpMode.POPS && drmInfo.KeyIndex != 1)
                 return Error("KeyType is " + drmInfo.KeyIndex + ", but PBP mode is POPS, you cant do that .. please use a type 1 versionkey.", 8);
 
             if (rifFile is null)
                 return Error("Rif is not set, use --rif to specify base game RIF", 8);
-            //if (pbpMode == PbpMode.POPS && (popsDiscName is null || popsIcon0File is null)) return Error("pbp mode is POPS, but you have not specified a disc title or icon file using --pops-info.", 9);
+            
             ChovySign csign = new ChovySign();
             csign.RegisterCallback(onProgress);
             if (pbpMode == PbpMode.POPS)
@@ -287,10 +344,16 @@ namespace ChovySign_CLI
                 if(popsDiscName is not null)
                     popsParameters.Name = popsDiscName;
                 
-                if(File.Exists(popsIcon0File))
-                    popsParameters.Icon0 = File.ReadAllBytes(popsIcon0File);
+                if(popsIcon0File is not null)
+                    popsParameters.Icon0 = popsIcon0File;
+                
 
+                popsParameters.CreatePsvImg = packagePsvImg;
                 popsParameters.Account.Devkit = devKit;
+
+                // Allow for custom eboot.elf and configs
+                popsParameters.ConfigBinOverride = configBin;
+                popsParameters.EbootElfOverride = ebootElf;
 
                 csign.Go(popsParameters);
                 
@@ -299,6 +362,8 @@ namespace ChovySign_CLI
             {
                 PspParameters pspParameters = new PspParameters(drmInfo, rifFile);
                 pspParameters.Account.Devkit = devKit;
+                pspParameters.CreatePsvImg = packagePsvImg;
+
                 pspParameters.Compress = pspCompress;
                 pspParameters.Umd = new UmdInfo(discs.First());
                 

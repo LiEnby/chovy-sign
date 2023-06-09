@@ -19,6 +19,9 @@ namespace LibChovy
             Type = ChovyTypes.POPS;
             discList = new List<PSInfo>();
 
+            EbootElfOverride = null;
+            ConfigBinOverride = null;
+
             discIdOverride = null;
             nameOverride = null;
             libCryptMethod = LibCryptMethod.METHOD_MAGIC_WORD;
@@ -31,6 +34,10 @@ namespace LibChovy
         private byte[]? pic0;
         private byte[]? pic1;
         private byte[]? icon0;
+
+
+        public byte[]? EbootElfOverride;
+        public byte[]? ConfigBinOverride;
 
         public PSInfo FirstDisc
         {

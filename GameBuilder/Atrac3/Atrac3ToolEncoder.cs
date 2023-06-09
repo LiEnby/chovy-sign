@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Channels;
 using System.Threading.Tasks;
@@ -12,6 +13,9 @@ namespace GameBuilder.Atrac3
 {
     public class Atrac3ToolEncoder : IAtracEncoderBase
     {
+        [DllImport("libc")]
+        private static extern int setenv(string name, string value, bool overwrite);
+
         private static Random rng = new Random();
         private static string TOOLS_DIRECTORY = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "tools");
 
@@ -19,6 +23,7 @@ namespace GameBuilder.Atrac3
         private static string AT3TOOL_LINUX = Path.Combine(TOOLS_DIRECTORY, "at3tool.elf");
         
         private static string TEMP_DIRECTORY = Path.Combine(Path.GetTempPath(), "at3tool_tmp");
+        private static string LD_LIBRARY_PATH = "LD_LIBRARY_PATH";
 
         // random name so that can generate multiple at once if wanted ..
         private string TEMP_WAV;
@@ -45,10 +50,24 @@ namespace GameBuilder.Atrac3
             }
         }
 
+        private string setupLibaryPath()
+        {
+            string? libaryPath = Environment.GetEnvironmentVariable(LD_LIBRARY_PATH);
+            if (libaryPath is null) libaryPath = TOOLS_DIRECTORY;
+            else libaryPath += ";" + TOOLS_DIRECTORY;
+
+            Environment.SetEnvironmentVariable(libaryPath, libaryPath);
+            setenv(LD_LIBRARY_PATH, libaryPath, true);
+
+            return libaryPath;
+        }
         private void runAtrac3Tool()
         {
             using(Process proc = new Process())
             {
+                if (OperatingSystem.IsLinux())
+                    proc.StartInfo.Environment.Add(LD_LIBRARY_PATH, setupLibaryPath());
+
                 proc.StartInfo.FileName = AT3TOOL_LOCATION;
                 proc.StartInfo.Arguments = "-br 132 -e \"" + TEMP_WAV + "\" \"" + TEMP_AT3 + "\"";
 

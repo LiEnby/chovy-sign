@@ -43,8 +43,8 @@ namespace GameBuilder.Psp
         public void PatchSfo()
         {
             Sfo sfoKeys = Sfo.ReadSfo(umdImage.DataFiles["PARAM.SFO"]);
-            if ((sfoKeys["CATEGORY"] as String) == "UG") // "UMD Game"
-                sfoKeys["CATEGORY"] = "EG"; // set it to "Eboot Game"
+            //if ((sfoKeys["CATEGORY"] as String) == "UG") // "UMD Game"
+            sfoKeys["CATEGORY"] = "EG"; // set it to "Eboot Game"
             umdImage.DataFiles["PARAM.SFO"] = sfoKeys.WriteSfo();
         }
         private void createNpHdr()

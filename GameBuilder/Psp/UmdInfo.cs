@@ -12,12 +12,12 @@ namespace GameBuilder.Psp
     {
         private string[] filesList = new string[]
         {
-            "PSP_GAME\\ICON0.PNG",
-            "PSP_GAME\\ICON1.PMF",
-            "PSP_GAME\\PARAM.SFO",
-            "PSP_GAME\\PIC0.PNG",
-            "PSP_GAME\\PIC1.PNG",
-            "PSP_GAME\\SND0.AT3"
+            Path.Combine("PSP_GAME","ICON0.PNG"),
+            Path.Combine("PSP_GAME","ICON1.PMF"),
+            Path.Combine("PSP_GAME","PARAM.SFO"),
+            Path.Combine("PSP_GAME","PIC0.PNG"),
+            Path.Combine("PSP_GAME","PIC1.PNG"),
+            Path.Combine("PSP_GAME","SND0.AT3")
         };
 
         public Dictionary<string, byte[]?> DataFiles = new Dictionary<string, byte[]?>();
@@ -27,12 +27,12 @@ namespace GameBuilder.Psp
             this.IsoStream = File.OpenRead(isoFile);
             using (CDReader cdReader = new CDReader(this.IsoStream, true, true))
             {
-                foreach (string file in filesList)
+                foreach (string file in this.filesList)
                 {
                     string fname = Path.GetFileName(file).ToUpperInvariant();
-                    if (cdReader.FileExists(file))
+                    if (cdReader.FileExists(file.Replace('/', '\\')))
                     {
-                        using (SparseStream s = cdReader.OpenFile(file, FileMode.Open))
+                        using (SparseStream s = cdReader.OpenFile(file.Replace('/', '\\'), FileMode.Open))
                         {
                             byte[] data = new byte[s.Length];
 
@@ -48,11 +48,14 @@ namespace GameBuilder.Psp
                 }
             }
 
-
-            if (DataFiles["PARAM.SFO"] is null) throw new Exception("ISO contains no PARAM.SFO file, so this is not a valid PSP game.");
+            byte[]? paramFile = DataFiles["PARAM.SFO"];
+            if (paramFile is null) throw new Exception("ISO contains no PARAM.SFO file, so this is not a valid PSP game.");
             
-            Sfo sfo = Sfo.ReadSfo(DataFiles["PARAM.SFO"]);
-            this.DiscId = sfo["DISC_ID"] as String;
+            Sfo sfo = Sfo.ReadSfo(paramFile);
+            string? discId = sfo["DISC_ID"] as String;
+            if (discId is null) throw new Exception("PARAM.SFO does not contain \"DISC_ID\"");
+
+            this.DiscId = discId;
 
             // check minis
             if (sfo["ATTRIBUTE"] is UInt32)

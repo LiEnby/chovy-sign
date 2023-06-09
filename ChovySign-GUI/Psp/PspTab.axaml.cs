@@ -38,7 +38,7 @@ namespace ChovySign_GUI.Psp
         {
             keySelector.IsEnabled = true;
             isoSelector.IsEnabled = true;
-            SettingsTab.Settings.IsEnabled = false;
+            SettingsTab.Settings.IsEnabled = true;
 
             Window? currentWindow = this.VisualRoot as Window;
             if (currentWindow is not Window) throw new Exception("could not find current window");

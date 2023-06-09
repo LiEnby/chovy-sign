@@ -75,7 +75,50 @@ namespace Vita.ContentManager
 
         private static string getDefaultCmaPSVitaFolder()
         {
-            return Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Personal), "PS Vita");
+             return Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Personal), "PS Vita");
+        }
+
+        private static string getQcmaConfFile()
+        {
+            if (OperatingSystem.IsLinux())
+                return Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".config", "codestation", "qcma.conf");
+            else if (OperatingSystem.IsMacOS())
+                return Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "Library", "Preferences", "com.codestation.qcma.plist");
+            else
+                throw new PlatformNotSupportedException("cannot open qcma config as i dont know where it is.");
+        }
+        private static string? getQcmaConfigSetting(string file, string key)
+        {
+            if (!File.Exists(file)) return null;
+
+            if (OperatingSystem.IsLinux())
+            {
+                using (TextReader confFile = File.OpenText(file))
+                {
+                    for (string? ln = confFile.ReadLine();
+                        ln is not null;
+                        ln = confFile.ReadLine())
+                    {
+                        ln = ln.Trim();
+                        if (ln.StartsWith("[")) continue;
+
+                        string[] kvp = ln.Split('=');
+                        if (kvp.Length < 2) continue;
+
+                        string settingKey = kvp[0].Trim();
+                        string settingValue = kvp[1].Trim();
+
+
+                        if (settingKey == key)
+                            return settingValue;
+                    }
+                }
+            }
+            else if (OperatingSystem.IsMacOS())
+            {
+                throw new PlatformNotSupportedException("TODO: Implement reading bplist file from mac os");
+            }
+            return null;
         }
 
         private static string? getRegistryKey(string registryPath, string keyName)
@@ -116,15 +159,12 @@ namespace Vita.ContentManager
         {
             if (OperatingSystem.IsWindows())
             {
-                using(RegistryKey? qcmaKey = Registry.CurrentUser.OpenSubKey(@"Software\codestation\qcma"))
-                {
-                    return getRegistryKey(@"Software\codestation\qcma", "appsPath");
-                }
+                return getRegistryKey(@"Software\codestation\qcma", "appsPath");
             }
             else if (OperatingSystem.IsLinux())
             {
-                string qcmaConfigPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".config", "codestation", "qcma.conf");
-                // TODO: read file
+                string qcmaConf = getQcmaConfFile();
+                return getQcmaConfigSetting(qcmaConf, "appsPath");
             }
             else if (OperatingSystem.IsMacOS())
             {

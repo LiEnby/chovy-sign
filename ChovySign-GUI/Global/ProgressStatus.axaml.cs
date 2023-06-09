@@ -42,12 +42,21 @@ namespace ChovySign_GUI.Global
             if (currentWindow is not Window) throw new Exception("could not find current window");
 
             this.goButton.IsEnabled = false;
-
+            
             OnBeforeStart(new EventArgs());
 
             if(Parameters is null) { await MessageBox.Show(currentWindow, "ChovySignParameters was null, cannot start!", "Invalid Parameters", MessageBoxButtons.Ok); return; }
 
-            await Task.Run(() => { chovySign.Go(Parameters); });
+            await Task.Run(() => {
+                try
+                {
+                    chovySign.Go(Parameters);
+                }
+                catch (Exception e)
+                {
+                    Dispatcher.UIThread.Post(() => { _ = MessageBox.Show(currentWindow, "Error building: " + e.Message + "\n\nSTACKTRACE: " + e.StackTrace, "ERROR", MessageBoxButtons.Ok); });
+                }
+            });
 
             OnFinished(new EventArgs());
 

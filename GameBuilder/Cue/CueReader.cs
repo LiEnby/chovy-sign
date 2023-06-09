@@ -300,6 +300,19 @@ namespace GameBuilder.Cue
             openTracks.Clear();
         }
 
+        private string getFilename(string str)
+        {
+            if (!str.Contains(' ')) throw new Exception("cue specifies no bin file.");
+            if (!str.Contains('"')) return str.Split(' ')[1];
+
+            int start = str.IndexOf('"');
+            str = str.Substring(start + 1);
+
+            
+            int end = str.IndexOf('"');
+            str = str.Substring(0, end);
+            return str;
+        }
         public CueReader(string cueFile)
         {
             openTracks = new Dictionary<int, CueStream>();
@@ -310,10 +323,11 @@ namespace GameBuilder.Cue
                 CueTrack? curTrack = null;
 
                 for (string? cueData = cueReader.ReadLine();
-                    cueData != null;
+                    cueData is not null;
                     cueData = cueReader.ReadLine())
                 {
-                    string[] cueLn = cueData.Trim().Replace("\r", "").Replace("\n", "").Split(' ');
+                    cueData = cueData.Trim().Replace("\r", "").Replace("\n", "");
+                    string[] cueLn = cueData.Split(' ');
 
                     if (cueLn[0] == "INDEX")
                     {
@@ -350,16 +364,16 @@ namespace GameBuilder.Cue
                         if (curTrack != null) setTrackNumber(curTrack.TrackNo, ref curTrack);
 
                         // parse out filename..
-                        string[] cueFnameParts = new string[cueLn.Length - 2];
-                        Array.ConstrainedCopy(cueLn, 1, cueFnameParts, 0, cueFnameParts.Length);
-                        string cueFname = String.Join(' ', cueFnameParts);
-
-                        // open file ..
-                        string binFileName = cueFname.Substring(1, cueFname.Length - 2);
+                        string binFileName = getFilename(cueData);
                         string? folderContainingCue = Path.GetDirectoryName(cueFile);
 
                         if (folderContainingCue != null)
                             binFileName = Path.Combine(folderContainingCue, binFileName);
+
+                        if(!File.Exists(binFileName))
+                            binFileName = Path.ChangeExtension(cueFile, ".bin");
+
+                        if (!File.Exists(binFileName)) throw new FileNotFoundException("unable to find bin file.");
 
                         curTrack = new CueTrack(binFileName);
                     }

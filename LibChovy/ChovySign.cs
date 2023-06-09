@@ -62,6 +62,17 @@ namespace LibChovy
             else
                 img = new PsIsoImg(parameters.DrmInfo, parameters.FirstDisc);
 
+            // apply eboot elf overrides
+            if(parameters.EbootElfOverride is not null)
+            {
+                img.EbootElf = parameters.EbootElfOverride;
+                img.PatchEboot = false;
+            }
+            if (parameters.ConfigBinOverride is not null)
+            {
+                img.ConfigBin = parameters.ConfigBinOverride;
+            }
+
             using (PbpBuilder pbpBuilder = new PbpBuilder(sfo, parameters.Icon0, null, parameters.Pic0, parameters.Pic1, null, img, 0))
             {
                 pbpBuilder.RegisterCallback(onProgress);

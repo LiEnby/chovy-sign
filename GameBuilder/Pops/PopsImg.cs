@@ -24,6 +24,9 @@ namespace GameBuilder.Pops
             this.createSimpleDat();
             this.SimplePgd = CreatePgd(simple.ToArray());
 
+            this.EbootElf = Resources.DATAPSPSD;
+            this.ConfigBin = Resources.DATAPSPSDCFG;
+            this.PatchEboot = true;
         }
         internal void createSimpleDat()
         {
@@ -54,27 +57,41 @@ namespace GameBuilder.Pops
         public override byte[] GenerateDataPsp()
         {
             Span<byte> loaderEnc = new byte[0x9B13];
+            
+            //byte[] dataPspElf = Resources.DATAPSPSD;
 
-            byte[] dataPspElf = Resources.DATAPSPSD;
+            if (this.PatchEboot)
+            {
+                // calculate size low and high part ..
+                uint szLow = Convert.ToUInt32(Psar.Length) >> 16;
+                uint szHigh = Convert.ToUInt32(Psar.Length) & 0xFFFF;
 
-            // calculate size low and high part ..
-            uint szLow = Convert.ToUInt32(Psar.Length) >> 16;
-            uint szHigh = Convert.ToUInt32(Psar.Length) & 0xFFFF;
+                // convert to big endain bytes
+                byte[] lowBits = BitConverter.GetBytes(Convert.ToUInt16(szLow)).ToArray();
+                byte[] highBits = BitConverter.GetBytes(Convert.ToUInt16(szHigh)).ToArray();
 
-            // convert to big endain bytes
-            byte[] lowBits = BitConverter.GetBytes(Convert.ToUInt16(szLow)).ToArray();
-            byte[] highBits = BitConverter.GetBytes(Convert.ToUInt16(szHigh)).ToArray();
+                // overwrite data.psar size check ..
+                Array.ConstrainedCopy(lowBits, 0, this.EbootElf, 0x68C, 0x2);
+                Array.ConstrainedCopy(highBits, 0, this.EbootElf, 0x694, 0x2);
+            }
 
-            // overwrite data.psar size check ..
-            Array.ConstrainedCopy(lowBits, 0, dataPspElf, 0x68C, 0x2);
-            Array.ConstrainedCopy(highBits, 0, dataPspElf, 0x694, 0x2);
-
-            SceMesgLed.Encrypt(loaderEnc, dataPspElf, 0x0DAA06F0, SceExecFileDecryptMode.DECRYPT_MODE_POPS_EXEC, DrmInfo.VersionKey, DrmInfo.ContentId, Resources.DATAPSPSDCFG);
+            SceMesgLed.Encrypt(
+                loaderEnc,
+                this.EbootElf,
+                0x0DAA06F0,
+                SceExecFileDecryptMode.DECRYPT_MODE_POPS_EXEC,
+                DrmInfo.VersionKey,
+                DrmInfo.ContentId, 
+                this.ConfigBin);
             return loaderEnc.ToArray();
         }
 
         private MemoryStream simple;
         private StreamUtil simpleUtil;
+
+        public byte[] EbootElf;
+        public byte[] ConfigBin;
+        public bool PatchEboot;
 
         public byte[] StartDat;
         public byte[] SimplePgd;
