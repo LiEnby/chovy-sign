@@ -13,12 +13,30 @@ namespace ChovySign_GUI.Settings
 
         internal bool disableEvents = false;
         private string? promptMsg = null;
-
+        private bool defaultSetting = false;
         internal override void init()
         {
             bool? isToggleChecked = ChovyConfig.CurrentConfig.GetBool(ConfigKey);
-            if (isToggleChecked is null) isToggleChecked = false;
+            if(isToggleChecked is null) isToggleChecked = defaultSetting;
+
+            this.disableEvents = true;
             configCheckbox.IsChecked = isToggleChecked;
+            this.disableEvents = false;
+        }
+
+        public bool Default
+        {
+            get
+            {
+                return defaultSetting;
+            }
+            set
+            {
+                defaultSetting = value;
+
+                if (ChovyConfig.CurrentConfig.GetBool(ConfigKey) is null)
+                    this.IsToggled = defaultSetting;
+            }
         }
         public string Label
         {

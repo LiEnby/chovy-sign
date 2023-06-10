@@ -67,8 +67,9 @@ namespace ChovySign_GUI.Psp
             pspParameters.Compress = isoSelector.Compress;
 
             // read settings from settings tab.
-            if (SettingsTab.Settings.DevkitMode) pspParameters.Account = new Account(0);
+            pspParameters.Account.Devkit = SettingsTab.Settings.DevkitMode;
             SettingsReader.BackupsFolder = SettingsTab.Settings.CmaDirectory;
+            pspParameters.CreatePsvImg = SettingsTab.Settings.PackagePsvimg;
 
             progressStatus.Parameters = pspParameters;
         }

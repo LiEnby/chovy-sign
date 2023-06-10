@@ -7,7 +7,7 @@ namespace ChovySign_GUI.Settings
 {
     public partial class SettingsTab : UserControl
     {
-        public static SettingsTab Settings;
+        public static SettingsTab? Settings;
 
         public LibCryptMethod LibcryptMode
         {
@@ -35,6 +35,13 @@ namespace ChovySign_GUI.Settings
             get
             {
                 return devkitAccount.IsToggled;
+            }
+        }
+        public bool PackagePsvimg
+        {
+            get
+            {
+                return packagePsvimg.IsToggled;
             }
         }
 

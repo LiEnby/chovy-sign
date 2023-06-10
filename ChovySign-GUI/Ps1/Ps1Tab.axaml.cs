@@ -70,8 +70,10 @@ namespace ChovySign_GUI.Ps1
 
             // read settings from settings tab.
             if (SettingsTab.Settings.DevkitMode) popsParameters.Account = new Account(0);
+            
             popsParameters.CrackMethod = SettingsTab.Settings.LibcryptMode;
             SettingsReader.BackupsFolder = SettingsTab.Settings.CmaDirectory;
+            popsParameters.CreatePsvImg = SettingsTab.Settings.PackagePsvimg;
 
             progressStatus.Parameters = popsParameters;
 

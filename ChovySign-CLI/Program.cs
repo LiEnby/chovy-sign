@@ -6,10 +6,7 @@ using LibChovy.VersionKey;
 using System.Text;
 using Vita.ContentManager;
 using PspCrypto;
-using Li.Utilities;
-using System.Security.Cryptography;
-using static PspCrypto.SceNpDrm;
-using System.Runtime.InteropServices;
+using System.ComponentModel;
 
 namespace ChovySign_CLI
 {
@@ -197,7 +194,7 @@ namespace ChovySign_CLI
             parameters.Clear();
             return 0;
         }
-
+        /*
         public static void generateRif(byte[] idps, byte[] actBuf, byte[] versionKey, int versionKeyType, ulong accountId, string contentId)
         {
             byte[] vkey2 = new byte[versionKey.Length];
@@ -246,7 +243,7 @@ namespace ChovySign_CLI
                 rifUtil.WritePadding(0xFF, 0x28);
             }
         }
-
+        */
         public static int Main(string[] args)
         {
             if (args.Length == 0)
@@ -372,19 +369,16 @@ namespace ChovySign_CLI
             generateKeysTxt();
 
             if (drmInfo is null) return Error("no versionkey was found, exiting", 6);
-
-            //Console.WriteLine("Version Key: " + BitConverter.ToString(drmInfo.VersionKey).Replace("-", "") + ", " + drmInfo.KeyIndex);
-
             if (pbpMode is null) return Error("no pbp mode was set, exiting", 7);
-            
-            if (pbpMode == PbpMode.PSP && drmInfo.KeyIndex != 2)
-                return Error("KeyType is "+drmInfo.KeyIndex+", but PBP mode is PSP, you cant do that .. please use a type 2 versionkey.", 8);
 
-            if (pbpMode == PbpMode.POPS && drmInfo.KeyIndex != 1)
-                return Error("KeyType is " + drmInfo.KeyIndex + ", but PBP mode is POPS, you cant do that .. please use a type 1 versionkey.", 8);
+            int targetKeyIndex = (pbpMode == PbpMode.PSP) ? 2 : 1;
+            if (drmInfo.KeyIndex != targetKeyIndex)
+            {
+                SceNpDrm.sceNpDrmTransformVersionKey(drmInfo.VersionKey, drmInfo.KeyIndex, 2);
+                drmInfo.KeyIndex = targetKeyIndex;
+            }
 
-            if (rifFile is null)
-                return Error("Rif is not set, use --rif to specify base game RIF", 8);
+            if (rifFile is null) return Error("Rif is not set, use --rif to specify base game RIF", 8);
             
             ChovySign csign = new ChovySign();
             csign.RegisterCallback(onProgress);

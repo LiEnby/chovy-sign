@@ -11,23 +11,22 @@ atleast one of these are free in *most* regions;
 however failing that, you can also use a PSP DLC license- 
 
 -- if you don't have a hacked PSVita:
-Copy the game to your PC using Content Manager,
+Copy the offical game to your PC using Content Manager,
 open chovy-sign2 and click the "Get Keys" button
-select "EBOOT.PBP" method, click on the game
+select "EBOOT.PBP" method, 
+select the offical game;
 
+click on select "Content Manager" backup
 (note: there may be some issues if you try this while having DLC for the game installed ...)
 
 you should see the RIF and KEY fields populate, and your good to go!
 
 -- If you have a hacked PSVita:
 note: you can still use the unhacked vita method if you would like 
-(i.e if your only wanting to make PSP games, or are using PETZ SADDLE CLUB, LOCOROCO MIDNIGHT CARNIVAL or APE QUEST STARTER PACK)
 
 note2: bubbles created using the hacked vita method will still *work* on any unhacked vita, 
 using the same PSN Account; however it requires a hacked vita to *obtain* some of the files, 
 that are required for this method;
-
-the main advantage to doing it this way is you can use any psp license to create both ps1 and psp bubbles;
 
 you will need: 
 - Your ConsoleID/IDPS, Yoti has a tool to dump this availible [here](https://github.com/Yoti/psv_idpsdump/releases/)

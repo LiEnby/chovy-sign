@@ -29,6 +29,7 @@ namespace ChovySign_GUI.Global
         }
 
         public event EventHandler<EventArgs>? Finished;
+
         protected virtual void OnFinished(EventArgs e)
         {
             if (Finished is not null)
@@ -47,19 +48,18 @@ namespace ChovySign_GUI.Global
 
             if(Parameters is null) { await MessageBox.Show(currentWindow, "ChovySignParameters was null, cannot start!", "Invalid Parameters", MessageBoxButtons.Ok); return; }
 
-            await Task.Run(() => {
-                try
-                {
+            try
+            {
+                await Task.Run(() => {
                     chovySign.Go(Parameters);
-                }
-                catch (Exception e)
-                {
-                    Dispatcher.UIThread.Post(() => { _ = MessageBox.Show(currentWindow, "Error building: " + e.Message + "\n\nSTACKTRACE: " + e.StackTrace, "ERROR", MessageBoxButtons.Ok); });
-                }
-            });
-
+                });
+            }
+            catch (Exception ex)
+            {
+                await MessageBox.Show(currentWindow, "Error building: " + ex.Message + "\n\nSTACKTRACE: " + ex.StackTrace, "ERROR", MessageBoxButtons.Ok);
+                return;
+            }
             OnFinished(new EventArgs());
-
             this.goButton.IsEnabled = true;
 
         }
