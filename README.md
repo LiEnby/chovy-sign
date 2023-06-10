@@ -4,7 +4,7 @@ Now with PS1 Support !
 \- chovy-sign is an application to allow you to convert PSP and PS1 ISO's to be playable on unmodified PSVita's
 
 Setups:
-You need a valid (offical) PSP or PS1 game.
+so You need a valid (offical) PSP or PS1 game.
 
 i recommend getting; Petz Saddle Club, LocoRoco Midnight Carnival, or Ape Quest Starter Pack
 because atleast one of these are free in *most* regions; 
@@ -12,10 +12,10 @@ because atleast one of these are free in *most* regions;
 however failing that, you can also use a PSP DLC license- 
 
 ----
-**-- If you don't have a hacked PSVita:**
+**-- If you don't have a modded PSVita:**
 
 *you will need:*
-- Any PS1 or PSP game (or demo) from the PS Store.
+- Any PS1 or PSP game (or demo) from the PS Store. (Petz Saddle Club, LocoRoco Midnight Carnival, etc..)
 - Ability to connect PSVita to PC Content Manager (USB or WiFi)
 
 *obtaining keys:*
@@ -38,7 +38,7 @@ however failing that, you can also use a PSP DLC license-
 note: *there may be some issues if you try this while having DLC for the game installed .*
 
 ----
-**-- If you have a hacked PSVita:**
+**-- If you have a modded PSVita:**
 
 note: *you can still use the unmodified vita method on a hacked vita; if you would like *
 
@@ -48,9 +48,8 @@ note2: *bubbles created using the hacked vita method will still *work* on any un
 
 *you will need: *
 - Your ConsoleID/IDPS, Yoti has a tool to dump this availible [here](https://github.com/Yoti/psv_idpsdump/releases/)
-- Your Consoles activation data file (located at tm0:/npdrm/act.dat)
-- Any PSP/PS1 License file for your account (located at ux0:/pspemu/PSP/LICENSE/*.rif, or ux0:/bgdl/t/XXXXXX/temp.dat if you have a pending download)
-- Ability to connect PSVita to PC Content Manager (USB or WiFi)
+- Your Consoles activation data file (located at ``tm0:/npdrm/act.dat``)
+- Any offical PSP/PS1 License file for your account (located at ``ux0:/pspemu/PSP/LICENSE/*.rif``, or ``ux0:/bgdl/t/XXXXXX/temp.dat`` for a pending download)
 
 note: *your IDPS is unique to your PSVita and is used to identify your console on the PSN, so do not share it with other people*
 
@@ -73,12 +72,11 @@ note: *your IDPS is unique to your PSVita and is used to identify your console o
 
 -----
 
-a image explaining the 3 key obtaining methods is below:
-
+so overall there are 3 methods to obtain keys,
 ![image](https://silica.codes/SilicaAndPina/chovy-sign/raw/branch/master/Methods.png)
+note: *keys.txt is basically pointless now, in the bast it wasn't known how to use psp eboot to create ps1 games*
 
--- 
-
+----
 
 Credits:    
 SquallATF (for "PspCrypto" and "PBPResigner", and making PS1 Game signing possible,
@@ -90,7 +88,6 @@ Developing the GUI, finding the original psp bubbles method and,
 Writing the PS1 Disc Compresison algorithm, making it possible to use custom ISOs,
 Writing C# Implementation of PSVIMGTOOLS,
 Being transgender)
-
 				
 dots-tb (for [chovy-gen](https://github.com/dots-tb/chovy-gen) (\_\_sce_ebootpbp signing)         
 
@@ -101,16 +98,14 @@ yifanlu & xyz for the original [psvimgtools](https://github.com/yifanlu/psvimgto
 Mathieulh (Found psp signing keys?)            
 
 Motoharu (For helping dots with \_\_sce_ebootpbp)                 
-
 Davee (For finding the PS1 Signing Key)
-
 xlenore (For [PS1 Cover Art](https://github.com/xlenore/psx-covers))              
-
 RupertAvery (For their fork of DiscUtils to add PS1 Support)  
 
-
 SquallATF's PBPResigner and PSPCrypto were derived from :
+
 xdotnano ([PSXTract](https://github.com/xdotnano/PSXtract))             
+
 swarzesherz ([sign_np](https://github.com/swarzesherz/sign_np))             
+
 tpunix ([kirk_engine](https://github.com/tpunix/kirk_engine))             
-	
