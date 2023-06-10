@@ -14,25 +14,26 @@ however failing that, you can also use a PSP DLC license-
 ----
 **-- If you don't have a hacked PSVita:**
 
-you will need: 
-- Any PS1 or PSP game (or demo) from PSN
-- Ability to connect PSVita to PC Content Manager (Usb or WiFi)
+*you will need:*
+- Any PS1 or PSP game (or demo) from the PS Store.
+- Ability to connect PSVita to PC Content Manager (USB or WiFi)
 
--- Copy an offical PS1 or PSP game to your PC using Content Manager,
--- open chovy-sign2
--- select either PSP or PS1 and click the "Get Keys" button
--- click "EBOOT.PBP method", 
--- select the offical PS1 or PSP game you copied;
--- click on select "Content Manager" backup
+*obtaining keys:*
+- Copy an offical PS1 or PSP game to your PC using Content Manager,
+- open chovy-sign2
+- select either PSP or PS1 and click the "Get Keys" button
+- click "EBOOT.PBP method", 
+- select the offical PS1 or PSP game you copied;
+- click on select "Content Manager" backup
 
--- you should see the RIF and KEY fields populate,
+- you should see the RIF and KEY fields populate,
 
 *chovy-sign2 will remember this information for later so you only have to do this part one time;*
 
---- now select either a PS1 BIN/CUE image or a UMD ISO image.
---- click "go"
---- once it finishes, you should be able to find the game availible to be copied over from Content Manager.
-
+*getting psp or ps1 games:*
+- select either a PS1 BIN/CUE image or a UMD ISO image.
+- click "go"
+- once it finishes, you should be able to find the game availible to be copied over from Content Manager.
 
 note: *there may be some issues if you try this while having DLC for the game installed .*
 
@@ -45,26 +46,30 @@ note2: *bubbles created using the hacked vita method will still *work* on any un
 *using the same PSN Account; however it requires a hacked vita to *obtain* some of the files, *
 *that are required for this method;*
 
-you will need: 
+*you will need: *
 - Your ConsoleID/IDPS, Yoti has a tool to dump this availible [here](https://github.com/Yoti/psv_idpsdump/releases/)
 - Your Consoles activation data file (located at tm0:/npdrm/act.dat)
 - Any PSP/PS1 License file for your account (located at ux0:/pspemu/PSP/LICENSE/*.rif, or ux0:/bgdl/t/XXXXXX/temp.dat if you have a pending download)
+- Ability to connect PSVita to PC Content Manager (USB or WiFi)
 
 note: *your IDPS is unique to your PSVita and is used to identify your console on the PSN, so do not share it with other people*
 
--- open chovy-sign2
--- select either PSP or PS1 and click the "Get Keys" button
--- select "IDPS+RIF+ACT Method",
--- copy in your IDPS
--- browse for your license rif file
--- browse for our act.dat file
--- click generate keys
+*obtaining keys:*
+- open chovy-sign2
+- select either PSP or PS1 and click the "Get Keys" button
+- select "IDPS+RIF+ACT Method",
+- copy in your IDPS
+- browse for your license rif file
+- browse for our act.dat file
+- click generate keys
 
 *chovy-sign2 will remember this information for later so you only have to do this part one time;*
 
---- now select either a PS1 BIN/CUE image or a UMD ISO image.
---- click "go"
---- once it finishes, you should be able to find the game availible to be copied over from Content Manager.
+*getting psp or ps1 games:*
+- select either a PS1 BIN/CUE image or a UMD ISO image.
+- click "go"
+- once it finishes, you should be able to find the game availible to be copied over from Content Manager.
+- alternatively, you can disable the "Use CMA" option in settings, and then copy the resulting **TITLEID** folder to ``ux0:/pspemu/PSP/GAME``, then delete ``ux0:/id.dat``, and reboot to trigger an app database update.
 
 -----
 
