@@ -4,56 +4,71 @@ Now with PS1 Support !
 \- chovy-sign is an application to allow you to convert PSP and PS1 ISO's to be playable on unmodified PSVita's
 
 Setups:
-You need a valid (offical) PSP or PS1 license,
+You need a valid (offical) PSP or PS1 game.
+
 i recommend getting; Petz Saddle Club, LocoRoco Midnight Carnival, or Ape Quest Starter Pack
-atleast one of these are free in *most* regions; 
+because atleast one of these are free in *most* regions; 
 
 however failing that, you can also use a PSP DLC license- 
 
--- if you don't have a hacked PSVita:
+----
+**-- If you don't have a hacked PSVita:**
 
-Copy the offical game to your PC using Content Manager,
+you will need: 
+- Any PS1 or PSP game (or demo) from PSN
+- Ability to connect PSVita to PC Content Manager (Usb or WiFi)
 
-open chovy-sign2 and click the "Get Keys" button
+-- Copy an offical PS1 or PSP game to your PC using Content Manager,
+-- open chovy-sign2
+-- select either PSP or PS1 and click the "Get Keys" button
+-- click "EBOOT.PBP method", 
+-- select the offical PS1 or PSP game you copied;
+-- click on select "Content Manager" backup
 
-select "EBOOT.PBP" method, 
+-- you should see the RIF and KEY fields populate,
 
-select the offical game;
+*chovy-sign2 will remember this information for later so you only have to do this part one time;*
 
-click on select "Content Manager" backup
+--- now select either a PS1 BIN/CUE image or a UMD ISO image.
+--- click "go"
+--- once it finishes, you should be able to find the game availible to be copied over from Content Manager.
 
-(note: there may be some issues if you try this while having DLC for the game installed ...)
 
-you should see the RIF and KEY fields populate, and your good to go!
+note: *there may be some issues if you try this while having DLC for the game installed .*
 
--- If you have a hacked PSVita:
+----
+**-- If you have a hacked PSVita:**
 
-note: you can still use the unhacked vita method if you would like 
+note: *you can still use the unmodified vita method on a hacked vita; if you would like *
 
-note2: bubbles created using the hacked vita method will still *work* on any unhacked vita, 
-using the same PSN Account; however it requires a hacked vita to *obtain* some of the files, 
-that are required for this method;
+note2: *bubbles created using the hacked vita method will still *work* on any unmodified vita, *
+*using the same PSN Account; however it requires a hacked vita to *obtain* some of the files, *
+*that are required for this method;*
 
 you will need: 
 - Your ConsoleID/IDPS, Yoti has a tool to dump this availible [here](https://github.com/Yoti/psv_idpsdump/releases/)
 - Your Consoles activation data file (located at tm0:/npdrm/act.dat)
 - Any PSP/PS1 License file for your account (located at ux0:/pspemu/PSP/LICENSE/*.rif, or ux0:/bgdl/t/XXXXXX/temp.dat if you have a pending download)
 
-YOUTUBERS: if you are planning on making a youtube tutorial on this, please note that your consoles IDPS is
-also used to identify your console on the playstation network,
-and sharing it would allow anyone to impersonate your console on the PSN!,
-do not just blindly give this out to people.
-(this would not give them access to your PSN Account however)
+note: *your IDPS is unique to your PSVita and is used to identify your console on the PSN, so do not share it with other people*
 
-Open the CHOVY-SIGN2 application, under PSP click GET KEYS
-put in your IDPS into the ConsoleID/IDPS field; in hex (if you used yotis tool, its in ux0:/data/idps.txt) 
-browse to your act.dat file, and rif file, and click Generate.
-this will populate the key and rif field; 
-now do the same thing for the PS1 Option, using the same license and activation file as before.
+-- open chovy-sign2
+-- select either PSP or PS1 and click the "Get Keys" button
+-- select "IDPS+RIF+ACT Method",
+-- copy in your IDPS
+-- browse for your license rif file
+-- browse for our act.dat file
+-- click generate keys
 
+*chovy-sign2 will remember this information for later so you only have to do this part one time;*
 
+--- now select either a PS1 BIN/CUE image or a UMD ISO image.
+--- click "go"
+--- once it finishes, you should be able to find the game availible to be copied over from Content Manager.
 
-a diagram explaining the 3 key obtaining methods is below:
+-----
+
+a image explaining the 3 key obtaining methods is below:
 
 ![image](https://silica.codes/SilicaAndPina/chovy-sign/raw/branch/master/Methods.png)
 
