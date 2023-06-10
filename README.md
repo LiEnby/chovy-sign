@@ -4,12 +4,11 @@ Now with PS1 Support !
 **chovy-sign is an application to allow you to convert PSP and PS1 ISO's to be playable on unmodified PSVita***
 
 Setups:
-so You need a valid (offical) PSP or PS1 game.
+You need an (offical) PSP or PS1 license;
 
 i recommend getting; Petz Saddle Club, LocoRoco Midnight Carnival, or Ape Quest Starter Pack
 because atleast one of these are free in *most* regions; 
 
-however failing that, you can also use a PSP DLC license- 
 
 ----
 **-- If you don't have a modded PSVita:**
@@ -46,10 +45,10 @@ note2: *bubbles created using the hacked vita method will still *work* on any un
 *using the same PSN Account; however it requires a hacked vita to *obtain* some of the files, *
 *that are required for this method;*
 
-*you will need: *
+*you will need:*
 - Your ConsoleID/IDPS, Yoti has a tool to dump this availible [here](https://github.com/Yoti/psv_idpsdump/releases/)
 - Your Consoles activation data file (located at ``tm0:/npdrm/act.dat``)
-- Any offical PSP/PS1 License file for your account (located at ``ux0:/pspemu/PSP/LICENSE/*.rif``, or ``ux0:/bgdl/t/XXXXXX/temp.dat`` for a pending download)
+- Any offical PSP/PS1 License file for your account (located at ``ux0:/pspemu/PSP/LICENSE/*.rif``, or ``ux0:/bgdl/t/XXXXXX/temp.dat`` for downloads) *you can also use PocketStation license or a PSP DLC license*
 
 note: *your IDPS is unique to your PSVita and is used to identify your console on the PSN, so do not share it with other people*
 
