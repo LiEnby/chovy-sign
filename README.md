@@ -13,11 +13,15 @@ however failing that, you can also use a PSP DLC license-
 -- if you don't have a hacked PSVita:
 
 Copy the offical game to your PC using Content Manager,
+
 open chovy-sign2 and click the "Get Keys" button
+
 select "EBOOT.PBP" method, 
+
 select the offical game;
 
 click on select "Content Manager" backup
+
 (note: there may be some issues if you try this while having DLC for the game installed ...)
 
 you should see the RIF and KEY fields populate, and your good to go!
