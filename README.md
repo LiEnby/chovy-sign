@@ -48,7 +48,8 @@ note2: *bubbles created using the hacked vita method will still *work* on any un
 *you will need:*
 - Your ConsoleID/IDPS, Yoti has a tool to dump this availible [here](https://github.com/Yoti/psv_idpsdump/releases/)
 - Your Consoles activation data file (located at ``tm0:/npdrm/act.dat``)
-- Any offical PSP/PS1 License file for your account (located at ``ux0:/pspemu/PSP/LICENSE/*.rif``, or ``ux0:/bgdl/t/XXXXXX/temp.dat`` for downloads) *you can also use PocketStation license or a PSP DLC license*
+- Any offical PSP/PS1 License file for your account (located at ``ux0:/pspemu/PSP/LICENSE/*.rif``, or ``ux0:/bgdl/t/XXXXXX/temp.dat`` for downloads) 
+*you can also use PocketStation license or a PSP DLC license*
 
 note: *your IDPS is unique to your PSVita and is used to identify your console on the PSN, so do not share it with other people*
 
@@ -73,6 +74,7 @@ note: *your IDPS is unique to your PSVita and is used to identify your console o
 
 so overall there are 3 methods to obtain keys,
 ![image](https://silica.codes/SilicaAndPina/chovy-sign/raw/branch/master/Methods.png)
+
 note: *keys.txt is basically pointless now, in the bast it wasn't known how to use psp eboot to create ps1 games*
 
 ----
