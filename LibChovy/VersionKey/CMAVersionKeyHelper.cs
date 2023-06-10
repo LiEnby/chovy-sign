@@ -26,7 +26,7 @@ namespace LibChovy.VersionKey
             catch { return null; }
         }
 
-        public static NpDrmInfo? GetKeyFromGamePsvimg(string gameBackupFolder, string accountId)
+        public static NpDrmInfo? GetKeyFromGamePsvimg(string gameBackupFolder, string accountId, int keyIndex)
         {
             string gamePsvimgFile = Path.Combine(gameBackupFolder, "game", "game.psvimg");
             if (!File.Exists(gamePsvimgFile)) return null;
@@ -36,7 +36,7 @@ namespace LibChovy.VersionKey
             using (PSVIMGFileStream? pbp = GetFileFromPsvImg(gamePsvimgFile, "/EBOOT.PBP", cmaKey))
             {
                 if (pbp is null) return null;
-                return EbootPbpMethod.GetVersionKey(pbp);
+                return EbootPbpMethod.GetVersionKey(pbp, keyIndex);
             }
         }
 

@@ -20,8 +20,6 @@ namespace ChovySign_GUI.Popup.Global.KeySelector
             set
             {
                 keyIndex = value;
-                if (keyIndex == 1) { ebootMethodPspGraphic.IsVisible = false; ebootMethodPs1Graphic.IsVisible = true; }
-                else { ebootMethodPspGraphic.IsVisible = true; ebootMethodPs1Graphic.IsVisible = false; }
             }
         }
 

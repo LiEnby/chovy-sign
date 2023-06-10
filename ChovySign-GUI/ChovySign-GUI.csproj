@@ -16,8 +16,6 @@
     <None Remove="Icon.png" />
     <None Remove="Popup\Global\KeySelector\ACTRIFMETHOD.PNG" />
     <None Remove="Popup\Global\KeySelector\EBOOTMETHOD.PNG" />
-    <None Remove="Popup\Global\KeySelector\EBOOTMETHOD1.png" />
-    <None Remove="Popup\Global\KeySelector\EBOOTMETHOD2.png" />
     <None Remove="Popup\Global\KeySelector\KEYSTXTMETHOD.PNG" />
     <None Remove="PS1CD.PNG" />
     <None Remove="UMD.png" />
@@ -25,8 +23,7 @@
   <ItemGroup>
     <AvaloniaResource Include="ICON.PNG" />
     <AvaloniaResource Include="Popup\Global\KeySelector\ACTRIFMETHOD.PNG" />
-    <AvaloniaResource Include="Popup\Global\KeySelector\EBOOTMETHOD1.PNG" />
-    <AvaloniaResource Include="Popup\Global\KeySelector\EBOOTMETHOD2.PNG" />
+    <AvaloniaResource Include="Popup\Global\KeySelector\EBOOTMETHOD.PNG" />
     <AvaloniaResource Include="Popup\Global\KeySelector\KEYSTXTMETHOD.PNG" />
     <AvaloniaResource Include="Ps1\PS1CD.PNG" />
     <AvaloniaResource Include="Psp\UMD.PNG">

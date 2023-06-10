@@ -117,6 +117,10 @@ namespace Li.Utilities
         {
             WriteBytesWithPadding(Encoding.UTF8.GetBytes(str), b, len);            
         }
+        public void WriteUInt64(UInt64 v)
+        {
+            WriteBytes(BitConverter.GetBytes(v));
+        }
         public void WriteInt64(Int64 v)
         {
             WriteBytes(BitConverter.GetBytes(v));

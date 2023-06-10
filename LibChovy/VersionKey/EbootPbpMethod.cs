@@ -21,7 +21,7 @@ namespace LibChovy.VersionKey
             AMCTRL.bbmac_getkey(mkey, bbmac, versionKey);
             return versionKey;
         }
-        public static NpDrmInfo GetVersionKey(Stream ebootStream)
+        public static NpDrmInfo GetVersionKey(Stream ebootStream, int keyIndex)
         {
             using (ebootStream)
             {
@@ -39,32 +39,35 @@ namespace LibChovy.VersionKey
                     switch (psarMagic)
                     {
                         case "NPUMDIMG":
-                            int keyType = ebootUtil.ReadInt32();
+                            int orginalKeyIndex = ebootUtil.ReadInt32();
                             string contentId = ebootUtil.ReadStringAt(dataPsarLocation + 0x10);
 
                             byte[] npUmdHdr = ebootUtil.ReadBytesAt(dataPsarLocation, 0xC0);
                             byte[] npUmdHeaderHash = ebootUtil.ReadBytesAt(dataPsarLocation + 0xC0, 0x10);
                             
                             byte[] versionkey = getKey(npUmdHeaderHash, npUmdHdr);
-
-                            return new NpDrmInfo(versionkey, contentId, keyType);
+                            
+                            SceNpDrm.sceNpDrmTransformVersionKey(versionkey, orginalKeyIndex, keyIndex);
+                            return new NpDrmInfo(versionkey, contentId, keyIndex);
                         case "PSISOIMG":
                             using (DNASStream dnas = new DNASStream(ebootStream, dataPsarLocation + 0x400))
                             {
                                 contentId = ebootUtil.ReadStringAt(dataPspLocation + 0x560);
-                                keyType = dnas.KeyIndex;
+                                orginalKeyIndex = dnas.KeyIndex;
                                 versionkey = dnas.VersionKey;
 
-                                return new NpDrmInfo(versionkey, contentId, keyType);
+                                SceNpDrm.sceNpDrmTransformVersionKey(versionkey, orginalKeyIndex, keyIndex);
+                                return new NpDrmInfo(versionkey, contentId, keyIndex);
                             }
                         case "PSTITLEI":
                             using (DNASStream dnas = new DNASStream(ebootStream, dataPsarLocation + 0x200))
                             {
                                 contentId = ebootUtil.ReadStringAt(dataPspLocation + 0x560);
-                                keyType = dnas.KeyIndex;
+                                orginalKeyIndex = dnas.KeyIndex;
                                 versionkey = dnas.VersionKey;
 
-                                return new NpDrmInfo(versionkey, contentId, keyType);
+                                SceNpDrm.sceNpDrmTransformVersionKey(versionkey, orginalKeyIndex, keyIndex);
+                                return new NpDrmInfo(versionkey, contentId, keyIndex);
                             }
                         default:
                             throw new Exception("Cannot obtain versionkey from this EBOOT.PBP (magic:" + psarMagic + ")");

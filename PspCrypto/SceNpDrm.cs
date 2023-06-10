@@ -3,6 +3,7 @@ using System;
 using System.Buffers.Binary;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 using System.Text;
@@ -433,6 +434,14 @@ namespace PspCrypto
             }
 
         }
+        public static int sceNpDrmTransformVersionKey(Span<byte> versionKey, int srcKeyType, int dstKeyType)
+        {
+            // reverse the previous "GenVersionKey" step ..
+            int ret = ReverseGenVersionKey(versionKey, srcKeyType);
+            if (ret >= 0)
+                ret = GenVersionKey(versionKey, dstKeyType); // generate a new version key of this type
+            return ret;
+        }
 
         public static int sceNpDrmGetIDps(Span<byte> idps)
         {
@@ -444,7 +453,7 @@ namespace PspCrypto
             return -0x7faaf6ff;
         }
 
-        private static int GetActKey(Span<byte> key, ReadOnlySpan<byte> keyTable, int count)
+        public static int GetActKey(Span<byte> key, ReadOnlySpan<byte> keyTable, int count)
         {
             Span<byte> idps = stackalloc byte[16];
             Span<byte> decKey = stackalloc byte[16];
@@ -525,6 +534,22 @@ namespace PspCrypto
             return 0;
         }
 
+        
+        private static int ReverseGenVersionKey(Span<byte> versionkey, int type)
+        {
+            type &= 0xffffff;
+            int ret = 0;
+            if (type != 0)
+            {
+                ret = unchecked((int)0x80550901);
+                if (type < 4)
+                {
+                    ret = AesHelper.AesDecrypt(versionkey, versionkey, KeyVault.drmVersionKeyKey.AsSpan().Slice(type * 0x10, 0x10));
+                    ret = ret == 16 ? 0 : unchecked((int)0x80550902);
+                }
+            }
+            return ret;
+        }
         private static int GenVersionKey(Span<byte> versionKey, int type)
         {
             type &= 0xffffff;

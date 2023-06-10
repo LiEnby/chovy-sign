@@ -21,8 +21,7 @@
 		<Button Content="IDPS+RIF+ACT Method" Click="actRifMethodClick" Grid.Row="0" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center"/>
 		<Button Content="KEYS.TXT Method" Click="keysTxtMethodClick" Grid.Row="0" Grid.Column="2" HorizontalAlignment="Center" VerticalAlignment="Center"/>
 
-		<Image Name="ebootMethodPs1Graphic" Source="/Popup/Global/KeySelector/EBOOTMETHOD1.PNG" Grid.Row="1" Grid.Column="0" VerticalAlignment="Top" HorizontalAlignment="Stretch"/>
-		<Image Name="ebootMethodPspGraphic" Source="/Popup/Global/KeySelector/EBOOTMETHOD2.PNG" Grid.Row="1" Grid.Column="0" VerticalAlignment="Top" HorizontalAlignment="Stretch"/>
+		<Image Name="ebootMethodGraphic" Source="/Popup/Global/KeySelector/EBOOTMETHOD.PNG" Grid.Row="1" Grid.Column="0" VerticalAlignment="Top" HorizontalAlignment="Stretch"/>
 		<Image Name="actRifMethodGraphic" Source="/Popup/Global/KeySelector/ACTRIFMETHOD.PNG" Grid.Row="1" Grid.Column="1" VerticalAlignment="Top" HorizontalAlignment="Stretch"/>
 		<Image Name="keysTxtMethodGraphic" Source="/Popup/Global/KeySelector/KEYSTXTMETHOD.PNG" Grid.Row="1" Grid.Column="2" VerticalAlignment="Top" HorizontalAlignment="Stretch"/>
 	</Grid>

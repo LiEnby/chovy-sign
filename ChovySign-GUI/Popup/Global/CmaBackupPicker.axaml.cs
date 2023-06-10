@@ -3,7 +3,8 @@ using Avalonia.Interactivity;
 using ChovySign_GUI.Global;
 using GameBuilder.Psp;
 using LibChovy.Config;
-using Org.BouncyCastle.Utilities.Bzip2;
+using Org.BouncyCastle.Asn1;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -16,7 +17,7 @@ namespace ChovySign_GUI.Popup.Global
 
         private const string lookingInLabelText = "Looking in: ";
         private string[]? gameDirectories;
-        private string backupSubFolder = "";
+        private string[] backupSubFolders;
         
         private string[]? filter;
 
@@ -69,50 +70,80 @@ namespace ChovySign_GUI.Popup.Global
             }
         }
 
-        private string accountIdSearchFolder
+        private string[] accountIdSearchFolders
         {
             get
             {
-                string searchIn = Path.Combine(BackupDir, this.BackupType);
+                string[] searchIn = new string[this.BackupType.Length];
+                for (int i = 0; i < this.BackupType.Length; i++)
+                {
+                    searchIn[i] = Path.Combine(BackupDir, this.BackupType[i]);
+                }
+
                 return searchIn;
             }
         }
-        private string backupSearchFolder
+        private string[] backupSearchFolders
         {
             get
             {
-                if (AccountId == "") return accountIdSearchFolder;
-                return Path.Combine(accountIdSearchFolder, AccountId);
+                string[] backupFolders = new string[this.BackupType.Length];
+                string[] searchFolders = this.accountIdSearchFolders;
+                for (int i = 0; i < this.BackupType.Length; i++)
+                {
+                    if (this.AccountId == "") backupFolders[i] = searchFolders[i];
+                    backupFolders[i] = Path.Combine(searchFolders[i], this.AccountId);
+                }
+                return backupFolders;
             }
         }
-        public string BackupType
+        public string[] BackupType
         {
             get
             {
-                return backupSubFolder;
+                return backupSubFolders;
             }
             set
             {
-                backupSubFolder = value;
-                lookingInLbl.Content = lookingInLabelText + backupSubFolder;
+                backupSubFolders = value;
+                lookingInLbl.Content = lookingInLabelText + String.Join(", ", backupSubFolders);
                 
                 reloadAccountIdsList();
                 reloadBackupsList();
             }
         }
 
+        private string[] GetAllDriectories(string[] dirList)
+        {
+            List<string> foundDir = new List<string>();
+
+            foreach(string dirSearch in dirList)
+            {
+                if (!Directory.Exists(dirSearch)) continue;
+                foreach(string dir in Directory.GetDirectories(dirSearch))
+                {
+                    if (!foundDir.Contains(dir))
+                    {
+                        foundDir.Add(dir);
+                    }
+                }
+            }
+
+            return foundDir.ToArray();
+        }
+
         private void reloadAccountIdsList()
         {
             try
             {
-                string[] usedAccountIds = Directory.GetDirectories(accountIdSearchFolder);
+                string[] usedAccountIds = GetAllDriectories(accountIdSearchFolders);
                 List<string> accountIdLst = new List<string>();
                 foreach (string accountId in usedAccountIds)
                 {
                     string aid = Path.GetFileName(accountId);
+                    if (accountIdLst.Contains(aid)) continue;
                     if (aid.Length != 16) continue;
                     accountIdLst.Add(aid);
-                    
                 }
 
                 this.accId.Items = accountIdLst.ToArray();
@@ -142,8 +173,8 @@ namespace ChovySign_GUI.Popup.Global
             this.backupList.Items = new string[0];
             try
             {
-                if(!Directory.Exists(backupSearchFolder)) { return; }
-                string[] gameBackupDirectories = Directory.GetDirectories(backupSearchFolder);
+                string[] gameBackupDirectories = GetAllDriectories(backupSearchFolders);
+
                 List<string> filteredGameDirectories = new List<string>();
                 List<string> gameList = new List<string>();
                 foreach (string gameDirectory in gameBackupDirectories)
@@ -180,7 +211,7 @@ namespace ChovySign_GUI.Popup.Global
         {
             InitializeComponent();
             this.cmaDir.FilePath = BackupDir;
-            this.backupSubFolder = "APP";
+            this.backupSubFolders = new string[] { "APP" };
             this.accId.SelectionChanged += onAccountSelectionChanged;
             this.cmaDir.FileChanged += onCmaDirChanged;
             this.backupList.SelectionChanged += onSelectedBackupChanged;
@@ -191,6 +222,7 @@ namespace ChovySign_GUI.Popup.Global
         private void onSelectedBackupChanged(object? sender, SelectionChangedEventArgs e)
         {
             ListBox? lstBox = sender as ListBox;
+            if (lstBox is null) return;
             if (lstBox.SelectedIndex == -1) selectBtn.IsEnabled = false;
             else selectBtn.IsEnabled = true;
         }

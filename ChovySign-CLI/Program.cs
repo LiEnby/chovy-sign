@@ -6,6 +6,10 @@ using LibChovy.VersionKey;
 using System.Text;
 using Vita.ContentManager;
 using PspCrypto;
+using Li.Utilities;
+using System.Security.Cryptography;
+using static PspCrypto.SceNpDrm;
+using System.Runtime.InteropServices;
 
 namespace ChovySign_CLI
 {
@@ -105,6 +109,7 @@ namespace ChovySign_CLI
 
                 if(rif.AccountId != accountId) { Error(rif.ContentId + " account id does not match: " + accountId.ToString("X") + " (was " + rif.AccountId.ToString("X") + ")", 10); continue; }
                 string[] keys = new string[4];
+                
                 for (int i = 0; i < keys.Length; i++)
                     keys[i] = BitConverter.ToString(ActRifMethod.GetVersionKey(actDat, rif.Rif, idps, i).VersionKey).Replace("-", "");
 
@@ -112,7 +117,7 @@ namespace ChovySign_CLI
                 string keysTxt = String.Join(' ', keysTxtLine);
 
                 addKeys.AppendLine(keysTxt);
-                Console.WriteLine(keysTxt);
+                //Console.WriteLine(keysTxt);
             }
             File.AppendAllText("KEYS.TXT", addKeys.ToString());
         }
@@ -143,8 +148,8 @@ namespace ChovySign_CLI
                     drmInfo = new NpDrmInfo(StringToByteArray(parameters[0]), parameters[1], int.Parse(parameters[2]));
                     break;
                 case ArgumentParsingMode.VERSIONKEY_EXTRACT:
-                    if (parameters.Count != 1) return Error("--vkey-extract: expect 1 arguments. ("+parameters.Count+" given)", 4);
-                    drmInfo = EbootPbpMethod.GetVersionKey(File.OpenRead(parameters[0]));
+                    if (parameters.Count != 2) return Error("--vkey-extract: expect 2 arguments. ("+parameters.Count+" given)", 4);
+                    drmInfo = EbootPbpMethod.GetVersionKey(File.OpenRead(parameters[0]), int.Parse(parameters[1]));
                     break;
                 case ArgumentParsingMode.VERSIONKEY_GENERATOR:
                     if(parameters.Count != 4) return Error("--vkey-gen: expect 4 arguments. ("+parameters.Count+" given)", 4);
@@ -192,9 +197,58 @@ namespace ChovySign_CLI
             parameters.Clear();
             return 0;
         }
+
+        public static void generateRif(byte[] idps, byte[] actBuf, byte[] versionKey, int versionKeyType, ulong accountId, string contentId)
+        {
+            byte[] vkey2 = new byte[versionKey.Length];
+            Array.Copy(versionKey, vkey2, versionKey.Length);
+
+            byte[] rkey = Rng.RandomBytes(0x10);
+            int keyId = 0x10; // (Int32)(Rng.RandomUInt() % 0x80);
+            Array.ConstrainedCopy(BitConverter.GetBytes(keyId).Reverse().ToArray(), 0, rkey, 0xC, 0x4);
+
+            byte[] encKey1 = new byte[0x10];
+            AesHelper.AesEncrypt(rkey, encKey1, KeyVault.drmRifKey);
+
+            // get the act key
+            byte[] actKey = new byte[0x10];
+            
+            SceNpDrm.SetPSID(idps);
+            SceNpDrm.Aid = accountId;
+
+            Act act = MemoryMarshal.AsRef<Act>(actBuf);
+            GetActKey(actKey, act.PrimKeyTable[(keyId * 0x10)..], 1);
+
+            // reverse version key back to main version key
+            sceNpDrmTransformVersionKey(vkey2, versionKeyType, 0);
+
+            byte[] encKey2 = new byte[0x10];
+            AesHelper.AesEncrypt(vkey2, encKey2, actKey);
+
+            using (MemoryStream rifStream = new MemoryStream())
+            {
+                StreamUtil rifUtil = new StreamUtil(rifStream);
+
+                rifUtil.WriteInt16(0x0);
+                rifUtil.WriteInt16(0x1);
+
+                rifUtil.WriteInt32(0x2);
+                rifUtil.WriteUInt64(accountId);
+
+                rifUtil.WriteStrWithPadding(contentId, 0x00, 0x30);
+
+                rifUtil.WriteBytes(encKey1); // enckey1
+                rifUtil.WriteBytes(encKey2); // enckey2
+
+                rifUtil.WriteUInt64(SceRtc.ksceRtcGetCurrentSecureTick());
+                rifUtil.WriteUInt64(0x00); // expiry
+
+                rifUtil.WritePadding(0xFF, 0x28);
+            }
+        }
+
         public static int Main(string[] args)
         {
-
             if (args.Length == 0)
             {
                 Console.WriteLine("Chovy-Sign v2 (CLI)");
@@ -211,7 +265,7 @@ namespace ChovySign_CLI
                 Console.WriteLine("--output-folder [output_folder]");
 
                 Console.WriteLine("--vkey [versionkey] [contentid] [key_index]");
-                Console.WriteLine("--vkey-extract [eboot.pbp]");
+                Console.WriteLine("--vkey-extract [eboot.pbp] [key_index]");
                 Console.WriteLine("--vkey-gen [act.dat] [license.rif] [console_id] [key_index]");
                 
                 Console.WriteLine("--keys-txt-gen [act.dat] [console_id] [psp_license_folder]");

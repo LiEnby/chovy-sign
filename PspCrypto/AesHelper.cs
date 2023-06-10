@@ -197,6 +197,7 @@ namespace PspCrypto
             var encData = encryptor.TransformFinalBlock(buffer, 0, buffer.Length);
             encData.AsSpan().CopyTo(oubput);
         }
+
 #if false
         public static byte[] AesDecrypt(Aes aes, byte[] data, int offset, int length)
         {

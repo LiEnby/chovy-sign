@@ -11,16 +11,10 @@ atleast one of these are free in *most* regions;
 however failing that, you can also use a PSP DLC license- 
 
 -- if you don't have a hacked PSVita:
-Note: If the game you are using to do this with any games besides PETZ SADDLE CLUB, LOCOROCO MIDNIGHT CARNIVAL or APE QUEST STARTER PACK; 
-you will be limited to the same game type as the license is for,
-i.e a PS1 game will only be usable to create a PS1 game,
-and a PSP game will only be usable to create a PSP game
-(this is different' if you use the henkaku method)
-
 Copy the game to your PC using Content Manager,
 open chovy-sign2 and click the "Get Keys" button
- -- if you are using "APE QUEST, LOCOROCO MIDNIGHT CARNIVAL, or PETZ SADDLE CLUB, and want to make a PS1 game select "KEYS.TXT" instead-)
 select "EBOOT.PBP" method, click on the game
+
 (note: there may be some issues if you try this while having DLC for the game installed ...)
 
 you should see the RIF and KEY fields populate, and your good to go!

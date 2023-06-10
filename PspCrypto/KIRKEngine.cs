@@ -1080,7 +1080,7 @@ namespace PspCrypto
 
             unsafe
             {
-                var ecdsa = ECDsaHelper.Create(curve, sig.public_key.x, sig.public_key.y);
+                ECDsa ecdsa = ECDsaHelper.Create(curve, sig.public_key.x, sig.public_key.y);
 
                 if (ecdsa.VerifyHash(sig.message_hash, sig.signature.sig))
                 {

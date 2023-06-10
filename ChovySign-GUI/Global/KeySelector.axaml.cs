@@ -153,19 +153,19 @@ namespace ChovySign_GUI.Global
                     break;
                 case VersionKeyMethod.EBOOT_PBP_METHOD:
                     CmaBackupPicker ebootBackupSelector = new CmaBackupPicker();
-                    ebootBackupSelector.BackupType = ((keyIndex == 1) ? "PSGAME" : "PGAME");
+                    ebootBackupSelector.BackupType = new string[] { "PGAME", "PSGAME" };
 
                     string? gameBackupFolder = await ebootBackupSelector.ShowDialog<string>(currentWindow);
                     string accountId = ebootBackupSelector.AccountId;
                     if (gameBackupFolder is null) break;
                     if (accountId == "") break;
 
-                    key = CMAVersionKeyHelper.GetKeyFromGamePsvimg(gameBackupFolder, accountId);
+                    key = CMAVersionKeyHelper.GetKeyFromGamePsvimg(gameBackupFolder, accountId, this.keyIndex);
                     rif = CMAVersionKeyHelper.GetRifFromLicensePsvimg(gameBackupFolder, accountId);
                     break;
                 case VersionKeyMethod.KEYS_TXT_METHOD:
                     CmaBackupPicker pspLicenseBackupSelector = new CmaBackupPicker();
-                    pspLicenseBackupSelector.BackupType = "PGAME";
+                    pspLicenseBackupSelector.BackupType = new string[] { "PGAME", "PSGAME" };
                     pspLicenseBackupSelector.Filter = KeysTxtMethod.TitleIds;
 
                     gameBackupFolder = await pspLicenseBackupSelector.ShowDialog<string>(currentWindow);
@@ -186,10 +186,8 @@ namespace ChovySign_GUI.Global
             if (key is not null)
             {
                 if (key.KeyIndex != this.keyIndex)
-                {
-                    await MessageBox.Show(currentWindow, "VersionKey obtained, but had keyindex: " + key.KeyIndex + " however keyindex " + this.keyIndex + " was required.", "KeyIndex mismatch!", MessageBoxButtons.Ok);
-                    return;
-                }
+                    sceNpDrmTransformVersionKey(key.VersionKey, key.KeyIndex, this.keyIndex); 
+                // its a revoolution~
 
                 VersionKey = key.VersionKey;
             }
