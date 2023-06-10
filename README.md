@@ -1,7 +1,7 @@
 #ChovyProject v2
 Now with PS1 Support !
 
-\- chovy-sign is an application to allow you to convert PSP and PS1 ISO's to be playable on unmodified PSVita's
+**chovy-sign is an application to allow you to convert PSP and PS1 ISO's to be playable on unmodified PSVita***
 
 Setups:
 so You need a valid (offical) PSP or PS1 game.
