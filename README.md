@@ -11,6 +11,7 @@ atleast one of these are free in *most* regions;
 however failing that, you can also use a PSP DLC license- 
 
 -- if you don't have a hacked PSVita:
+
 Copy the offical game to your PC using Content Manager,
 open chovy-sign2 and click the "Get Keys" button
 select "EBOOT.PBP" method, 
@@ -22,6 +23,7 @@ click on select "Content Manager" backup
 you should see the RIF and KEY fields populate, and your good to go!
 
 -- If you have a hacked PSVita:
+
 note: you can still use the unhacked vita method if you would like 
 
 note2: bubbles created using the hacked vita method will still *work* on any unhacked vita, 
