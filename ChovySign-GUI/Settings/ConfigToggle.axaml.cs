@@ -85,6 +85,9 @@ namespace ChovySign_GUI.Settings
                 else
                     IsToggled = false;
             }
+			else{
+				IsToggled = true;
+			}
 
         }
 
