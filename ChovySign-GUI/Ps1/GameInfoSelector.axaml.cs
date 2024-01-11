@@ -99,9 +99,12 @@ namespace ChovySign_GUI.Ps1
                 Title = disc.DiscName;
                 DiscId = disc.DiscId;
 
-                byte[] newCover = await Downloader.DownloadCover(disc);
-                loadIcon(newCover);
-                iconCache = newCover;
+                if (!File.Exists(this.iconFile.FilePath))
+                {
+                    byte[] newCover = await Downloader.DownloadCover(disc);
+                    loadIcon(newCover);
+                    iconCache = newCover;
+                }
             }
             catch (Exception e) {
                 Window? currentWindow = this.VisualRoot as Window;

@@ -176,19 +176,28 @@ namespace ChovySign_GUI.Global
             }
         }
 
+
         public BrowseButton()
         {
             InitializeComponent();
 
-            this.filePath.KeyUp += onKeyPress;
+            this.filePath.PropertyChanged += onPropertyChanged;
 
             this.extension = "";
             this.fileTypeName = "All Files";
         }
 
-        private void onKeyPress(object? sender, KeyEventArgs e)
+        private void onPropertyChanged(object? sender, AvaloniaPropertyChangedEventArgs e)
         {
-            OnFileChanged(new EventArgs());
+            TextBox? txt = sender as TextBox;
+            if (txt is null) return;
+
+            if (e.Property.Name == "Text")
+            {
+                if (txt.Text is null) return;
+                if (!ContainsFile) return;
+                OnFileChanged(new EventArgs());
+            }
         }
     }
 }

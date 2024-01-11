@@ -1,11 +1,9 @@
 using Avalonia.Controls;
-using Avalonia.Interactivity;
 using ChovySign_GUI.Global;
 using ChovySign_GUI.Popup.Global;
 using ChovySign_GUI.Settings;
 using GameBuilder.Psp;
 using LibChovy;
-using LibChovy.Config;
 using System;
 using System.Linq;
 using Vita.ContentManager;
