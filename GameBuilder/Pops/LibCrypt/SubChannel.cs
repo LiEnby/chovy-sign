@@ -12,7 +12,7 @@ namespace GameBuilder.Pops.LibCrypt
     {
         public static byte[] CreateSubchannelDat(int magicWord)
         {
-            using(MemoryStream subChannels = new MemoryStream())
+            using(BuildStream subChannels = new BuildStream())
             {
                 StreamUtil subChannelsUtil = new StreamUtil(subChannels);
                 // this header seems to mark the start of the sub channel data.

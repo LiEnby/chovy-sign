@@ -50,10 +50,10 @@ namespace GameBuilder.Pops
             }
 
 
-            isoMap = new MemoryStream();
+            isoMap = new BuildStream();
             isoMapUtil = new StreamUtil(isoMap);
 
-            isoPart = new MemoryStream();
+            isoPart = new BuildStream();
             isoPartUtil = new StreamUtil(isoPart);
 
 
@@ -174,10 +174,10 @@ namespace GameBuilder.Pops
         private PSInfo[] discs;
         private DiscCompressor[] compressors;
 
-        private MemoryStream isoPart;
+        private BuildStream isoPart;
         private StreamUtil isoPartUtil;
 
-        private MemoryStream isoMap;
+        private BuildStream isoMap;
         private StreamUtil isoMapUtil;
     }
 }

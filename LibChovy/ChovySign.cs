@@ -1,4 +1,5 @@
-﻿using GameBuilder.Pops;
+﻿using GameBuilder;
+using GameBuilder.Pops;
 using GameBuilder.Psp;
 using Li.Progress;
 using PspCrypto;
@@ -148,6 +149,8 @@ namespace LibChovy
         {
 
             SceNpDrm.Aid = parameters.DrmRif.AccountId;
+
+            BuildStream.BuildUsingStreamType = parameters.BuildStreamType;
 
             if (!Directory.Exists(parameters.OutputFolder))
                 Directory.CreateDirectory(parameters.OutputFolder);

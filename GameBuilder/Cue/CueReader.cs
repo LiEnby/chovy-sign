@@ -269,7 +269,7 @@ namespace GameBuilder.Cue
 
         public byte[] CreateToc()
         {
-            using (MemoryStream toc = new MemoryStream())
+            using (BuildStream toc = new BuildStream())
             {
                 StreamUtil tocUtil = new StreamUtil(toc);
                 tocUtil.WriteBytes(createDummyTracks());

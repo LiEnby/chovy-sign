@@ -21,16 +21,16 @@ namespace GameBuilder.Psp
         {
             this.compress = compress;
 
-            this.npHdr = new MemoryStream();
+            this.npHdr = new BuildStream();
             this.npHdrUtil = new StreamUtil(npHdr);
 
-            this.npHdrBody = new MemoryStream();
+            this.npHdrBody = new BuildStream();
             this.npHdrBodyUtil = new StreamUtil(npHdrBody);
 
-            this.npTbl = new MemoryStream();
+            this.npTbl = new BuildStream();
             this.npTblUtil = new StreamUtil(npTbl);
             
-            this.isoData = new MemoryStream();
+            this.isoData = new BuildStream();
             this.isoDataUtil = new StreamUtil(isoData);
 
             this.headerKey = Rng.RandomBytes(0x10);
@@ -101,7 +101,7 @@ namespace GameBuilder.Psp
         public override byte[] GenerateDataPsp()
         {
             byte[] startDat = CreateStartDat(umdImage.Minis ? Resources.STARTDATMINIS : Resources.STARTDATPSP);
-            using (MemoryStream dataPsp = new MemoryStream())
+            using (BuildStream dataPsp = new BuildStream())
             {
                 StreamUtil dataPspUtil = new StreamUtil(dataPsp);
                 byte[] signature = signParamSfo(umdImage.DataFiles["PARAM.SFO"]);
@@ -288,16 +288,16 @@ namespace GameBuilder.Psp
         private byte[] dataKey;
 
 
-        private MemoryStream npHdr;
+        private BuildStream npHdr;
         private StreamUtil npHdrUtil;
 
-        private MemoryStream npHdrBody;
+        private BuildStream npHdrBody;
         private StreamUtil npHdrBodyUtil;
 
-        private MemoryStream isoData;
+        private BuildStream isoData;
         private StreamUtil isoDataUtil;
 
-        private MemoryStream npTbl;
+        private BuildStream npTbl;
         private StreamUtil npTblUtil;
     }
 }

@@ -1,4 +1,5 @@
-﻿using GameBuilder.Psp;
+﻿using GameBuilder;
+using GameBuilder.Psp;
 using LibChovy.Config;
 using System;
 using System.Collections.Generic;
@@ -19,6 +20,7 @@ namespace LibChovy
             this.Account = new Account(DrmRif.AccountId);
             this.CreatePsvImg = true;
             this.FirmwareVersion = 0x3600000;
+            this.BuildStreamType = StreamType.TYPE_MEMORY_STREAM;
         }
 
         public int FirmwareVersion;
@@ -27,7 +29,8 @@ namespace LibChovy
         public NpDrmRif DrmRif;
         public Account Account;
         public ChovyTypes Type;
-        
+
+        public StreamType BuildStreamType;
 
         protected string? outputFolderOverride;
 

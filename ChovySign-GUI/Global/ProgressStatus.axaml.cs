@@ -2,6 +2,7 @@ using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Threading;
 using ChovySign_GUI.Popup.Global;
+using ChovySign_GUI.Settings;
 using Li.Progress;
 using LibChovy;
 using System;
@@ -13,6 +14,8 @@ namespace ChovySign_GUI.Global
     public partial class ProgressStatus : UserControl
     {
         public ChovySignParameters? Parameters = null;
+        public event EventHandler<EventArgs>? Finished;
+        public event EventHandler<EventArgs>? BeforeStart;
         private ChovySign chovySign;
         public ProgressStatus()
         {
@@ -21,14 +24,12 @@ namespace ChovySign_GUI.Global
             chovySign = new ChovySign();
             chovySign.RegisterCallback(onProgress);
         }
-        public event EventHandler<EventArgs>? BeforeStart;
         protected virtual void OnBeforeStart(EventArgs e)
         {
             if (BeforeStart is not null)
                 BeforeStart(this, e);
         }
 
-        public event EventHandler<EventArgs>? Finished;
 
         protected virtual void OnFinished(EventArgs e)
         {
@@ -45,8 +46,10 @@ namespace ChovySign_GUI.Global
             this.goButton.IsEnabled = false;
             
             OnBeforeStart(new EventArgs());
-
+            // sanity check it
             if(Parameters is null) { await MessageBox.Show(currentWindow, "ChovySignParameters was null, cannot start!", "Invalid Parameters", MessageBoxButtons.Ok); return; }
+            // apply settings that are global to all signs
+            if(SettingsTab.Settings is not null) Parameters.BuildStreamType = SettingsTab.Settings.BuildStreamType;
 
             try
             {

@@ -17,19 +17,19 @@ namespace GameBuilder.Psp
         {
             DrmInfo = npDrmInfo;
 
-            Psar = new MemoryStream();
+            Psar = new BuildStream();
             psarUtil = new StreamUtil(Psar);
 
         }
 
         public NpDrmInfo DrmInfo;
-        public MemoryStream Psar;
+        public BuildStream Psar;
         internal StreamUtil psarUtil;
         public abstract void CreatePsar();
         public abstract byte[] GenerateDataPsp();
         public static byte[] CreateStartDat(byte[] image)
         {
-            using(MemoryStream startDatStream = new MemoryStream())
+            using(BuildStream startDatStream = new BuildStream())
             {
                 StreamUtil startDatUtil = new StreamUtil(startDatStream);
 

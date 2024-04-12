@@ -18,7 +18,7 @@ namespace GameBuilder.Psp
         private byte[]? snd0At3;
         private NpDrmPsar psar;
         private short pbpVersion;
-        private MemoryStream pbpStream;
+        private BuildStream pbpStream;
 
         public PbpBuilder(byte[] paramSfo, byte[] icon0Png, byte[]? icon1Pmf,
                            byte[]? pic0Png, byte[]? pic1Png, byte[]? snd0At3,
@@ -33,11 +33,11 @@ namespace GameBuilder.Psp
             this.psar = dataPsar;
             this.pbpVersion = version;
 
-            pbpStream = new MemoryStream();
+            pbpStream = new BuildStream();
             psar.RegisterCallback(onProgress);
         }
 
-        public MemoryStream PbpStream
+        public BuildStream PbpStream
         {
             get
             {

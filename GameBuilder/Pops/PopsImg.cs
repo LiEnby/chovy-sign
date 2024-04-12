@@ -17,7 +17,7 @@ namespace GameBuilder.Pops
         
         public PopsImg(NpDrmInfo versionKey) : base(versionKey)
         {
-            simple = new MemoryStream();
+            simple = new BuildStream();
             simpleUtil = new StreamUtil(simple);
 
             this.StartDat = NpDrmPsar.CreateStartDat(Resources.STARTDATPOPS);
@@ -86,7 +86,7 @@ namespace GameBuilder.Pops
             return loaderEnc.ToArray();
         }
 
-        private MemoryStream simple;
+        private BuildStream simple;
         private StreamUtil simpleUtil;
 
         public byte[] EbootElf;

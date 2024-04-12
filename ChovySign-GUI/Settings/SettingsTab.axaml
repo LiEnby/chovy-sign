@@ -17,6 +17,7 @@
 				<RowDefinition Height="1*"/>
 				<RowDefinition Height="1*"/>
 				<RowDefinition Height="1*"/>
+				<RowDefinition Height="1*"/>
 			</Grid.RowDefinitions>
 			<Settings:ConfigToggle Name="devkitAccount" 
 								 ConfigKey="USE_DEVKIT_ACCOUNT_ID"
@@ -45,6 +46,12 @@
 								 Label="LibCrypt Method:"
 								 HorizontalAlignment="Stretch"
 								 Grid.Row="3"/>
+			
+			<Settings:ConfigDropDown Name="streamType"
+								ConfigKey="USE_STREAM_TYPE"
+								Label="Build Stream Type:"
+								HorizontalAlignment="Stretch"
+								Grid.Row="4"/>
 
 		</Grid>
 	</Grid>

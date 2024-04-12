@@ -26,8 +26,8 @@ namespace GameBuilder.Pops
             this.disc = disc;
             this.cue = new CueReader(disc.CueFile);
 
-            this.IsoHeader = new MemoryStream();
-            this.CompressedIso = new MemoryStream();
+            this.IsoHeader = new BuildStream();
+            this.CompressedIso = new BuildStream();
 
             this.isoHeaderUtil = new StreamUtil(IsoHeader);
             this.atrac3Encoder = encoder;
@@ -189,9 +189,9 @@ namespace GameBuilder.Pops
 
                     writeCDAEntry(Convert.ToInt32(CompressedIso.Position), atracData.Length, key);
 
-                    using (MemoryStream atracStream = new MemoryStream(atracData))
+                    using (BuildStream atracStream = new BuildStream(atracData))
                     {
-                        using (MemoryStream encryptedAtracStream = new MemoryStream())
+                        using (BuildStream encryptedAtracStream = new BuildStream())
                         {
                             AtracCrypto.ScrambleAtracData(atracStream, encryptedAtracStream, key);
                             encryptedAtracStream.Seek(0x00, SeekOrigin.Begin);
@@ -241,8 +241,8 @@ namespace GameBuilder.Pops
         private CueReader cue;
         private PopsImg srcImg;
 
-        public MemoryStream IsoHeader;
-        public MemoryStream CompressedIso;
+        public BuildStream IsoHeader;
+        public BuildStream CompressedIso;
 
         private StreamUtil isoHeaderUtil;
         private IAtracEncoderBase atrac3Encoder;
