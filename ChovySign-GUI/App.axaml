@@ -1,153 +1,123 @@
 <Application xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             x:Class="ChovySign_GUI.App">
+             x:Class="ChovySign_GUI.App"
+			 RequestedThemeVariant="Dark">
 	<Application.Styles>
-		<FluentTheme Mode="Light"/>
+		<FluentTheme/>
 
 		<!-- Checkbox Styling -->
-		<Style Selector="CheckBox:checked /template/ ContentPresenter">
-			<Setter Property="TextBlock.Foreground">
-				<Setter.Value>LightGreen</Setter.Value>
-			</Setter>
+
+		<!-- checked -->
+		<Style Selector="CheckBox:checked">
+			<Setter Property="BorderBrush" Value="LightGreen" />
+
+			<Style Selector="^ /template/ ContentPresenter#PART_ContentPresenter">
+				<Setter Property="Foreground" Value="LightGreen" />
+			</Style>
+			
+			<Style Selector="^ /template/ Border#NormalRectangle">
+				<Setter Property="BorderBrush" Value="LightGreen" />
+				<Setter Property="Background" Value="#3f3f3f" />
+			</Style>
 		</Style>
 
-		<Style Selector="CheckBox:checked /template/ Border#NormalRectangle">
-			<Setter Property="BorderBrush">
-				<Setter.Value>LightGreen</Setter.Value>
-			</Setter>
-			<Setter Property="Background">
-				<Setter.Value>#3f3f3f</Setter.Value>
-			</Setter>
+		<!-- unchecked -->
+
+		<Style Selector="CheckBox:unchecked">
+			<Setter Property="BorderBrush" Value="LightGreen" />
+			<Setter Property="Foreground" Value="LightGreen" />
+
+			<Style Selector="^ /template/ ContentPresenter#PART_ContentPresenter">
+				<Setter Property="Foreground" Value="LightGreen" />
+			</Style>
+
+			<Style Selector="^ /template/ Border#NormalRectangle">
+				<Setter Property="BorderBrush" Value="LightGreen" />
+				<Setter Property="Background" Value="#3f3f3f" />
+			</Style>
 		</Style>
 
-		<Style Selector="CheckBox:pointerover /template/ Border#NormalRectangle">
-			<Setter Property="BorderBrush">
-				<Setter.Value>Green</Setter.Value>
-			</Setter>
-			<Setter Property="Background">
-				<Setter.Value>#1f1f1f</Setter.Value>
-			</Setter>
-		</Style>
+		<!-- pointerover -->
 
-		<Style Selector="CheckBox /template/ Border#NormalRectangle">
-			<Setter Property="BorderBrush">
-				<Setter.Value>Green</Setter.Value>
-			</Setter>
-			<Setter Property="Background">
-				<Setter.Value>#3f3f3f</Setter.Value>
-			</Setter>
-		</Style>
+		<Style Selector="CheckBox:pointerover">
+			<Setter Property="BorderBrush" Value="Green" />
 
-		<Style Selector="CheckBox:pointerover /template/ ContentPresenter">
-			<Setter Property="TextBlock.Foreground">
-				<Setter.Value>Green</Setter.Value>
-			</Setter>
+			<Style Selector="^ /template/ ContentPresenter#PART_ContentPresenter">
+				<Setter Property="Foreground" Value="Green" />
+			</Style>
 
+			<Style Selector="^ /template/ Border#NormalRectangle">
+				<Setter Property="BorderBrush" Value="Green" />
+				<Setter Property="Background" Value="#1f1f1f" />
+			</Style>
 		</Style>
 
 
-		<Style Selector="CheckBox">
-			<Setter Property="BorderBrush">
-				<Setter.Value>LightGreen</Setter.Value>
-			</Setter>
 
-			<Setter Property="Foreground">
-				<Setter.Value>LightGreen</Setter.Value>
-			</Setter>
-		</Style>
-
+		
+		
 		<!-- Button styles -->
-		<Style Selector="Button:disabled /template/ ContentPresenter">
-			<Setter Property="Background">
-				<Setter.Value>Black</Setter.Value>
-			</Setter>
-			<Setter Property="BorderBrush">
-				<Setter.Value>DarkRed</Setter.Value>
-			</Setter>
-			<Setter Property="TextBlock.Foreground">
-				<Setter.Value>DarkRed</Setter.Value>
-			</Setter>
+
+		<!-- disabled -->
+		<Style Selector="Button:disabled">
+			<Style Selector="^:disabled /template/ ContentPresenter">
+				<Setter Property="Background" Value="Black" />
+				<Setter Property="BorderBrush" Value="DarkRed" />
+				<Setter Property="Foreground" Value="DarkRed" />
+			</Style>
 		</Style>
 
-		<Style Selector="Button:pointerover /template/ ContentPresenter">
-			<Setter Property="Background">
-				<Setter.Value>Red</Setter.Value>
-			</Setter>
-			<Setter Property="BorderBrush">
-				<Setter.Value>DarkRed</Setter.Value>
-			</Setter>
-			<Setter Property="TextBlock.Foreground">
-				<Setter.Value>Black</Setter.Value>
-			</Setter>
+		<!-- pointerover -->
+		<Style Selector="Button:pointerover">
+			<Style Selector="^:pointerover /template/ ContentPresenter">
+				<Setter Property="Background" Value="Red" />
+				<Setter Property="BorderBrush" Value="DarkRed" />
+				<Setter Property="Foreground" Value="Black" />
+			</Style>
 		</Style>
 
+		<!-- regular -->
 		<Style Selector="Button">
-			<Setter Property="BorderThickness">
-				<Setter.Value>1</Setter.Value>
-			</Setter>
-			<Setter Property="Foreground">
-				<Setter.Value>Red</Setter.Value>
-			</Setter>
-			<Setter Property="BorderBrush">
-				<Setter.Value>Red</Setter.Value>
-			</Setter>
-			<Setter Property="Background">
-				<Setter.Value>Black</Setter.Value>
-			</Setter>
+			<Setter Property="Background" Value="Black" />
+			<Setter Property="BorderBrush" Value="Red" />
+			<Setter Property="Foreground" Value="Red" />
+			<Setter Property="BorderThickness" Value="1" />
 		</Style>
 
 		<!-- Textbox Styling -->
 
 		<Style Selector="TextBox:focus">
-			<Setter Property="Foreground">
-				<Setter.Value>LightGreen</Setter.Value>
-			</Setter>
-		</Style>
+			<Setter Property="Foreground" Value="LightGreen" />
+			
+			<Style Selector="^ /template/ TextBlock">
+				<Setter Property="Foreground" Value="LightGreen" />
+			</Style>
 
-		<Style Selector="TextBox:focus /template/ TextBlock">
-			<Setter Property="Foreground">
-				<Setter.Value>LightGreen</Setter.Value>
-			</Setter>
+			<Style Selector="^ /template/ Border">
+				<Setter Property="Background" Value="#3f3f3f" />
+				<Setter Property="BorderBrush" Value="LightGreen" />
+			</Style>
+			
 		</Style>
-		<Style Selector="TextBox:focus /template/ Border">
-			<Setter Property="Background">
-				<Setter.Value>#3f3f3f</Setter.Value>
-			</Setter>
-			<Setter Property="BorderBrush">
-				<Setter.Value>LightGreen</Setter.Value>
-			</Setter>
-		</Style>
+		
 
 		<Style Selector="TextBox:pointerover">
-			<Setter Property="Foreground">
-				<Setter.Value>Green</Setter.Value>
-			</Setter>
-		</Style>
+			<Setter Property="Foreground" Value="Green" />
 
-		<Style Selector="TextBox:pointerover /template/ TextBlock">
-			<Setter Property="Foreground">
-				<Setter.Value>Green</Setter.Value>
-			</Setter>
+			<Style Selector="^ /template/ TextBlock">
+				<Setter Property="Foreground" Value="Green" />
+			</Style>
+			
+			<Style Selector="^ /template/ Border">
+				<Setter Property="Background" Value="#1f1f1f" />
+				<Setter Property="BorderBrush" Value="Green" />
+			</Style>
 		</Style>
-		<Style Selector="TextBox:pointerover /template/ Border">
-			<Setter Property="Background">
-				<Setter.Value>#1f1f1f</Setter.Value>
-			</Setter>
-			<Setter Property="BorderBrush">
-				<Setter.Value>Green</Setter.Value>
-			</Setter>
-		</Style>
-
+		
 		<Style Selector="TextBox">
-			<Setter Property="Foreground">
-				<Setter.Value>LightGreen</Setter.Value>
-			</Setter>
-			<Setter Property="Background">
-				<Setter.Value>#3f3f3f</Setter.Value>
-			</Setter>
-			<Setter Property="BorderBrush">
-				<Setter.Value>LightGreen</Setter.Value>
-			</Setter>
+			<Setter Property="Foreground" Value="LightGreen" />
+			<Setter Property="Background" Value="#3f3f3f" />
+			<Setter Property="BorderBrush" Value="LightGreen" />
 		</Style>
 
 		<!-- ComboBox -->

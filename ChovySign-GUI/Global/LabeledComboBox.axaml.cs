@@ -54,13 +54,13 @@ namespace ChovySign_GUI.Global
         {
             get
             {
-                string[]? strings = this.comboBox.Items as string[];
+                string[]? strings = this.comboBox.ItemsSource as string[];
                 if (strings is null) return new string[0];
                 return strings;
             }
             set
             {
-                this.comboBox.Items = value;
+                this.comboBox.ItemsSource = value;
             }
         }
 

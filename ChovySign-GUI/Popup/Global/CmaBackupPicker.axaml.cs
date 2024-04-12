@@ -170,7 +170,7 @@ namespace ChovySign_GUI.Popup.Global
         private void reloadBackupsList()
         {
             this.selectBtn.IsEnabled = false;
-            this.backupList.Items = new string[0];
+            this.backupList.ItemsSource = new string[0];
             try
             {
                 string[] gameBackupDirectories = GetAllDriectories(backupSearchFolders);
@@ -202,7 +202,7 @@ namespace ChovySign_GUI.Popup.Global
                 }
 
                 this.gameDirectories = filteredGameDirectories.ToArray();
-                this.backupList.Items = gameList;
+                this.backupList.ItemsSource = gameList;
             }
             catch { }
         }
