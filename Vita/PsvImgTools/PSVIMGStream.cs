@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Li.Utilities;
+using System;
 using System.IO;
 using System.Security.Cryptography;
 
@@ -106,10 +107,10 @@ namespace Vita.PsvImgTools
 
         }
 
-        public PSVIMGStream(Stream file, byte[] KEY)
+        public PSVIMGStream(Stream file, byte[] aesKey)
         {
             baseStream = file;
-            key = KEY;
+            key = aesKey;
             if (!verifyFooter())
             {
                 throw new Exception("Invalid KEY!");
@@ -283,22 +284,6 @@ namespace Vita.PsvImgTools
             baseStream.Read(iv, 0x00, iv.Length);
             return iv;
         }
-        private byte[] aes_cbc_decrypt(byte[] cipherData, byte[] IV)
-        {
-            MemoryStream ms = new MemoryStream();
-            Aes alg = Aes.Create();
-            alg.Mode = CipherMode.CBC;
-            alg.Padding = PaddingMode.None;
-            alg.KeySize = 256;
-            alg.BlockSize = 128;
-            alg.Key = key;
-            alg.IV = IV;
-            CryptoStream cs = new CryptoStream(ms, alg.CreateDecryptor(), CryptoStreamMode.Write);
-            cs.Write(cipherData, 0, cipherData.Length);
-            cs.Close();
-            byte[] decryptedData = ms.ToArray();
-            return decryptedData;
-        }
 
         private void seekToBlock(long blockIndex)
         {
@@ -315,31 +300,25 @@ namespace Vita.PsvImgTools
 
         private bool verifyFooter()
         {
-            byte[] Footer = new byte[0x10];
-            byte[] IV = new byte[PSVIMGConstants.AES_BLOCK_SIZE];
+            byte[] footer = new byte[0x10];
+            byte[] iv = new byte[PSVIMGConstants.AES_BLOCK_SIZE];
 
-            baseStream.Seek(baseStream.Length - (Footer.Length + IV.Length), SeekOrigin.Begin);
-            baseStream.Read(IV, 0x00, PSVIMGConstants.AES_BLOCK_SIZE);
-            baseStream.Read(Footer, 0x00, 0x10);
+            baseStream.Seek(baseStream.Length - (footer.Length + iv.Length), SeekOrigin.Begin);
+            baseStream.Read(iv, 0x00, PSVIMGConstants.AES_BLOCK_SIZE);
+            baseStream.Read(footer, 0x00, 0x10);
 
-            byte[] FooterDec = aes_cbc_decrypt(Footer, IV);
-            ulong FooterLen;
-            using (MemoryStream ms = new MemoryStream(FooterDec))
+            byte[] footerDec = CryptoUtil.aes_cbc_decrypt(footer, iv, this.Key);
+            ulong footerLen = 0;
+
+            using (MemoryStream ms = new MemoryStream(footerDec))
             {
-                ms.Seek(0x4, SeekOrigin.Current);
-                ms.Seek(0x4, SeekOrigin.Current);
-                byte[] LenInt = new byte[0x8];
-                ms.Read(LenInt, 0x00, 0x8);
-                FooterLen = BitConverter.ToUInt64(LenInt, 0x00);
+                PSVIMGStreamUtil fStreamUtil = new PSVIMGStreamUtil(ms);
+                fStreamUtil.ReadInt32();
+                fStreamUtil.ReadInt32();
+                footerLen = fStreamUtil.ReadUInt64();
             }
-            if (Convert.ToUInt64(baseStream.Length) == FooterLen)
-            {
-                return true;
-            }
-            else
-            {
-                return false;
-            }
+
+            return Convert.ToUInt64(baseStream.Length) == footerLen;
         }
 
         private byte[] getBlock(long blockIndex)
@@ -358,7 +337,7 @@ namespace Vita.PsvImgTools
 
 
             baseStream.Read(encryptedBlock, 0x00, encryptedBlock.Length);
-            byte[] decryptedBlock = aes_cbc_decrypt(encryptedBlock, iv);
+            byte[] decryptedBlock = CryptoUtil.aes_cbc_decrypt(encryptedBlock, iv, this.Key);
             return decryptedBlock;
         }
     }

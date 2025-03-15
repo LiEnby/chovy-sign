@@ -1,4 +1,6 @@
 ﻿using DiscUtils.Streams;
+using GameBuilder.Psp;
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -27,7 +29,7 @@ namespace GameBuilder
                 string tmpFolder = Path.Combine(Path.GetTempPath(), "chovysign2");
                 Directory.CreateDirectory(tmpFolder);
 
-                this.filename = Path.Combine(tmpFolder, Guid.NewGuid().ToString());
+                this.filename = Path.Combine(tmpFolder, Rng.RandomStr(5));
                 this.underylingStream = File.Create(this.filename);
             }
             else
@@ -41,10 +43,12 @@ namespace GameBuilder
             init();
             this.Write(data, 0, data.Length);
             this.Seek(0x00, SeekOrigin.Begin);
+            if (this.underylingStream == null) throw new NullReferenceException("somehow underlying stream is null");
         }
         public BuildStream()
         {
             init();
+            if (this.underylingStream == null) throw new NullReferenceException("somehow underlying stream is null");
         }
 
         public override bool CanRead {

@@ -16,8 +16,8 @@ namespace GameBuilder.Psp
         public NpDrmPsar(NpDrmInfo npDrmInfo)
         {
             DrmInfo = npDrmInfo;
-
             Psar = new BuildStream();
+
             psarUtil = new StreamUtil(Psar);
 
         }

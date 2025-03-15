@@ -25,5 +25,18 @@ namespace GameBuilder.Psp
             byte[] intBytes = RandomBytes(0x4);
             return BitConverter.ToInt32(intBytes);
         }
+
+
+        public static string RandomStr(int length)
+        {
+            string allowedChars = "abcdefghijklmnopqrstuvwxyzABDECFGHIJKLMNOPQRSTUVWXYZ1234567890 ";
+            StringBuilder sb = new StringBuilder();
+            do
+            {
+                sb.Append(allowedChars[RandomInt() % allowedChars.Length]);
+            } while (sb.Length < length);
+
+            return sb.ToString();
+        }
     }
 }

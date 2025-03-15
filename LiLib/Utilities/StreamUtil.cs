@@ -100,6 +100,17 @@ namespace Li.Utilities
             byte[] vbytes = ReadBytes(0x4);
             return BitConverter.ToInt32(vbytes);
         }
+
+        public UInt64 ReadUInt64()
+        {
+            byte[] vbytes = ReadBytes(0x8);
+            return BitConverter.ToUInt64(vbytes);
+        }
+        public Int64 ReadInt64()
+        {
+            byte[] vbytes = ReadBytes(0x8);
+            return BitConverter.ToInt64(vbytes);
+        }
         public void WriteBytesWithPadding(byte[] data, byte b, int len)
         {
             if (len < data.Length)

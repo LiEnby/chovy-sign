@@ -14,6 +14,10 @@ namespace Vita.PsvImgTools
         public const string PSVIMG_TAILOR_END = "EndOfTailer\n";
         public const string PSVIMG_PADDING_END = "\n";
 
+        public const byte PSVIMG_HEAD_PAD_BYTE = 0x78;
+        public const byte PSVIMG_TAIL_PAD_BYTE = 0x7a;
+        public const byte PSVIMG_PAD_BYTE = 0x2B;
+
         public const int FULL_PSVIMG_SIZE = PSVIMG_BLOCK_SIZE + SHA256_BLOCK_SIZE;
     }
 
@@ -121,14 +125,19 @@ namespace Vita.PsvImgTools
 
         public Modes Mode;
         public AttributesEnum Attributes;
+        
         /** Size of the file in bytes. */
-        public ulong Size;
+        public ulong Size = 0;
+        
         /** Creation time. */
-        public SceDateTime CreationTime;
+        public SceDateTime CreationTime = new SceDateTime();
+        
         /** Access time. */
-        public SceDateTime AccessTime;
+        public SceDateTime AccessTime = new SceDateTime();
+        
         /** Modification time. */
-        public SceDateTime ModificaionTime;
+        public SceDateTime ModificaionTime = new SceDateTime();
+
         /** Device-specific data. */
         public uint[] Private = new uint[6];
         public SceIoStat()
@@ -144,7 +153,7 @@ namespace Vita.PsvImgTools
     {
         public ulong Flags;
         public byte[] Padding = new byte[1004];
-        public byte[] bEnd = new byte[12];
+        internal byte[] bEnd = new byte[12];
 
         public string End
         {
@@ -175,12 +184,12 @@ namespace Vita.PsvImgTools
     {
         public ulong SysTime;
         public ulong Flags;
-        public SceIoStat Statistics;
+        public SceIoStat Statistics = new SceIoStat();
         public byte[] bParentPath = new byte[256];
         public uint unk_16C; // set to 1
-        public byte[] bPath = new byte[256];
-        public byte[] Padding = new byte[904];
-        public byte[] bEnd = new byte[12];
+        internal byte[] bPath = new byte[256];
+        internal byte[] Padding = new byte[904];
+        internal byte[] bEnd = new byte[12];
 
         public string Path
         {
