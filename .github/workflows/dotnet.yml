@@ -1,0 +1,79 @@
+name: build
+
+on:
+  push:
+    branches: [ master ]
+defaults:
+  run:
+    working-directory: ./
+
+jobs:
+  build-apps:
+    runs-on: windows-latest
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+      
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 9.0.x
+        include-prerelease: false
+        
+    - name: Restore dependencies
+      run: |
+        dotnet restore ChovySign-GUI
+        dotnet restore ChovySign-CLI
+        dotnet restore PbpResign
+
+    - name: Build windows gui
+      continue-on-error: false
+      run: |
+        dotnet publish -p:PublishProfile=Win64 ChovySign-GUI
+        dotnet publish -p:PublishProfile=Win64 ChovySign-CLI
+        dotnet publish -p:PublishProfile=Win64 PbpResign
+        
+    - name: Upload windows gui
+      uses: actions/upload-artifact@v4
+      with:
+        name: ChovySign-GUI-Windows-x64
+        path: ChovySign-GUI/bin/Release/Windows
+
+    - name: Upload windows cli
+      uses: actions/upload-artifact@v4
+      with:
+        name: ChovySign-CLI-Windows-x64
+        path: ChovySign-CLI/bin/Release/Windows
+
+    - name: Upload windows PbpResign
+      uses: actions/upload-artifact@v4
+      with:
+        name: PbpResign-Windows-x64
+        path: PbpResign/bin/Release/Windows
+
+
+    - name: Build linux gui
+      continue-on-error: false
+      run: |
+        dotnet publish -p:PublishProfile=Linux64 ChovySign-GUI
+        dotnet publish -p:PublishProfile=Linux64 ChovySign-CLI
+        dotnet publish -p:PublishProfile=Linux64 PbpResign
+        
+    - name: Upload linux gui
+      uses: actions/upload-artifact@v4
+      with:
+        name: ChovySign-GUI-Linux-x64
+        path: ChovySign-GUI/bin/Release/Linux
+
+    - name: Upload linux cli
+      uses: actions/upload-artifact@v4
+      with:
+        name: ChovySign-CLI-Linux-x64
+        path: ChovySign-CLI/bin/Release/Linux
+
+    - name: Upload linux PbpResign
+      uses: actions/upload-artifact@v4
+      with:
+        name: PbpResign-Linux-x64
+        path: PbpResign/bin/Release/Linux
