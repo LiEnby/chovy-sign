@@ -29,13 +29,13 @@ jobs:
     - name: Upload windows cli
       uses: actions/upload-artifact@v4
       with:
-        name: ChovySign-CLI-Windows-x64
+        name: ChovySign2-CLI-Windows-x64
         path: bin/Windows/ChovyCLI
         
     - name: Upload windows gui
       uses: actions/upload-artifact@v4
       with:
-        name: ChovySign-GUI-Windows-x64
+        name: ChovySign2-GUI-Windows-x64
         path: bin/Windows/ChovyGUI
 
 
@@ -56,13 +56,13 @@ jobs:
     - name: Upload linux cli
       uses: actions/upload-artifact@v4
       with:
-        name: ChovySign-CLI-Linux-x64
+        name: ChovySign2-CLI-Linux-x64
         path: bin/Linux/ChovyCLI
         
     - name: Upload linux gui
       uses: actions/upload-artifact@v4
       with:
-        name: ChovySign-GUI-Linux-x64
+        name: ChovySign2-GUI-Linux-x64
         path: bin/Linux/ChovyGUI
 
     - name: Upload linux PbpResign
