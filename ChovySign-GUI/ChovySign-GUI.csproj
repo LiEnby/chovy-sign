@@ -3,13 +3,13 @@
     <OutputType>WinExe</OutputType>
     <TargetFramework>net9.0</TargetFramework>
     <Nullable>enable</Nullable>
-    <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <RootNamespace>ChovySign_GUI</RootNamespace>
     <AssemblyName>ChovySign v2</AssemblyName>
     <ApplicationIcon>ICON.ICO</ApplicationIcon>
     <Authors>SquallATF, Li, Dots-Tb</Authors>
   </PropertyGroup>
+  
   <ItemGroup>
     <None Remove=".gitignore" />
     <None Remove="DEFAULTICON.PNG" />
@@ -21,16 +21,16 @@
     <None Remove="PS1CD.PNG" />
     <None Remove="UMD.png" />
   </ItemGroup>
+  
   <ItemGroup>
     <AvaloniaResource Include="ICON.PNG" />
     <AvaloniaResource Include="Popup\Global\KeySelector\ACTRIFMETHOD.PNG" />
     <AvaloniaResource Include="Popup\Global\KeySelector\EBOOTMETHOD.PNG" />
     <AvaloniaResource Include="Popup\Global\KeySelector\NOPSPEMUDRMMETHOD.PNG" />
     <AvaloniaResource Include="Ps1\PS1CD.PNG" />
-    <AvaloniaResource Include="Psp\UMD.PNG">
-      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-    </AvaloniaResource>
+    <AvaloniaResource Include="Psp\UMD.PNG" />
   </ItemGroup>
+  
   <ItemGroup>
     <Content Include="ICON.ICO" />
   </ItemGroup>
