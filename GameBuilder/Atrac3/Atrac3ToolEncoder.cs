@@ -1,4 +1,5 @@
-﻿using Li.Utilities;
+﻿using GameBuilder.Psp;
+using Li.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -16,7 +17,6 @@ namespace GameBuilder.Atrac3
         [DllImport("libc")]
         private static extern int setenv(string name, string value, bool overwrite);
 
-        private static Random rng = new Random();
         private static string TOOLS_DIRECTORY = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "tools");
 
         private static string AT3TOOL_WIN = Path.Combine(TOOLS_DIRECTORY, "at3tool.exe");
@@ -26,14 +26,14 @@ namespace GameBuilder.Atrac3
         private static string LD_LIBRARY_PATH = "LD_LIBRARY_PATH";
 
         // random name so that can generate multiple at once if wanted ..
-        private string TEMP_WAV;
-        private string TEMP_AT3;
+        private string tempWav;
+        private string tempAt9;
         public Atrac3ToolEncoder()
         {
-            string rdmPart = rng.Next().ToString("X");
+            string rdmPart = Rng.RandomStr(10);
 
-            TEMP_WAV = Path.Combine(TEMP_DIRECTORY, rdmPart + "_tmp.wav");
-            TEMP_AT3 = Path.Combine(TEMP_DIRECTORY, rdmPart + "_tmp.at3");
+            tempWav = Path.Combine(TEMP_DIRECTORY, rdmPart + "_tmp.wav");
+            tempAt9 = Path.Combine(TEMP_DIRECTORY, rdmPart + "_tmp.at3");
 
         }
          
@@ -69,7 +69,7 @@ namespace GameBuilder.Atrac3
                     proc.StartInfo.Environment.Add(LD_LIBRARY_PATH, setupLibaryPath());
 
                 proc.StartInfo.FileName = AT3TOOL_LOCATION;
-                proc.StartInfo.Arguments = "-br 132 -e \"" + TEMP_WAV + "\" \"" + TEMP_AT3 + "\"";
+                proc.StartInfo.Arguments = "-br 132 -e \"" + tempWav + "\" \"" + tempAt9 + "\"";
 
                 proc.StartInfo.UseShellExecute = false;
                 proc.StartInfo.CreateNoWindow = true;
@@ -87,7 +87,7 @@ namespace GameBuilder.Atrac3
 
         private byte[] stripAtracHeader()
         {
-            using(FileStream at3Stream = File.OpenRead(TEMP_AT3))
+            using(FileStream at3Stream = File.OpenRead(tempAt9))
             {
                 StreamUtil at3Util = new StreamUtil(at3Stream);
                 at3Stream.Seek(0x4C, SeekOrigin.Begin);
@@ -98,7 +98,7 @@ namespace GameBuilder.Atrac3
 
         private void makeWav(byte[] pcmData)
         {
-            using (FileStream wavStream = File.Open(TEMP_WAV, FileMode.Create))
+            using (FileStream wavStream = File.Open(tempWav, FileMode.Create))
             {
                 // CD-AUDIO standard settings
                 int fileSize = pcmData.Length;
@@ -154,8 +154,8 @@ namespace GameBuilder.Atrac3
 
         private void cleanup()
         {
-            if (File.Exists(TEMP_WAV)) File.Delete(TEMP_WAV);
-            if (File.Exists(TEMP_AT3)) File.Delete(TEMP_AT3);
+            if (File.Exists(tempWav)) File.Delete(tempWav);
+            if (File.Exists(tempAt9)) File.Delete(tempAt9);
         }
 
         public byte[] EncodeToAtrac(byte[] pcmData)
