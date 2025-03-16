@@ -3,9 +3,7 @@ name: build
 on:
   push:
     branches: [ master ]
-defaults:
-  run:
-    working-directory: ./
+    
 
 jobs:
   build-apps:
@@ -20,60 +18,55 @@ jobs:
       with:
         dotnet-version: 9.0.x
         include-prerelease: false
-        
-    - name: Restore dependencies
-      run: |
-        dotnet restore ChovySign-GUI
-        dotnet restore ChovySign-CLI
-        dotnet restore PbpResign
 
     - name: Build windows
       continue-on-error: false
       run: |
-        dotnet publish -p:PublishProfile=Win64 ChovySign-GUI
-        dotnet publish -p:PublishProfile=Win64 ChovySign-CLI
-        dotnet publish -p:PublishProfile=Win64 PbpResign
+        dotnet publish -p:PublishProfile=Win64 ChovySign-CLI --output bin/Windows/ChovyCLI
+        dotnet publish -p:PublishProfile=Win64 ChovySign-GUI --output bin/Windows/ChovyGUI
+        dotnet publish -p:PublishProfile=Win64 PbpResign  --output bin/Windows/PbpResign
+    
+    - name: Upload windows cli
+      uses: actions/upload-artifact@v4
+      with:
+        name: ChovySign-CLI-Windows-x64
+        path: bin/Windows/ChovyCLI
         
     - name: Upload windows gui
       uses: actions/upload-artifact@v4
       with:
         name: ChovySign-GUI-Windows-x64
-        path: ChovySign-GUI/bin/Release/Windows
+        path: bin/Windows/ChovyGUI
 
-    - name: Upload windows cli
-      uses: actions/upload-artifact@v4
-      with:
-        name: ChovySign-CLI-Windows-x64
-        path: ChovySign-CLI/bin/Release/Windows
 
     - name: Upload windows PbpResign
       uses: actions/upload-artifact@v4
       with:
         name: PbpResign-Windows-x64
-        path: PbpResign/bin/Release/Windows
+        path: bin/Windows/PbpResign
 
 
     - name: Build linux
       continue-on-error: false
       run: |
-        dotnet publish -p:PublishProfile=Linux64 ChovySign-GUI
-        dotnet publish -p:PublishProfile=Linux64 ChovySign-CLI
-        dotnet publish -p:PublishProfile=Linux64 PbpResign
-        
-    - name: Upload linux gui
-      uses: actions/upload-artifact@v4
-      with:
-        name: ChovySign-GUI-Linux-x64
-        path: ChovySign-GUI/bin/Release/Linux
+        dotnet publish -p:PublishProfile=Linux64 ChovySign-CLI --output bin/Linux/ChovyCLI
+        dotnet publish -p:PublishProfile=Linux64 ChovySign-GUI --output bin/Linux/ChovyGUI
+        dotnet publish -p:PublishProfile=Linux64 PbpResign --output bin/Linux/PbpResign
 
     - name: Upload linux cli
       uses: actions/upload-artifact@v4
       with:
         name: ChovySign-CLI-Linux-x64
-        path: ChovySign-CLI/bin/Release/Linux
+        path: bin/Linux/ChovyCLI
+        
+    - name: Upload linux gui
+      uses: actions/upload-artifact@v4
+      with:
+        name: ChovySign-GUI-Linux-x64
+        path: bin/Linux/ChovyGUI
 
     - name: Upload linux PbpResign
       uses: actions/upload-artifact@v4
       with:
         name: PbpResign-Linux-x64
-        path: PbpResign/bin/Release/Linux
+        path: bin/Linux/PbpResign
