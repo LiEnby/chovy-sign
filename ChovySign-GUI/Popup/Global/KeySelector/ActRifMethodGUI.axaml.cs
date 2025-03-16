@@ -1,10 +1,10 @@
 using Avalonia.Controls;
 using Avalonia.Interactivity;
+using Li.Utilities;
 using ChovySign_GUI.Global;
 using LibChovy.Config;
 using LibChovy.VersionKey;
 using GameBuilder.Psp;
-using Li.Utilities;
 using System;
 using System.IO;
 using static ChovySign_GUI.Popup.Global.MessageBox;
@@ -47,7 +47,6 @@ namespace ChovySign_GUI.Popup.Global.KeySelector
 
             if (lastAct is not null)
                 actFile.FilePath = lastAct;
-
             if (lastCid is not null)
                 idpsInput.Text = BitConverter.ToString(lastCid).Replace("-", "");
             if (lastAct is not null)
@@ -55,8 +54,7 @@ namespace ChovySign_GUI.Popup.Global.KeySelector
             if (lastRif is not null)
                 rifFile.FilePath = lastRif;
 
-            hideConsoleId.Checked += onChangeCidState;
-            hideConsoleId.Unchecked += onChangeCidState;
+            hideConsoleId.IsCheckedChanged += onChangeCidState;
 
             idpsInput.TextChanged += onIdpsChange;
             actFile.FileChanged += onActFileChange;
@@ -69,27 +67,31 @@ namespace ChovySign_GUI.Popup.Global.KeySelector
         private void onRifFileChange(object? sender, EventArgs e)
         {
             BrowseButton? filePth = sender as BrowseButton;
+
+            check();
+
             if (filePth is null) return;
             if (!filePth.ContainsFile) return;
             ChovyConfig.CurrentConfig.SetString(keygenRifKey, filePth.FilePath);
-
-            check();
         }
 
         private void onActFileChange(object? sender, EventArgs e)
         {
             BrowseButton? filePth = sender as BrowseButton;
+            
+            check();
+
             if (filePth is null) return;
             if (!filePth.ContainsFile) return;
             ChovyConfig.CurrentConfig.SetString(keygenActKey, filePth.FilePath);
-
-            check();
         }
 
         private void onIdpsChange(object? sender, EventArgs e)
         {
             LabeledTextBox? labledTxtBox = sender as LabeledTextBox;
-            
+
+            check();
+
             if (labledTxtBox is null) return;
             if (labledTxtBox.Text.Length != 32) return;
 
@@ -97,7 +99,6 @@ namespace ChovySign_GUI.Popup.Global.KeySelector
             {
                 byte[] idps = MathUtil.StringToByteArray(labledTxtBox.Text);
                 ChovyConfig.CurrentConfig.SetBytes(keygenIdpsKey, idps);
-                check();
             }
             catch{ };
         }

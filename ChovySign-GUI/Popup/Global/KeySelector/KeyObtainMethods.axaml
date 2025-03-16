@@ -19,10 +19,10 @@
 			
 		<Button Content="EBOOT.PBP Method" Click="ebootMethodClick" Grid.Row="0" Grid.Column="0" HorizontalAlignment="Center" VerticalAlignment="Center"/>
 		<Button Content="IDPS+RIF+ACT Method" Click="actRifMethodClick" Grid.Row="0" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-		<Button Content="KEYS.TXT Method" Click="keysTxtMethodClick" Grid.Row="0" Grid.Column="2" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+		<Button Content="NoPspEmuDrm Method" Click="noPspEmuDrmMethodClick" Grid.Row="0" Grid.Column="2" HorizontalAlignment="Center" VerticalAlignment="Center"/>
 
 		<Image Name="ebootMethodGraphic" Source="/Popup/Global/KeySelector/EBOOTMETHOD.PNG" Grid.Row="1" Grid.Column="0" VerticalAlignment="Top" HorizontalAlignment="Stretch"/>
 		<Image Name="actRifMethodGraphic" Source="/Popup/Global/KeySelector/ACTRIFMETHOD.PNG" Grid.Row="1" Grid.Column="1" VerticalAlignment="Top" HorizontalAlignment="Stretch"/>
-		<Image Name="keysTxtMethodGraphic" Source="/Popup/Global/KeySelector/KEYSTXTMETHOD.PNG" Grid.Row="1" Grid.Column="2" VerticalAlignment="Top" HorizontalAlignment="Stretch"/>
+		<Image Name="noPspEmuDrmMethodGraphic" Source="/Popup/Global/KeySelector/NOPSPEMUDRMMETHOD.PNG" Grid.Row="1" Grid.Column="2" VerticalAlignment="Top" HorizontalAlignment="Stretch"/>
 	</Grid>
 </Window>

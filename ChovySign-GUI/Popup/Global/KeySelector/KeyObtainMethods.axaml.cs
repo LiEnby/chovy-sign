@@ -35,9 +35,9 @@ namespace ChovySign_GUI.Popup.Global.KeySelector
             this.Close(method);
         }
 
-        private void keysTxtMethodClick(object sender, RoutedEventArgs e)
+        private void noPspEmuDrmMethodClick(object sender, RoutedEventArgs e)
         {
-            this.method = VersionKeyMethod.KEYS_TXT_METHOD;
+            this.method = VersionKeyMethod.NOPSPEMUDRM_METHOD;
             this.Close(method);
         }
 

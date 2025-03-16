@@ -224,7 +224,7 @@ namespace Vita.PsvImgTools
         }
         private void update()
         {
-            long offset = Position % PSVIMGConstants.FULL_PSVIMG_SIZE;
+            long offset = Position % PSVIMGConstants.FULL_PSVIMG_BLOCK_SIZE;
             long blockIndex = getBlockIndex();
             byte[] decryptedBlock = getBlock(blockIndex);
             blockStream.Seek(0x00, SeekOrigin.Begin);
@@ -244,15 +244,15 @@ namespace Vita.PsvImgTools
 
             while (true)
             {
-                blockOffset = i * PSVIMGConstants.FULL_PSVIMG_SIZE + PSVIMGConstants.AES_BLOCK_SIZE;
+                blockOffset = i * PSVIMGConstants.FULL_PSVIMG_BLOCK_SIZE + PSVIMGConstants.AES_BLOCK_SIZE;
                 long remaining = getRemainingBase();
-                if (remaining < PSVIMGConstants.FULL_PSVIMG_SIZE)
+                if (remaining < PSVIMGConstants.FULL_PSVIMG_BLOCK_SIZE)
                 {
                     fullBlock = blockOffset + remaining;
                 }
                 else
                 {
-                    fullBlock = blockOffset + PSVIMGConstants.FULL_PSVIMG_SIZE;
+                    fullBlock = blockOffset + PSVIMGConstants.FULL_PSVIMG_BLOCK_SIZE;
                 }
                 if (curPos >= blockOffset && curPos < fullBlock)
                 {
@@ -288,7 +288,7 @@ namespace Vita.PsvImgTools
         private void seekToBlock(long blockIndex)
         {
             long blockOffset;
-            blockOffset = blockIndex * PSVIMGConstants.FULL_PSVIMG_SIZE + PSVIMGConstants.AES_BLOCK_SIZE;
+            blockOffset = blockIndex * PSVIMGConstants.FULL_PSVIMG_BLOCK_SIZE + PSVIMGConstants.AES_BLOCK_SIZE;
 
             if (blockOffset > baseStream.Length)
             {
@@ -326,9 +326,9 @@ namespace Vita.PsvImgTools
             byte[] iv = getIV(blockIndex);
             long remaining = getRemainingBase();
             byte[] encryptedBlock;
-            if (PSVIMGConstants.FULL_PSVIMG_SIZE < remaining)
+            if (PSVIMGConstants.FULL_PSVIMG_BLOCK_SIZE < remaining)
             {
-                encryptedBlock = new byte[PSVIMGConstants.FULL_PSVIMG_SIZE];
+                encryptedBlock = new byte[PSVIMGConstants.FULL_PSVIMG_BLOCK_SIZE];
             }
             else
             {

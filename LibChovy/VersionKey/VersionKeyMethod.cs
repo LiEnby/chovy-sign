@@ -10,6 +10,7 @@ namespace LibChovy.VersionKey
     {
         ACT_RIF_METHOD = 1,
         EBOOT_PBP_METHOD = 2,
-        KEYS_TXT_METHOD = 3
+        NOPSPEMUDRM_METHOD = 3,
+        KEYS_TXT_METHOD = 4
     }
 }

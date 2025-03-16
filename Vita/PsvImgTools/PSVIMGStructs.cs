@@ -18,7 +18,7 @@ namespace Vita.PsvImgTools
         public const byte PSVIMG_TAIL_PAD_BYTE = 0x7a;
         public const byte PSVIMG_PAD_BYTE = 0x2B;
 
-        public const int FULL_PSVIMG_SIZE = PSVIMG_BLOCK_SIZE + SHA256_BLOCK_SIZE;
+        public const int FULL_PSVIMG_BLOCK_SIZE = PSVIMG_BLOCK_SIZE + SHA256_BLOCK_SIZE;
     }
 
     internal class StringReader

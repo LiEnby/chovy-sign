@@ -184,8 +184,8 @@ namespace Vita.PsvImgTools
 
         internal virtual void startNewBlock()
         {
-            blockData = new byte[PSVIMGConstants.FULL_PSVIMG_SIZE];
-            blockStream = new MemoryStream(blockData, 0x00, PSVIMGConstants.FULL_PSVIMG_SIZE);
+            blockData = new byte[PSVIMGConstants.FULL_PSVIMG_BLOCK_SIZE];
+            blockStream = new MemoryStream(blockData, 0x00, PSVIMGConstants.FULL_PSVIMG_BLOCK_SIZE);
         }
 
 

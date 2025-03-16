@@ -17,6 +17,7 @@
     <None Remove="Popup\Global\KeySelector\ACTRIFMETHOD.PNG" />
     <None Remove="Popup\Global\KeySelector\EBOOTMETHOD.PNG" />
     <None Remove="Popup\Global\KeySelector\KEYSTXTMETHOD.PNG" />
+    <None Remove="Popup\Global\KeySelector\NOPSPEMUDRMMETHOD.PNG" />
     <None Remove="PS1CD.PNG" />
     <None Remove="UMD.png" />
   </ItemGroup>
@@ -24,7 +25,7 @@
     <AvaloniaResource Include="ICON.PNG" />
     <AvaloniaResource Include="Popup\Global\KeySelector\ACTRIFMETHOD.PNG" />
     <AvaloniaResource Include="Popup\Global\KeySelector\EBOOTMETHOD.PNG" />
-    <AvaloniaResource Include="Popup\Global\KeySelector\KEYSTXTMETHOD.PNG" />
+    <AvaloniaResource Include="Popup\Global\KeySelector\NOPSPEMUDRMMETHOD.PNG" />
     <AvaloniaResource Include="Ps1\PS1CD.PNG" />
     <AvaloniaResource Include="Psp\UMD.PNG">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
@@ -39,11 +40,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Avalonia" Version="11.2.3" />
-    <PackageReference Include="Avalonia.Desktop" Version="11.2.3" />
+    <PackageReference Include="Avalonia" Version="11.2.5" />
+    <PackageReference Include="Avalonia.Desktop" Version="11.2.5" />
     <!--Condition below is needed to remove Avalonia.Diagnostics package from build output in Release configuration.-->
-    <PackageReference Condition="'$(Configuration)' == 'Debug'" Include="Avalonia.Diagnostics" Version="11.2.3" />
-    <PackageReference Include="Avalonia.Themes.Fluent" Version="11.2.3" />
+    <PackageReference Condition="'$(Configuration)' == 'Debug'" Include="Avalonia.Diagnostics" Version="11.2.5" />
+    <PackageReference Include="Avalonia.Themes.Fluent" Version="11.2.5" />
   </ItemGroup>
 
   <ItemGroup>
@@ -52,6 +53,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Update="Popup\Global\KeySelector\NoPspEmuDrmMethodGUI.axaml.cs">
+      <DependentUpon>NoPspEmuDrmMethodGUI.axaml</DependentUpon>
+    </Compile>
     <Compile Update="Settings\ConfigPath.axaml.cs">
       <DependentUpon>ConfigPath.axaml</DependentUpon>
     </Compile>

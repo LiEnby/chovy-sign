@@ -163,6 +163,14 @@ namespace ChovySign_GUI.Global
                     key = CMAVersionKeyHelper.GetKeyFromGamePsvimg(gameBackupFolder, accountId, this.keyIndex);
                     rif = CMAVersionKeyHelper.GetRifFromLicensePsvimg(gameBackupFolder, accountId);
                     break;
+                case VersionKeyMethod.NOPSPEMUDRM_METHOD:
+                    NoPspEmuDrmMethodGUI noPspEmuDrmMethodGUI = new NoPspEmuDrmMethodGUI();
+                    keys = await noPspEmuDrmMethodGUI.ShowDialog<NpDrmInfo[]>(currentWindow);
+                    if (keys is null) break;
+
+                    key = keys[keyIndex];
+                    rif = noPspEmuDrmMethodGUI.Rif;
+                    break;
                 case VersionKeyMethod.KEYS_TXT_METHOD:
                     CmaBackupPicker pspLicenseBackupSelector = new CmaBackupPicker();
                     pspLicenseBackupSelector.BackupType = new string[] { "PGAME", "PSGAME" };
@@ -187,7 +195,7 @@ namespace ChovySign_GUI.Global
             {
                 if (key.KeyIndex != this.keyIndex)
                     sceNpDrmTransformVersionKey(key.VersionKey, key.KeyIndex, this.keyIndex); 
-                // its a revoolution~
+                // its a reeeevolution~
 
                 VersionKey = key.VersionKey;
             }

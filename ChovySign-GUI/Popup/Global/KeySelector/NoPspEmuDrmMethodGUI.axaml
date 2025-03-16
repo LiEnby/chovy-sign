@@ -1,0 +1,21 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:Global="clr-namespace:ChovySign_GUI.Global"
+		mc:Ignorable="d" d:DesignWidth="450" d:DesignHeight="100"
+        x:Class="ChovySign_GUI.Popup.Global.KeySelector.NoPspEmuDrmMethodGUI"
+		SizeToContent="Height" Width="450" Height="100" 
+		MinWidth="450" MinHeight="100" CanResize="False"
+        Title="NoPspEmuDrm Method" Icon="/ICON.PNG">
+
+	<Grid>
+		<Grid.RowDefinitions>
+			<RowDefinition Height="1*"/>
+			<RowDefinition Height="1*"/>
+		</Grid.RowDefinitions>
+
+		<Global:LabeledTextBox Name="contentIdInput" MaxLength="36" AllowedChars="01234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ_-" Label="Content ID:" Watermark="EP0099-ULUS09999_00-CHOVYSIGN0000000" Grid.Row="0" VerticalAlignment="Center" HorizontalAlignment="Stretch"/>	
+		<Button Name="keyGen" Click="keyGenClick" Content="Generate Keys" Grid.Row="3" HorizontalAlignment="Center"/>
+	</Grid>
+</Window>
