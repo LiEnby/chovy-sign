@@ -27,7 +27,7 @@ jobs:
         dotnet restore ChovySign-CLI
         dotnet restore PbpResign
 
-    - name: Build windows gui
+    - name: Build windows
       continue-on-error: false
       run: |
         dotnet publish -p:PublishProfile=Win64 ChovySign-GUI
@@ -53,7 +53,7 @@ jobs:
         path: PbpResign/bin/Release/Windows
 
 
-    - name: Build linux gui
+    - name: Build linux
       continue-on-error: false
       run: |
         dotnet publish -p:PublishProfile=Linux64 ChovySign-GUI
