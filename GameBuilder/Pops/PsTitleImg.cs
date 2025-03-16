@@ -155,11 +155,11 @@ namespace GameBuilder.Pops
 
             }
             isoMapUtil.WriteBytes(checksums);
-            isoMapUtil.WriteStrWithPadding(discs.First().DiscIdHdr, 0x00, 0x20);
+            isoMapUtil.WriteCStrWithPadding(discs.First().DiscIdHdr, 0x00, 0x20);
 
             isoMapUtil.WriteInt64(Convert.ToInt64(PSISO_ALIGN + isoPart.Length + StartDat.Length));
             isoMapUtil.WriteBytes(Rng.RandomBytes(0x80));
-            isoMapUtil.WriteStrWithPadding(discs.First().DiscName, 0x00, 0x80);
+            isoMapUtil.WriteCStrWithPadding(discs.First().DiscName, 0x00, 0x80);
             isoMapUtil.WriteInt32(MAX_DISCS);
             isoMapUtil.WritePadding(0x00, 0x70);
         }

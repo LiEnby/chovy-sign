@@ -124,9 +124,13 @@ namespace Li.Utilities
                 WritePadding(b, (len - data.Length));
             }
         }
-        public void WriteStrWithPadding(string str, byte b, int len)
+        public void WriteCStrWithPadding(string str, byte b, int len)
         {
-            WriteBytesWithPadding(Encoding.UTF8.GetBytes(str), b, len);            
+            byte[] strBytes = Encoding.UTF8.GetBytes(str);
+            Array.Resize(ref strBytes, strBytes.Length + 1);
+            strBytes[strBytes.Length-1] = 0;
+
+            WriteBytesWithPadding(strBytes, b, len);            
         }
         public void WriteUInt64(UInt64 v)
         {

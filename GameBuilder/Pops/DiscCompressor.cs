@@ -66,7 +66,7 @@ namespace GameBuilder.Pops
 
         private void writeHeader()
         {
-            isoHeaderUtil.WriteStrWithPadding(disc.DiscIdHdr, 0x00, 0x400);
+            isoHeaderUtil.WriteCStrWithPadding(disc.DiscIdHdr, 0x00, 0x400);
         }
         private void writeIsoLocation()
         {
@@ -153,7 +153,7 @@ namespace GameBuilder.Pops
         private void writeDiscInfo()
         {
             isoHeaderUtil.WriteUInt32(Convert.ToUInt32(disc.LibCrypt.Method)); // libcrypt method
-            isoHeaderUtil.WriteStrWithPadding(disc.DiscName, 0x00, 0x80);  // disc title
+            isoHeaderUtil.WriteCStrWithPadding(disc.DiscName, 0x00, 0x80);  // disc title
             isoHeaderUtil.WriteInt32(3); // PARENTAL_LEVEL ?
         }
 

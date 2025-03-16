@@ -52,7 +52,7 @@ namespace GameBuilder.Psp
             npHdrUtil.WriteStr("NPUMDIMG");
             npHdrUtil.WriteInt32(DrmInfo.KeyIndex);
             npHdrUtil.WriteInt32(BLOCK_BASIS);
-            npHdrUtil.WriteStrWithPadding(DrmInfo.ContentId, 0x00, 0x30);
+            npHdrUtil.WriteCStrWithPadding(DrmInfo.ContentId, 0x00, 0x30);
 
             createNpUmdBody();
             byte[] npumdDec = npHdrBody.ToArray();
@@ -107,7 +107,7 @@ namespace GameBuilder.Psp
                 byte[] signature = signParamSfo(umdImage.DataFiles["PARAM.SFO"]);
                 dataPspUtil.WriteBytes(signature);
                 dataPspUtil.WritePadding(0x00, 0x530);
-                dataPspUtil.WriteStrWithPadding(DrmInfo.ContentId, 0x00, 0x30);
+                dataPspUtil.WriteCStrWithPadding(DrmInfo.ContentId, 0x00, 0x30);
                 dataPspUtil.WriteInt32BE(DrmInfo.KeyIndex);
                 dataPspUtil.WriteInt32(0);
                 dataPspUtil.WriteInt32(0);
@@ -243,7 +243,7 @@ namespace GameBuilder.Psp
             npHdrBodyUtil.WriteUInt32(0x01003FFE); // unk_40
             npHdrBodyUtil.WriteUInt32(0x100); // block_entry_offset 
 
-            npHdrBodyUtil.WriteStrWithPadding(umdImage.DiscIdSeperated, 0x00, 0x10);
+            npHdrBodyUtil.WriteCStrWithPadding(umdImage.DiscIdSeperated, 0x00, 0x10);
 
             npHdrBodyUtil.WriteInt32(0); // header_start_offset 
             npHdrBodyUtil.WriteInt32(0); // unk_68

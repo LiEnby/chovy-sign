@@ -168,9 +168,9 @@ namespace Vita.PsvImgTools
                 headerUtil.WriteInt64(DateTime.UtcNow.Ticks); // sysTime
                 headerUtil.WriteInt64(0); // flags
                 headerUtil.WriteSceIoStat(stat);
-                headerUtil.WriteStrWithPadding(parentPath, PSVIMGConstants.PSVIMG_HEAD_PAD_BYTE, 256); // Parent Path
+                headerUtil.WriteCStrWithPadding(parentPath, PSVIMGConstants.PSVIMG_HEAD_PAD_BYTE, 256); // Parent Path
                 headerUtil.WriteUInt32(1); //unk_16C
-                headerUtil.WriteStrWithPadding(pathRel, PSVIMGConstants.PSVIMG_HEAD_PAD_BYTE, 256); //Relative Path
+                headerUtil.WriteCStrWithPadding(pathRel, PSVIMGConstants.PSVIMG_HEAD_PAD_BYTE, 256); //Relative Path
                 headerUtil.WritePadding(PSVIMGConstants.PSVIMG_HEAD_PAD_BYTE, 904); //'x'
                 headerUtil.WriteStr(PSVIMGConstants.PSVIMG_HEADER_END); //EndOfHeader
                 header.Seek(0x00, SeekOrigin.Begin);

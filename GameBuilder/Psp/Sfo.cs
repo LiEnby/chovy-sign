@@ -158,7 +158,7 @@ namespace GameBuilder.Psp
                                     valueUtils.WritePadding(0x00, Convert.ToInt32(entry.totalSize - entry.valueSize));
                                     break;
                                 case PSF_TYPE_STR:
-                                    valueUtils.WriteStrWithPadding(entry.value as String, 0x00, Convert.ToInt32(entry.totalSize));
+                                    valueUtils.WriteCStrWithPadding(entry.value as String, 0x00, Convert.ToInt32(entry.totalSize));
                                     break;
                                 case PSF_TYPE_BIN:
                                     valueUtils.WriteBytesWithPadding(entry.value as Byte[], 0x00, Convert.ToInt32(entry.totalSize));

@@ -1,4 +1,4 @@
-﻿#define DEBUGING_PSVIMG
+﻿//#define DEBUGING_PSVIMG
 
 using System;
 using System.Collections.Generic;
@@ -11,17 +11,18 @@ namespace Li.Utilities
 {
     public class CryptoUtil
     {
-
         public static byte[] aes_cbc_decrypt(byte[] cipherText, byte[] aesIv, byte[] aesKey, int size = -1)
         {
             if (size < 0) size = cipherText.Length;
-
+            #if DEBUGING_PSVIMG
+            return cipherText;
+            #endif
             using (MemoryStream ms = new MemoryStream())
             {
                 Aes alg = Aes.Create();
                 alg.Mode = CipherMode.CBC;
                 alg.Padding = PaddingMode.None;
-                alg.KeySize = 256;
+                alg.KeySize = aesKey.Length * 8;
                 alg.BlockSize = 128;
                 alg.Key = aesKey;
                 alg.IV = aesIv;
@@ -40,12 +41,16 @@ namespace Li.Utilities
         {
             if (size < 0) size = cipherText.Length;
 
+            #if DEBUGING_PSVIMG
+            return cipherText;
+            #endif
+
             using (MemoryStream ms = new MemoryStream())
             {
                 Aes alg = Aes.Create();
                 alg.Mode = CipherMode.ECB;
                 alg.Padding = PaddingMode.None;
-                alg.KeySize = 256;
+                alg.KeySize = aesKey.Length * 8;
                 alg.BlockSize = 128;
                 alg.Key = aesKey;
                 using (CryptoStream cs = new CryptoStream(ms, alg.CreateDecryptor(), CryptoStreamMode.Write))
@@ -73,7 +78,7 @@ namespace Li.Utilities
                 Aes alg = Aes.Create();
                 alg.Mode = CipherMode.CBC;
                 alg.Padding = PaddingMode.None;
-                alg.KeySize = 256;
+                alg.KeySize = aesKey.Length * 8;
                 alg.BlockSize = 128;
                 alg.Key = aesKey;
                 alg.IV = aesIv;
@@ -101,7 +106,7 @@ namespace Li.Utilities
                 Aes alg = Aes.Create();
                 alg.Mode = CipherMode.ECB;
                 alg.Padding = PaddingMode.None;
-                alg.KeySize = 256;
+                alg.KeySize = aesKey.Length * 8;
                 alg.BlockSize = 128;
                 alg.Key = aesKey;
                 using (CryptoStream cs = new CryptoStream(ms, alg.CreateEncryptor(), CryptoStreamMode.Write))

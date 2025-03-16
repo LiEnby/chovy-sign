@@ -33,7 +33,7 @@ namespace GameBuilder.Psp
             StringBuilder sb = new StringBuilder();
             do
             {
-                sb.Append(allowedChars[RandomInt() % allowedChars.Length]);
+                sb.Append(allowedChars[Convert.ToInt32(RandomUInt() % allowedChars.Length-1)]);
             } while (sb.Length < length);
 
             return sb.ToString();

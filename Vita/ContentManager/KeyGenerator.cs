@@ -1,3 +1,4 @@
+using Li.Utilities;
 using System;
 using System.IO;
 using System.Security.Cryptography;
@@ -7,60 +8,44 @@ namespace Vita.ContentManager
 {
     public class KeyGenerator
     {
-        static Byte[] Passphrase = Encoding.ASCII.GetBytes("Sri Jayewardenepura Kotte");
-        static Byte[] Key = { 0xA9, 0xFA, 0x5A, 0x62, 0x79, 0x9F, 0xCC, 0x4C, 0x72, 0x6B, 0x4E, 0x2C, 0xE3, 0x50, 0x6D, 0x38 };
+        private static byte[] AID_SALT_BYTES = Encoding.ASCII.GetBytes("Sri Jayewardenepura Kotte");
+        private static byte[] AID_SALT_KEY = { 0xA9, 0xFA, 0x5A, 0x62, 0x79, 0x9F, 0xCC, 0x4C, 0x72, 0x6B, 0x4E, 0x2C, 0xE3, 0x50, 0x6D, 0x38 };
 
-        public static string GenerateKeyStr(string Aid)
+        public static string GenerateKeyStr(string accountId)
         {
             try
             {
-                Int64 longlong = Convert.ToInt64(Aid, 16);
+                Int64 aidUint = Convert.ToInt64(accountId, 16);
 
-                byte[] AidBytes = BitConverter.GetBytes(longlong);
-                Array.Reverse(AidBytes);
+                byte[] aidBytes = BitConverter.GetBytes(aidUint);
+                Array.Reverse(aidBytes);
 
-                byte[] DerivedKey = GenerateKey(AidBytes);
+                byte[] derivedKey = GenerateKey(aidBytes);
 
-
-                 return BitConverter.ToString(DerivedKey).Replace("-", "");
+                return BitConverter.ToString(derivedKey).Replace("-", "");
             }
             catch (Exception)
             {
                 return "INVALID_AID";
             }
         }
-        public static byte[] GenerateKey(byte[] Aid)
+        public static byte[] GenerateKey(byte[] accountId)
         {
-            var ms = new MemoryStream();
-            ms.Write(Aid, 0, Aid.Length);
-            ms.Write(Passphrase, 0, Passphrase.Length);
-            Byte[] DerviedKey = ms.ToArray();
-            ms.Dispose();
-
-            SHA256 sha = SHA256.Create();
-            DerviedKey = sha.ComputeHash(DerviedKey);
-            sha.Dispose();
-
-            DerviedKey = Decrypt(DerviedKey, Key);
-
-            return DerviedKey;
+            using (MemoryStream ms = new MemoryStream())
+            {
+                ms.Write(accountId, 0, accountId.Length);
+                ms.Write(AID_SALT_BYTES, 0, AID_SALT_BYTES.Length);
+                ms.Seek(0, SeekOrigin.Begin);
+                byte[] derivedKey = ms.ToArray();
+                using (SHA256 sha = SHA256.Create())
+                {
+                    derivedKey = sha.ComputeHash(derivedKey);
+                    derivedKey = CryptoUtil.aes_ecb_decrypt(derivedKey, AID_SALT_KEY);
+                    return derivedKey;
+                }
+            }
         }
 
-        private static byte[] Decrypt(byte[] cipherData, byte[] Key)
-        {
-            MemoryStream ms = new MemoryStream();
-            Aes alg = Aes.Create();
-            alg.Mode = CipherMode.ECB;
-            alg.Padding = PaddingMode.None;
-            alg.KeySize = 128;
-            alg.Key = Key;
-            CryptoStream cs = new CryptoStream(ms,
-                alg.CreateDecryptor(), CryptoStreamMode.Write);
-            cs.Write(cipherData, 0, cipherData.Length);
-            cs.Close();
-            byte[] decryptedData = ms.ToArray();
-            return decryptedData;
-        }
 
     }
 }
