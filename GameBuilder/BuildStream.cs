@@ -29,7 +29,7 @@ namespace GameBuilder
                 string tmpFolder = Path.Combine(Path.GetTempPath(), "chovysign2");
                 Directory.CreateDirectory(tmpFolder);
 
-                this.filename = Path.Combine(tmpFolder, Rng.RandomStr(5));
+                this.filename = Path.Combine(tmpFolder, Rng.RandomStr(10));
                 this.underylingStream = File.Create(this.filename);
             }
             else
