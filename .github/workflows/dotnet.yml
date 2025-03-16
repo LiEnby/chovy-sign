@@ -22,12 +22,9 @@ jobs:
     - name: Build windows
       continue-on-error: false
       run: |
-        cd ChovySign-CLI
-        dotnet publish -p:PublishProfile=Win64.pubxml --output ../bin/Windows/ChovyCLI
-        cd ../ChovySign-GUI
-        dotnet publish -p:PublishProfile=Win64.pubxml ChovySign-GUI --output ../bin/Windows/ChovyGUI
-        cd ../PbpResign
-        dotnet publish -p:PublishProfile=Win64.pubxml PbpResign --output bin/Windows/PbpResign
+        dotnet publish -p:PublishProfile=Win64 ChovySign-CLI --output bin/Windows/ChovyCLI
+        dotnet publish -p:PublishProfile=Win64 ChovySign-GUI --output bin/Windows/ChovyGUI
+        dotnet publish -p:PublishProfile=Win64 PbpResign  --output bin/Windows/PbpResign
     
     - name: Upload windows cli
       uses: actions/upload-artifact@v4
