@@ -34,19 +34,19 @@ jobs:
     - name: Upload windows gui
       uses: actions/upload-artifact@v4
       with:
-        name: ChovySign2-GUI-Windows-x64
+        name: ChovySign2-GUI-Windows-x86_64
         path: ChovySign-GUI/bin/publish/windows
 
     - name: Upload windows cli
       uses: actions/upload-artifact@v4
       with:
-        name: ChovySign2-CLI-Windows-x64
+        name: ChovySign2-CLI-Windows-x86_64
         path: ChovySign-CLI/bin/publish/windows
 
     - name: Upload windows PbpResign
       uses: actions/upload-artifact@v4
       with:
-        name: PbpResign-Windows-x64
+        name: PbpResign-Windows-x86_64
         path: PbpResign/bin/publish/windows
 
   build-linux:
@@ -80,19 +80,19 @@ jobs:
     - name: Upload linux gui
       uses: actions/upload-artifact@v4
       with:
-        name: ChovySign2-GUI-Linux-x64
+        name: ChovySign2-GUI-Linux-x86_64
         path: ChovySign-GUI/bin/publish/linux
 
     - name: Upload linux cli
       uses: actions/upload-artifact@v4
       with:
-        name: ChovySign2-CLI-Linux-x64
+        name: ChovySign2-CLI-Linux-x86_64
         path: ChovySign-CLI/bin/publish/linux
 
     - name: Upload linux PbpResign
       uses: actions/upload-artifact@v4
       with:
-        name: PbpResign-Linux-x64
+        name: PbpResign-Linux-x86_64
         path: PbpResign/bin/publish/linux
 
   build-flatpak:
@@ -104,7 +104,7 @@ jobs:
     - uses: actions/checkout@v4
     - uses: flatpak/flatpak-github-actions/flatpak-builder@v6
       with:
-        bundle: ChovySign2-GUI-Linux-x64.flatpak
+        bundle: ChovySign2-GUI-Linux.flatpak
         manifest-path: Flatpak-data/codes.silica.chovysign.yml
         cache-key: flatpak-builder-${{ github.sha }}
         upload-artifact: true

@@ -5,14 +5,14 @@ namespace LibChovy.Config
     public class ChovyFileConfig : ChovyConfig
     {
         private const char SEPERATOR = ',';
-        private static string configFileName = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), PRODUCT_FAMILY, PRODUCT_NAME + ".cfg");
+        public static string ConfigFileName = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), PRODUCT_FAMILY, PRODUCT_NAME + ".cfg");
         private Dictionary<string, object> config;
 
         private void saveDict()
         {
-            Directory.CreateDirectory(Path.GetDirectoryName(configFileName));
+            Directory.CreateDirectory(Path.GetDirectoryName(ConfigFileName));
 
-            using (StreamWriter cfgWriter = new StreamWriter(File.Open(configFileName, FileMode.Create, FileAccess.Write)))
+            using (StreamWriter cfgWriter = new StreamWriter(File.Open(ConfigFileName, FileMode.Create, FileAccess.Write)))
             {
                 foreach (KeyValuePair<string, object> configOption in config)
                 {
@@ -42,10 +42,10 @@ namespace LibChovy.Config
         }
         private void loadDict()
         {
-            if (!File.Exists(configFileName))
+            if (!File.Exists(ConfigFileName))
                 saveDict();
 
-            using (StreamReader cfgReader = new StreamReader(File.Open(configFileName, FileMode.Open, FileAccess.Read)))
+            using (StreamReader cfgReader = new StreamReader(File.Open(ConfigFileName, FileMode.Open, FileAccess.Read)))
             {
                 for(string? line = cfgReader.ReadLine();
                     line is not null;
