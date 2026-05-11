@@ -3,12 +3,7 @@ using Li.Utilities;
 using GameBuilder.Atrac3;
 using GameBuilder.Psp;
 using PspCrypto;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace GameBuilder.Pops
 {
@@ -82,17 +77,17 @@ namespace GameBuilder.Pops
         private byte[] calculateChecksumForIsoImgTitle(byte[] header)
         {
             byte[] checksum = new byte[0x10];
-            Span<byte> mkey = stackalloc byte[Marshal.SizeOf<PspCrypto.AMCTRL.MAC_KEY>()];
+            Span<byte> mkey = stackalloc byte[Marshal.SizeOf<AMCTRL.MAC_KEY>()];
 
-            PspCrypto.AMCTRL.sceDrmBBMacInit(mkey, 3);
-            PspCrypto.AMCTRL.sceDrmBBMacUpdate(mkey, header, header.Length /*0xb3c80*/);
+            AMCTRL.sceDrmBBMacInit(mkey, 3);
+            AMCTRL.sceDrmBBMacUpdate(mkey, header, header.Length /*0xb3c80*/);
             Span<byte> newKey = new byte[20 + 0x10];
-            PspCrypto.AMCTRL.sceDrmBBMacFinal(mkey, newKey[20..], DrmInfo.VersionKey);
+            AMCTRL.sceDrmBBMacFinal(mkey, newKey[20..], DrmInfo.VersionKey);
             ref var aesHdr = ref MemoryMarshal.AsRef<KIRKEngine.KIRK_AES128CBC_HEADER>(newKey);
             aesHdr.mode = KIRKEngine.KIRK_MODE_ENCRYPT_CBC;
             aesHdr.keyseed = 0x63;
             aesHdr.data_size = 0x10;
-            PspCrypto.KIRKEngine.sceUtilsBufferCopyWithRange(newKey, 0x10, newKey, 0x10, KIRKEngine.KIRK_CMD_ENCRYPT_IV_0);
+            KIRKEngine.sceUtilsBufferCopyWithRange(newKey, 0x10, newKey, 0x10, KIRKEngine.KIRK_CMD_ENCRYPT_IV_0);
 
             newKey.Slice(20, 0x10).CopyTo(checksum);
 
@@ -104,12 +99,7 @@ namespace GameBuilder.Pops
             isoMap.Seek(0, SeekOrigin.Begin);
             byte[] isoMapBuf = isoMap.ToArray();
 
-            int encryptedSz = DNASHelper.CalculateSize(isoMapBuf.Length, 1024);
-            var isoMapEnc = new byte[encryptedSz];
-
-            DNASHelper.Encrypt(isoMapEnc, isoMapBuf, DrmInfo.VersionKey, isoMapBuf.Length, DrmInfo.KeyIndex, 1);
-
-            return isoMapEnc;
+            return CreatePgd(isoMapBuf);
         }
 
         private void createIsoMap()

@@ -58,8 +58,6 @@ namespace GameBuilder.Pops
         public override byte[] GenerateDataPsp()
         {
             Span<byte> loaderEnc = new byte[0x9B13];
-            
-            //byte[] dataPspElf = Resources.DATAPSPSD;
 
             if (this.PatchEboot)
             {
