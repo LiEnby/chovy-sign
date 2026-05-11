@@ -15,7 +15,7 @@ jobs:
     - name: Setup .NET
       uses: actions/setup-dotnet@v1
       with:
-        dotnet-version: 9.0.x
+        dotnet-version: 10.0.x
         include-prerelease: false
         
     - name: Restore dependencies
@@ -35,19 +35,19 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: ChovySign2-GUI-Windows-x64
-        path: ChovySign-GUI/bin/Release/Windows
+        path: ChovySign-GUI/bin/publish/windows
 
     - name: Upload windows cli
       uses: actions/upload-artifact@v4
       with:
         name: ChovySign2-CLI-Windows-x64
-        path: ChovySign-CLI/bin/Release/Windows
+        path: ChovySign-CLI/bin/publish/windows
 
     - name: Upload windows PbpResign
       uses: actions/upload-artifact@v4
       with:
         name: PbpResign-Windows-x64
-        path: PbpResign/bin/Release/Windows
+        path: PbpResign/bin/publish/windows
 
 
     - name: Build linux
@@ -61,16 +61,16 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: ChovySign2-GUI-Linux-x64
-        path: ChovySign-GUI/bin/Release/Linux
+        path: ChovySign-GUI/bin/publish/linux
 
     - name: Upload linux cli
       uses: actions/upload-artifact@v4
       with:
         name: ChovySign2-CLI-Linux-x64
-        path: ChovySign-CLI/bin/Release/Linux
+        path: ChovySign-CLI/bin/publish/linux
 
     - name: Upload linux PbpResign
       uses: actions/upload-artifact@v4
       with:
         name: PbpResign-Linux-x64
-        path: PbpResign/bin/Release/Linux
+        path: PbpResign/bin/bin/publish/linux
