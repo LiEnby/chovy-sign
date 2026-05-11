@@ -5,11 +5,13 @@ namespace LibChovy.Config
     public class ChovyFileConfig : ChovyConfig
     {
         private const char SEPERATOR = ',';
-        private static string configFileName = Path.Combine(Directory.GetCurrentDirectory(), Path.ChangeExtension(PRODUCT_NAME, ".cfg"));
+        private static string configFileName = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), PRODUCT_FAMILY, PRODUCT_NAME + ".cfg");
         private Dictionary<string, object> config;
 
         private void saveDict()
         {
+            Directory.CreateDirectory(Path.GetDirectoryName(configFileName));
+
             using (StreamWriter cfgWriter = new StreamWriter(File.Open(configFileName, FileMode.Create, FileAccess.Write)))
             {
                 foreach (KeyValuePair<string, object> configOption in config)
