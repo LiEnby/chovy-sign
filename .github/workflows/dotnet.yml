@@ -57,9 +57,11 @@ jobs:
         dotnet publish -p:PublishProfile=Linux64 ChovySign-CLI
         dotnet publish -p:PublishProfile=Linux64 PbpResign
 
-    - name: Build linux
+    - name: Build linux flatpak
       continue-on-error: false
       run: |
+        flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
+        flatpak install -y org.flatpak.Builder
         cd Flatpak-data
         ./quickpak build bundle
         cd ..
