@@ -34,6 +34,10 @@
       </ul>
     </description>
   </release>
+  <release version="CHOVY-SIGN 2.0.3" date="2023-06-19" type="stable">
+    <url>https://git.silica.codes/Li/chovy-sign/releases/tag/v2.0.3</url>
+    <description/>
+  </release>
   <release version="CHOVY-SIGN 2.0.2" date="2023-06-19" type="stable">
     <url>https://git.silica.codes/Li/chovy-sign/releases/tag/v2.02</url>
     <description/>
@@ -64,10 +68,6 @@
   </release>
   <release version="chovy-sign PUBLIC BETA" date="2019-08-18" type="development">
     <url>https://git.silica.codes/Li/chovy-sign/releases/tag/BETA01</url>
-    <description/>
-  </release>
-  <release version="CHOVY-SIGN 2.0.3" date="1970-01-01" type="stable">
-    <url>https://git.silica.codes/Li/chovy-sign/releases/tag/v2.0.3</url>
     <description/>
   </release>
 </releases>
