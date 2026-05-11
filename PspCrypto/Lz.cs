@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.IO;
-using System.Text;
-
-namespace PspCrypto
+﻿namespace PspCrypto
 {
     public class Lz
     {

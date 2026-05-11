@@ -5,41 +5,41 @@ using System.Runtime.InteropServices;
 
 namespace GameBuilder.Atrac3
 {
-    public class Atrac3ToolEncoder : IAtracEncoderBase
+    public class AtracdencEncoder : IAtracEncoderBase
     {
         [DllImport("libc")]
         private static extern int setenv(string name, string value, bool overwrite);
 
         private static string TOOLS_DIRECTORY = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "tools");
 
-        private static string AT3TOOL_WIN = Path.Combine(TOOLS_DIRECTORY, "at3tool.exe");
-        private static string AT3TOOL_LINUX = Path.Combine(TOOLS_DIRECTORY, "at3tool.elf");
+        private static string ATRACDENC_WINDOWS = Path.Combine(TOOLS_DIRECTORY, "atracdenc.exe");
+        private static string ATRACDENC_LINUX = Path.Combine(TOOLS_DIRECTORY, "atracdenc.elf");
         
-        private static string TEMP_DIRECTORY = Path.Combine(Path.GetTempPath(), "at3tool_tmp");
+        private static string TEMP_DIRECTORY = Path.Combine(Path.GetTempPath(), "atracdenc_tmp");
         private static string LD_LIBRARY_PATH = "LD_LIBRARY_PATH";
 
         // random name so that can generate multiple at once if wanted ..
         private string tempWav;
         private string tempAt9;
-        public Atrac3ToolEncoder()
+        public AtracdencEncoder()
         {
             string rdmPart = Rng.RandomStr(10);
 
             tempWav = Path.Combine(TEMP_DIRECTORY, rdmPart + "_tmp.wav");
-            tempAt9 = Path.Combine(TEMP_DIRECTORY, rdmPart + "_tmp.at3");
+            tempAt9 = Path.Combine(TEMP_DIRECTORY, rdmPart + "_tmp.oma");
 
         }
          
-        private static string AT3TOOL_LOCATION
+        private static string ATRACDENC_LOCATION
         {
             get
             {
                 if (OperatingSystem.IsWindows())
-                    return AT3TOOL_WIN;
+                    return ATRACDENC_WINDOWS;
                 else if (OperatingSystem.IsLinux())
-                    return AT3TOOL_LINUX;
+                    return ATRACDENC_LINUX;
                 else
-                    throw new PlatformNotSupportedException("No at3tool binary for your platform");
+                    throw new PlatformNotSupportedException("No atracdenc binary for your platform");
             }
         }
 
@@ -61,9 +61,9 @@ namespace GameBuilder.Atrac3
                 if (OperatingSystem.IsLinux())
                     proc.StartInfo.Environment.Add(LD_LIBRARY_PATH, setupLibaryPath());
 
-                proc.StartInfo.FileName = AT3TOOL_LOCATION;
-                proc.StartInfo.Arguments = "-br 132 -e \"" + tempWav + "\" \"" + tempAt9 + "\"";
-                
+                proc.StartInfo.FileName = ATRACDENC_LOCATION;
+                proc.StartInfo.Arguments = "-e atrac3plus --bitrate 132300 -i \"" + tempWav + "\" -o \"" + tempAt9 + "\"";
+
                 proc.StartInfo.UseShellExecute = false;
                 proc.StartInfo.CreateNoWindow = true;
                 proc.StartInfo.RedirectStandardOutput = true;
@@ -73,7 +73,7 @@ namespace GameBuilder.Atrac3
                 string stdout = proc.StandardOutput.ReadToEnd();
                 proc.WaitForExit();
 
-                if (!stdout.Contains("Total Encoded Bytes"))
+                if (!stdout.Contains("End of input file."))
                     throw new Exception(stdout);
             }
         }
@@ -83,26 +83,9 @@ namespace GameBuilder.Atrac3
             using(FileStream at3Stream = File.OpenRead(tempAt9))
             {
                 StreamUtil at3Util = new StreamUtil(at3Stream);
-                string magic = at3Util.ReadStrLen(4);
-                int filesz = at3Util.ReadInt32();
-                string riffType = at3Util.ReadStrLen(4);
-
-                if(magic == "RIFF" && riffType == "WAVE")
-                {
-                    // read headers until we get data;
-                    string blockName = "";
-                    int blockSz = 0;
-                    do
-                    {
-                        at3Stream.Seek(blockSz, SeekOrigin.Current);
-                        blockName = at3Util.ReadStrLen(4);
-                        blockSz = at3Util.ReadInt32();
-                    } while (blockName != "data");
-
-                    return at3Util.ReadBytes(blockSz);
-                }
-
-                throw new InvalidDataException("the encoded at3 file was not a RIFF");
+                at3Stream.Seek(0x60, SeekOrigin.Begin);
+                int lenRemain = Convert.ToInt32(at3Stream.Length - at3Stream.Position);
+                return at3Util.ReadBytes(lenRemain);
             }
         }
 
@@ -149,16 +132,16 @@ namespace GameBuilder.Atrac3
 
             if (OperatingSystem.IsWindows())
             {
-                if (!File.Exists(AT3TOOL_WIN))
+                if (!File.Exists(ATRACDENC_WINDOWS))
                 {
-                    throw new FileNotFoundException("Cannot find at3tool at " + AT3TOOL_WIN);
+                    throw new FileNotFoundException("Cannot find atracdenc at " + ATRACDENC_WINDOWS);
                 }
             }
             else if(OperatingSystem.IsLinux())
             {
-                if (!File.Exists(AT3TOOL_LINUX))
+                if (!File.Exists(ATRACDENC_LINUX))
                 {
-                    throw new FileNotFoundException("Cannot find at3tool at " + AT3TOOL_LINUX);
+                    throw new FileNotFoundException("Cannot find atracdenc at " + ATRACDENC_LINUX);
                 }
             }
         }
