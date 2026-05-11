@@ -70,7 +70,7 @@ namespace ChovySign_GUI.Ps1
             popsParameters.Account = new Account(SettingsTab.Settings.AccountId);
             
             popsParameters.CrackMethod = SettingsTab.Settings.LibcryptMode;
-            SettingsReader.BackupsFolder = SettingsTab.Settings.CmaDirectory;
+            popsParameters.OutputFolder = SettingsTab.Settings.CmaDirectory;
             popsParameters.CreatePsvImg = SettingsTab.Settings.PackagePsvimg;
 
             progressStatus.Parameters = popsParameters;

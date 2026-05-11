@@ -21,6 +21,10 @@ namespace LibChovy
             {
                 return Path.Combine(outputFolder, Umd.DiscId);
             }
+            set
+            {
+                outputFolder = value;
+            }
         }
 
     }

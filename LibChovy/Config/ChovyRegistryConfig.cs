@@ -43,7 +43,11 @@ namespace LibChovy.Config
         }
         public override UInt64? GetInt64(string key)
         {
-            return unchecked((UInt64)(chovyRegistryKey.GetValue(key) as Int64?));
+            Int64? value = chovyRegistryKey.GetValue(key) as Int64?;
+            if (value is not null)
+                return unchecked((UInt64)(value));
+            else
+                return null;
         }
 
         public override string? GetString(string key)

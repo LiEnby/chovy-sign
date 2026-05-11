@@ -7,6 +7,7 @@ using System.Text;
 using Vita.ContentManager;
 using PspCrypto;
 using System.ComponentModel;
+using System.Globalization;
 
 namespace ChovySign_CLI
 {
@@ -24,7 +25,6 @@ namespace ChovySign_CLI
         private static NpDrmInfo? drmInfo = null;
 
         // cma
-        private static bool devKit = false;
         private static bool packagePsvImg = true;
         private static string? outputFolder = null; 
 
@@ -36,6 +36,9 @@ namespace ChovySign_CLI
         // --pops-eboot-sign
         private static byte[]? ebootElf = null;
         private static byte[]? configBin = null;
+
+        // --account-id
+        private static UInt64? accountId = null;
 
         enum PbpMode
         {
@@ -60,6 +63,8 @@ namespace ChovySign_CLI
 
             POPS_INFO,
             POPS_EBOOT,
+
+            ACCOUNT_ID,
 
             KEYS_TXT_GEN,
             RIF
@@ -181,8 +186,13 @@ namespace ChovySign_CLI
                 case ArgumentParsingMode.CMA_OUTPUT_FOLDER:
                     if (parameters.Count < 1) return Error("--output-folder expects 1 output", 4);
                     if (!Directory.Exists(parameters[0])) return Error("--output-folder: directory not found", 4);
-                    
-                    SettingsReader.BackupsFolder = parameters[0];
+
+                    outputFolder = parameters[0];
+                    break;
+                case ArgumentParsingMode.ACCOUNT_ID:
+                    if (parameters.Count < 1) return Error("--account-id expects 1 output", 4);
+
+                    accountId = UInt64.Parse(parameters[0], NumberStyles.HexNumber);
                     break;
                 case ArgumentParsingMode.RIF:
                     if (parameters.Count != 1) return Error("--rif expects only 1 argument,", 4);
@@ -257,7 +267,7 @@ namespace ChovySign_CLI
                 
                 Console.WriteLine("--rif [GAME.RIF]");
                 
-                Console.WriteLine("--devkit (Use 000000000000 account id)");
+                Console.WriteLine("--account-id [ACCOUNT_ID] (specify cma account id)");
                 Console.WriteLine("--no-psvimg (Disable creating a .psvimg file)");
                 Console.WriteLine("--output-folder [output_folder]");
 
@@ -343,13 +353,14 @@ namespace ChovySign_CLI
                                 packagePsvImg = false;
                                 break;
 
-                            case "--devkit":
-                                devKit = true;
+                            case "--account-id":
+                                mode = ArgumentParsingMode.ACCOUNT_ID;
                                 break;
                             default:
                                 return Error("Unknown argument: " + arg, 1);
                         }
                         break;
+                    case ArgumentParsingMode.ACCOUNT_ID:
                     case ArgumentParsingMode.VERSIONKEY:
                     case ArgumentParsingMode.VERSIONKEY_GENERATOR:
                     case ArgumentParsingMode.VERSIONKEY_EXTRACT:
@@ -394,10 +405,15 @@ namespace ChovySign_CLI
                 
                 if(popsIcon0File is not null)
                     popsParameters.Icon0 = popsIcon0File;
-                
+
+                if (accountId is not null)
+                    popsParameters.Account = new Account(Convert.ToUInt64(accountId));
+
+                if (outputFolder is not null)
+                    popsParameters.OutputFolder = outputFolder;
 
                 popsParameters.CreatePsvImg = packagePsvImg;
-                popsParameters.Account.Devkit = devKit;
+
 
                 // Allow for custom eboot.elf and configs
                 popsParameters.ConfigBinOverride = configBin;
@@ -409,7 +425,13 @@ namespace ChovySign_CLI
             else if(pbpMode == PbpMode.PSP)
             {
                 PspParameters pspParameters = new PspParameters(drmInfo, rifFile);
-                pspParameters.Account.Devkit = devKit;
+                
+                if (accountId is not null)
+                    pspParameters.Account = new Account(Convert.ToUInt64(accountId));
+
+                if (outputFolder is not null)
+                    pspParameters.OutputFolder = outputFolder;
+
                 pspParameters.CreatePsvImg = packagePsvImg;
 
                 pspParameters.Compress = pspCompress;

@@ -45,12 +45,11 @@ namespace LibChovy
         {
             get
             {
-                if (outputFolderOverride is null) return Path.Combine(SettingsReader.Ps1Folder, Account.AccountIdStr);
-                return outputFolderOverride;
+                return Path.Combine(SettingsReader.GetPs1Folder(backupsFolder), Account.AccountIdStr);
             }
             set
             {
-                outputFolderOverride = value;
+                backupsFolder = value;
             }
         }
 
@@ -59,6 +58,10 @@ namespace LibChovy
             get
             {
                 return Path.Combine(outputFolder, FirstDisc.DiscId);
+            }
+            set
+            {
+                outputFolder = value;
             }
         }
         public byte[] Pic0

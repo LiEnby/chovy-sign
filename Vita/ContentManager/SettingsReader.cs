@@ -5,8 +5,6 @@ namespace Vita.ContentManager
 {
     public class SettingsReader
     {
-        private static string? overrideBackupsFolder = null;
-
         public static UInt64 AccountId
         {
             get
@@ -31,18 +29,44 @@ namespace Vita.ContentManager
                 return 0ul;
             }
         }
+
+        public static string GetPs1Folder(string backupsFolder)
+        {
+            return Path.Combine(backupsFolder, "PSGAME");
+        }
+        public static string GetPspFolder(string backupsFolder)
+        {
+            return Path.Combine(backupsFolder, "PGAME");
+        }
+        public static string GetAppFolder(string backupsFolder)
+        {
+            return Path.Combine(backupsFolder, "APP");
+        }
+        public static string GetPsmFolder(string backupsFolder)
+        {
+            return Path.Combine(backupsFolder, "PSM");
+        }
+        public static string GetSystemFolder(string backupsFolder)
+        {
+            return Path.Combine(backupsFolder, "SYSTEM");
+        }
+        public static string GetPspSaveFolder(string backupsFolder)
+        {
+            return Path.Combine(backupsFolder, "PSAVEDATA");
+        }
+
         public static string AppFolder
         {
             get
             {
-                return Path.Combine(BackupsFolder, "APP");
+                return GetAppFolder(BackupsFolder);
             }
         }
         public static string PspSavedataFolder
         {
             get
             {
-                return Path.Combine(BackupsFolder, "PSAVEDATA");
+                return GetPspSaveFolder(BackupsFolder);
             }
         }
 
@@ -50,36 +74,36 @@ namespace Vita.ContentManager
         {
             get
             {
-                return Path.Combine(BackupsFolder, "PSM");
+                return GetPsmFolder(BackupsFolder);
             }
         }
         public static string SystemFolder
         {
             get
             {
-                return Path.Combine(BackupsFolder, "SYSTEM");
+                return GetSystemFolder(BackupsFolder);
             }
         }
+
+
         public static string Ps1Folder
         {
             get
             {
-                return Path.Combine(BackupsFolder, "PSGAME");
+                return GetPs1Folder(BackupsFolder);
             }
         }
         public static string PspFolder
         {
             get
             {
-                return Path.Combine(BackupsFolder, "PGAME");
+                return GetPspFolder(BackupsFolder);
             }
         }
         public static string BackupsFolder
         {
             get
             {
-                if (overrideBackupsFolder is not null) return overrideBackupsFolder;
-
                 string? cmaFolder = getQcmaPSVitaFolder();
                 if (cmaFolder is not null) return cmaFolder;
                 cmaFolder = getDevkitCmaPSVitaFolder();
@@ -87,10 +111,6 @@ namespace Vita.ContentManager
                 cmaFolder = getSonyCmaPSVitaFolder();
                 if (cmaFolder is not null) return cmaFolder;
                 return getDefaultCmaPSVitaFolder();
-            }
-            set
-            {
-                overrideBackupsFolder = value;
             }
         }
 

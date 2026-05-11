@@ -68,7 +68,7 @@ namespace ChovySign_GUI.Psp
 
             // read settings from settings tab.
             pspParameters.Account = new Account(SettingsTab.Settings.AccountId);
-            SettingsReader.BackupsFolder = SettingsTab.Settings.CmaDirectory;
+            pspParameters.OutputFolder = SettingsTab.Settings.CmaDirectory;
             pspParameters.CreatePsvImg = SettingsTab.Settings.PackagePsvimg;
 
             progressStatus.Parameters = pspParameters;

@@ -15,6 +15,7 @@ namespace LibChovy
             this.CreatePsvImg = true;
             this.FirmwareVersion = 0x3600000;
             this.BuildStreamType = StreamType.TYPE_MEMORY_STREAM;
+            this.OutputFolder = SettingsReader.BackupsFolder;
         }
 
         public int FirmwareVersion;
@@ -25,23 +26,19 @@ namespace LibChovy
         public ChovyTypes Type;
 
         public StreamType BuildStreamType;
-
-        protected string? outputFolderOverride;
+        protected string backupsFolder;
 
         protected virtual string outputFolder
         {
             get
             {
-                if (outputFolderOverride is null) return Path.Combine(SettingsReader.PspFolder, Account.AccountIdStr);
-                return outputFolderOverride;
+                return Path.Combine(SettingsReader.GetPspFolder(backupsFolder), Account.AccountIdStr);
             }
             set
             {
-                outputFolderOverride = value;
+                backupsFolder = value;
             }
         }
-        public abstract string OutputFolder { get; }
-        
-
+        public abstract string OutputFolder { get; set; }
     }
 }
