@@ -51,7 +51,7 @@ modules:
 #    commit: *commit
   buildsystem: simple
   build-commands:
-  - ln -s "/app/bin/ChovySign V2" /app/bin/ChovySignGUI || exit
+  - ln -s "/app/bin/ChovySign v2" /app/bin/ChovySignGUI || exit
   - install -Dm644 Flatpak-data/codes.silica.chovysign.metainfo.xml -t /app/share/metainfo/
   - install -Dm644 Flatpak-data/codes.silica.chovysign.releases.xml -t /app/share/metainfo/releases/
   - install -Dm644 Flatpak-data/codes.silica.chovysign.png -t /app/share/icons/hicolor/128x128/apps
