@@ -1,0 +1,104 @@
+#!/bin/env bash
+# just to script to help me not have to ctrl + r the command lol
+# Licensed under GPL-3
+# Copyright fluoriteByte 2026
+
+if [ -n "$DEBUG" ]; then
+  set -x
+fi
+FPBUILD=
+FLATPAK_MANIFEST_NAME=codes.silica.chovysign
+
+if command -v flatpak-builder; then
+  FPBUILD=$(command -v flatpak-builder)
+else
+  FPBUILD="flatpak run org.flatpak.Builder" || exit
+fi
+
+
+usage() {
+  echo "usage: $0 (-b[builder opts] -l[linter opts]) [commands]"
+  echo Commands can be chained together
+  echo -e "\tfor example: source clean build lint bundle"
+  echo Commands:
+  echo -e "\tbuild: builds manifest"
+  echo -e "\tclean: cleans .flatpak-builder and repo"
+  echo -e "\tlint: lints repo"
+  echo -e "\tbundle: bundles app"
+  echo -e "\tsource: creates nuget-source.json"
+  echo Options:
+  echo -e "\t-b: build options to pass to flatpak-builder, can be used multiple times"
+  echo -e "\t\texample: -b\"--disable-updates\""
+  echo -e "\t-l: lint options to pass to flatpak-builder-lint, can be used multiple times"
+  echo -e "\t-h: display help"
+}
+
+bundle() {
+  flatpak build-bundle repo "$FLATPAK_MANIFEST_NAME".flatpak "$FLATPAK_MANIFEST_NAME" --runtime-repo=https://flathub.org/repo/flathub.flatpakrepo
+}
+
+clean() {
+  rm .flatpak-builder/build -rf 
+  rm .flatpak-builder/ccache -rf 
+  rm .flatpak-builder/rofiles -rf 
+  rm repo "${FLATPAK_MANIFEST_NAME}.flatpak" -rf
+}
+
+build() {
+  # shellcheck disable=SC2068
+  $FPBUILD build "$FLATPAK_MANIFEST_NAME.yml" $@ || exit
+}
+
+lint() {
+  # shellcheck disable=SC2068
+  flatpak run --command=flatpak-builder-lint org.flatpak.Builder \
+  --exceptions --debug repo repo $@ || true
+}
+
+source_gen() {
+  rm .temp/ -rf
+  build --download-only --force-clean && \
+  git clone .flatpak-builder/git/https_git.silica.codes_Li_chovy-sign/ .temp/ -b master && \
+  flatpak-builder-tools/dotnet/flatpak-dotnet-generator.py --dotnet 10 --freedesktop 25.08 nuget-sources.json .temp/ChovySign-GUI/
+}
+
+BUILD_FLAG=
+LINT_FLAG=
+
+while getopts "b:l:h" flag; do
+  case ${flag} in
+    h)  usage
+        exit 0;;
+    b)  echo Builder flags to pass: "${OPTARG}"
+        BUILD_FLAG="$BUILD_FLAG ${OPTARG}";;
+    l)  echo Linter flags to pass: "${OPTARG}"
+        LINT_FLAG="$BUILD_FLAG ${OPTARG}";;
+    *)  echo Unknown flag?
+        usage
+        exit 1;;
+  esac
+done
+
+echo Args: "$*"
+
+while [ $# -gt 0 ]; do
+  case $1 in
+    -b*|-l*|-h*)
+      ;;
+    source)
+      source_gen;;
+    lint)
+      lint "$LINT_FLAG";;
+    build)
+      build --force-clean --repo=repo --mirror-screenshots-url=https://dl.flathub.org/media --ccache --install-deps-from=flathub "$BUILD_FLAG";;
+    bundle)
+      bundle;;
+    clean)
+      clean;;
+    *)
+      echo Unknown command
+      exit 0;;
+  esac
+  shift
+done
+
