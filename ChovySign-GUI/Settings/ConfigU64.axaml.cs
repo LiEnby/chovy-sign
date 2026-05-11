@@ -1,6 +1,7 @@
 using ChovySign_GUI.Global;
 using LibChovy.Config;
 using System;
+using System.Globalization;
 
 namespace ChovySign_GUI.Settings
 {
@@ -47,10 +48,7 @@ namespace ChovySign_GUI.Settings
         {
             get
             {
-                UInt64 output;
-                if (!UInt64.TryParse(this.configU64.Text, out output)) return 0ul;
-
-                return output;
+                try { return UInt64.Parse(this.configU64.Text, NumberStyles.HexNumber); } catch (Exception) { return 0ul; };
             }
             set
             {
@@ -67,11 +65,12 @@ namespace ChovySign_GUI.Settings
 
         private void onTextChange(object? sender, EventArgs e)
         {
-            UInt64 output;
+            UInt64 output = 0;
             LabeledTextBox? txtBox = sender as LabeledTextBox;
             if (txtBox is null) return;
             if (txtBox.Text is null) return;
-            if (!UInt64.TryParse(txtBox.Text, out output)) return;
+            try { output = UInt64.Parse(txtBox.Text, NumberStyles.HexNumber); } catch (Exception) { return; }
+
 
             ChovyConfig.CurrentConfig.SetInt64(ConfigKey, output);
         }

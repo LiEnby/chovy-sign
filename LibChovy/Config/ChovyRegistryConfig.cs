@@ -43,7 +43,7 @@ namespace LibChovy.Config
         }
         public override UInt64? GetInt64(string key)
         {
-            return Convert.ToUInt64((chovyRegistryKey.GetValue(key) as Int64?));
+            return unchecked((UInt64)(chovyRegistryKey.GetValue(key) as Int64?));
         }
 
         public override string? GetString(string key)
@@ -68,7 +68,7 @@ namespace LibChovy.Config
 
         public override void SetInt64(string key, UInt64 value)
         {
-            chovyRegistryKey.SetValue(key, Convert.ToInt64(value), RegistryValueKind.QWord);
+            chovyRegistryKey.SetValue(key, unchecked((Int64)(value)), RegistryValueKind.QWord);
         }
 
         public override void SetString(string key, string value)
