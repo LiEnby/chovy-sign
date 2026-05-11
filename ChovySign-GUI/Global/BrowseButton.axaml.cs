@@ -1,13 +1,11 @@
 using Avalonia;
 using Avalonia.Controls;
-using Avalonia.Input;
 using Avalonia.Interactivity;
-using Org.BouncyCastle.Tls.Crypto;
+using Avalonia.Platform.Storage;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace ChovySign_GUI.Global
 {
@@ -133,42 +131,42 @@ namespace ChovySign_GUI.Global
     
                 if (this.IsDirectory)
                 {
+
+                    FolderPickerOpenOptions selectdir = new FolderPickerOpenOptions();
+                    selectdir.Title = "Select directory.";
+                    selectdir.AllowMultiple = false;
+                    if (this.ContainsFile) selectdir.SuggestedStartLocation = await currentWindow.StorageProvider.TryGetFolderFromPathAsync(this.FilePath);
+
                     // open directory
-                    OpenFolderDialog browseDialog = new OpenFolderDialog();
+                    var folders = await currentWindow.StorageProvider.OpenFolderPickerAsync(selectdir);
+                    string? localPath = folders.First().TryGetLocalPath();
 
-                    if (this.ContainsFile) browseDialog.Directory = this.FilePath;
-                    
-                    browseDialog.Title = "Select directory.";
-
-                    string? directory = await browseDialog.ShowAsync(currentWindow);
-                    if(directory is not null)
-                        this.FilePath = directory;
+                    if (localPath is not null)
+                        this.FilePath = localPath;
                 }
                 else
                 {
-                    // open file
-                    OpenFileDialog browseDialog = new OpenFileDialog();
+                    FilePickerOpenOptions selectfile = new FilePickerOpenOptions();
+                    selectfile.Title = "Select " + fileTypeName;
+                    selectfile.AllowMultiple = false;
+
                     if (extension != "")
                     {
-                        browseDialog.Filters = new List<FileDialogFilter>();
-                        FileDialogFilter filter = new FileDialogFilter();
-                        filter.Extensions.Add(extension);
-                        filter.Name = fileTypeName;
-                        browseDialog.Filters.Add(filter);
-                        browseDialog.Title = "Select " + fileTypeName;
-                    }
-                    else
-                    {
-                        browseDialog.Title = "Select a file.";
+                        var filetypes = new List<FilePickerFileType>
+                        {
+                            new FilePickerFileType(fileTypeName)
+                            {
+                                Patterns = new[] { "*."+extension },
+                            }
+                        };
+                        selectfile.FileTypeFilter = filetypes;
                     }
 
-                    if (this.ContainsFile) browseDialog.Directory = Path.GetDirectoryName(this.FilePath);
+                    var files = await currentWindow.StorageProvider.OpenFilePickerAsync(selectfile);
+                    string? localPath = files.First().TryGetLocalPath();
 
-
-                    string[]? selectedFiles = await browseDialog.ShowAsync(currentWindow);
-                    if (selectedFiles is not null && selectedFiles.Length > 0)
-                        this.FilePath = selectedFiles.First();
-
+                    if (localPath is not null)
+                        this.FilePath = localPath;
                 }
 
                 btn.IsEnabled = true;

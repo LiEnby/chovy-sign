@@ -179,7 +179,7 @@ namespace GameBuilder.Psp
             byte[] table = npTbl.ToArray();
 
             // Encrypt Table
-            var tp = MemoryMarshal.Cast<byte, uint>(table);
+            var tp = MemoryMarshal.Cast<byte, uint>(table.AsSpan());
 
             for (int i = 0; i < (table.Length / 0x20); i++)
                 XorTable(tp[(i * 8)..]);

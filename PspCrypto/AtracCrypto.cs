@@ -22,9 +22,9 @@ namespace PspCrypto
         {
             int blocks = (data.Length / NBYTES) / 0x10;
             int chunks_rest = (data.Length / NBYTES) % 0x10;
-            Span<uint> ptr = MemoryMarshal.Cast<byte, uint>(data);
+            Span<uint> ptr = MemoryMarshal.Cast<byte, uint>(data.AsSpan());
             uint tmp2 = key;
-            uint tmp;
+            uint tmp;   
             uint value;
             // for each block
             while (blocks > 0)

@@ -125,9 +125,23 @@ namespace ChovySign_GUI.Settings
             InitializeComponent();
             init();
 
-            configCheckbox.Unchecked += onToggleUnchecked;
-            configCheckbox.Checked += onToggleChecked;
+            configCheckbox.IsCheckedChanged += onCheckedChanged;
 
+        }
+
+        private void onCheckedChanged(object? sender, RoutedEventArgs e)
+        {
+            CheckBox? checkBox = sender as CheckBox;
+            if (checkBox is null) return;
+
+            if (checkBox.IsChecked == true)
+            {
+                onToggleChecked(sender, e);
+            }
+            else
+            {
+                onToggleUnchecked(sender, e);
+            }
         }
     }
 }

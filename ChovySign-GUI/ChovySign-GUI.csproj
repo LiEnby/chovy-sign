@@ -1,13 +1,14 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net9.0</TargetFramework>
+    <TargetFramework>net10.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <RootNamespace>ChovySign_GUI</RootNamespace>
     <AssemblyName>ChovySign v2</AssemblyName>
     <ApplicationIcon>ICON.ICO</ApplicationIcon>
     <Authors>SquallATF, Li, Dots-Tb</Authors>
+    <BaseOutputPath>$(SolutionDir)build\$(MSBuildProjectName)</BaseOutputPath>
   </PropertyGroup>
   
   <ItemGroup>
@@ -40,11 +41,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Avalonia" Version="11.2.5" />
-    <PackageReference Include="Avalonia.Desktop" Version="11.2.5" />
+    <PackageReference Include="Avalonia" Version="12.0.3" />
+    <PackageReference Include="Avalonia.Desktop" Version="12.0.3" />
     <!--Condition below is needed to remove Avalonia.Diagnostics package from build output in Release configuration.-->
     <PackageReference Condition="'$(Configuration)' == 'Debug'" Include="Avalonia.Diagnostics" Version="11.2.5" />
-    <PackageReference Include="Avalonia.Themes.Fluent" Version="11.2.5" />
+    <PackageReference Include="Avalonia.Themes.Fluent" Version="12.0.3" />
   </ItemGroup>
 
   <ItemGroup>
