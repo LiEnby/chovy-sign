@@ -26,6 +26,6 @@
 		</Grid>
 
 		<!-- Credits -->
-		<Label Content="Li, Dots TB, SquallATF, Motoharu, Davee" VerticalAlignment="Bottom" HorizontalAlignment="Right"/>
+		<Label Content="Li, Dots_TB, SquallATF" VerticalAlignment="Bottom" HorizontalAlignment="Right"/>
 	</Grid>
 </UserControl>
