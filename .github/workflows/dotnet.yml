@@ -68,6 +68,13 @@ jobs:
         dotnet restore ChovySign-CLI
         dotnet restore PbpResign
 
+    - name: Setup flatpak
+      continue-on-error: false
+      run: |
+        sudo apt install -y flatpak
+        flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
+        flatpak install -y org.flatpak.Builder
+
     - name: Build linux
       continue-on-error: false
       run: |
@@ -75,12 +82,6 @@ jobs:
         dotnet publish -p:PublishProfile=Linux64 ChovySign-CLI
         dotnet publish -p:PublishProfile=Linux64 PbpResign
 
-    - name: setup flatpak
-      continue-on-error: false
-      run: |
-        flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
-        flatpak install -y org.flatpak.Builder
-        
     - name: Build linux flatpak
       continue-on-error: false
       run: |
