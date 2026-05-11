@@ -26,7 +26,7 @@ namespace GameBuilder.Atrac3
             string rdmPart = Rng.RandomStr(10);
 
             tempWav = Path.Combine(TEMP_DIRECTORY, rdmPart + "_tmp.wav");
-            tempAt9 = Path.Combine(TEMP_DIRECTORY, rdmPart + "_tmp.oma");
+            tempAt9 = Path.Combine(TEMP_DIRECTORY, rdmPart + "_tmp.at3");
 
         }
          
@@ -62,7 +62,7 @@ namespace GameBuilder.Atrac3
                     proc.StartInfo.Environment.Add(LD_LIBRARY_PATH, setupLibaryPath());
 
                 proc.StartInfo.FileName = ATRACDENC_LOCATION;
-                proc.StartInfo.Arguments = "-e atrac3plus --bitrate 132300 -i \"" + tempWav + "\" -o \"" + tempAt9 + "\"";
+                proc.StartInfo.Arguments = "-e atrac3 --bitrate 132300 -i \"" + tempWav + "\" -o \"" + tempAt9 + "\"";
 
                 proc.StartInfo.UseShellExecute = false;
                 proc.StartInfo.CreateNoWindow = true;
@@ -80,12 +80,29 @@ namespace GameBuilder.Atrac3
 
         private byte[] stripAtracHeader()
         {
-            using(FileStream at3Stream = File.OpenRead(tempAt9))
+            using (FileStream at3Stream = File.OpenRead(tempAt9))
             {
                 StreamUtil at3Util = new StreamUtil(at3Stream);
-                at3Stream.Seek(0x60, SeekOrigin.Begin);
-                int lenRemain = Convert.ToInt32(at3Stream.Length - at3Stream.Position);
-                return at3Util.ReadBytes(lenRemain);
+                string magic = at3Util.ReadStrLen(4);
+                int filesz = at3Util.ReadInt32();
+                string riffType = at3Util.ReadStrLen(4);
+
+                if (magic == "RIFF" && riffType == "WAVE")
+                {
+                    // read headers until we get data;
+                    string blockName = "";
+                    int blockSz = 0;
+                    do
+                    {
+                        at3Stream.Seek(blockSz, SeekOrigin.Current);
+                        blockName = at3Util.ReadStrLen(4);
+                        blockSz = at3Util.ReadInt32();
+                    } while (blockName != "data");
+
+                    return at3Util.ReadBytes(blockSz);
+                }
+
+                throw new InvalidDataException("the encoded at3 file was not a RIFF");
             }
         }
 

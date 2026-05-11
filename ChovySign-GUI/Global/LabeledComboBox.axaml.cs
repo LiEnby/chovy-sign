@@ -8,7 +8,6 @@ namespace ChovySign_GUI.Global
 
     public partial class LabeledComboBox : UserControl
     {
-        private List<string> items;
         public string Label
         {
             get

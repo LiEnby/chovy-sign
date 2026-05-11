@@ -18,7 +18,7 @@
 				<ColumnDefinition Width="1*" />
 				<ColumnDefinition Width="75" />
 			</Grid.ColumnDefinitions>
-			<TextBox Name="filePath" HorizontalAlignment="Stretch" VerticalAlignment="Center" Watermark="(None)" Grid.Column="0"/>
+			<TextBox Name="filePath" HorizontalAlignment="Stretch" VerticalAlignment="Center" PlaceholderText="(None)" Grid.Column="0"/>
 			<Button Name="browseButton" Content="Browse" HorizontalAlignment="Center" VerticalAlignment="Center" Click="browseClick" Grid.Column="1"/>
 		</Grid>
 	</Grid>

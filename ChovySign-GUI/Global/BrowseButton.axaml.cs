@@ -69,7 +69,7 @@ namespace ChovySign_GUI.Global
         {
             get
             {
-                return this.filePath.PlaceholderText;
+                return this.filePath.PlaceholderText is null ? "(none)" : this.filePath.PlaceholderText;
             }
             set
             {
