@@ -18,7 +18,6 @@ namespace Vita.ContentManager
                 Int64 aidUint = Convert.ToInt64(accountId, 16);
 
                 byte[] aidBytes = BitConverter.GetBytes(aidUint);
-                Array.Reverse(aidBytes);
 
                 byte[] derivedKey = GenerateKey(aidBytes);
 

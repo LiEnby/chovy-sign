@@ -1,10 +1,4 @@
 ﻿using Ionic.Zlib;
-using System;
-using System.Collections.Generic;
-using System.Configuration;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace LibChovy.Config
 {
@@ -28,6 +22,7 @@ namespace LibChovy.Config
 
                     if (configOption.Value is string) { type = "string"; value = (string)(configOption.Value); }
                     if (configOption.Value is int)    { type = "int";    value = ((int)(configOption.Value)).ToString(); };
+                    if (configOption.Value is UInt64) { type = "uint64";    value = ((UInt64)(configOption.Value)).ToString(); };
                     if (configOption.Value is bool)   { type = "bool";   value = (((bool)(configOption.Value)) ? "1" : "0"); }
                     if (configOption.Value is byte[]) { type = "byte";   value = Convert.ToBase64String(ZlibStream.CompressBuffer((byte[])configOption.Value)); }
 
@@ -67,6 +62,9 @@ namespace LibChovy.Config
                         {
                             case "int":
                                 config[key] = Int32.Parse(value);
+                                break;
+                            case "uint64":
+                                config[key] = UInt64.Parse(value);
                                 break;
                             case "string":
                                 config[key] = value;
@@ -108,7 +106,11 @@ namespace LibChovy.Config
             if (!config.ContainsKey(key)) return null;
             return config[key] as int?;
         }
-
+        public override UInt64? GetInt64(string key)
+        {
+            if (!config.ContainsKey(key)) return null;
+            return config[key] as UInt64?;
+        }
         public override string? GetString(string key)
         {
             if (!config.ContainsKey(key)) return null;
@@ -128,6 +130,13 @@ namespace LibChovy.Config
         }
 
         public override void SetInt(string key, int value)
+        {
+            config[key] = value;
+            saveDict();
+
+        }
+
+        public override void SetInt64(string key, UInt64 value)
         {
             config[key] = value;
             saveDict();

@@ -1,15 +1,36 @@
 ﻿using Microsoft.Win32;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Globalization;
 
 namespace Vita.ContentManager
 {
     public class SettingsReader
     {
         private static string? overrideBackupsFolder = null;
+
+        public static UInt64 AccountId
+        {
+            get
+            {
+                string? accountId = getQcmaLastAccount();
+                if (accountId is not null) return UInt64.Parse(accountId, NumberStyles.HexNumber);
+                accountId = Directory.EnumerateDirectories(AppFolder).FirstOrDefault(o => o.Length == 16);
+
+                if (accountId is not null) return UInt64.Parse(accountId, NumberStyles.HexNumber);
+                accountId = Directory.EnumerateDirectories(PspSavedataFolder).FirstOrDefault(o => o.Length == 16);
+
+                if (accountId is not null) return UInt64.Parse(accountId, NumberStyles.HexNumber);
+                accountId = Directory.EnumerateDirectories(PspFolder).FirstOrDefault(o => o.Length == 16);
+
+                if (accountId is not null) return UInt64.Parse(accountId, NumberStyles.HexNumber);
+                accountId = Directory.EnumerateDirectories(Ps1Folder).FirstOrDefault(o => o.Length == 16);
+
+                if (accountId is not null) return UInt64.Parse(accountId, NumberStyles.HexNumber);
+                accountId = Directory.EnumerateDirectories(PsmFolder).FirstOrDefault(o => o.Length == 16);
+
+
+                return 0ul;
+            }
+        }
         public static string AppFolder
         {
             get
@@ -155,16 +176,16 @@ namespace Vita.ContentManager
             }
             return null;
         }
-        private static string? getQcmaPSVitaFolder()
+        private static string? readQcmaConfig(string settingName)
         {
             if (OperatingSystem.IsWindows())
             {
-                return getRegistryKey(@"Software\codestation\qcma", "appsPath");
+                return getRegistryKey(@"Software\codestation\qcma", settingName);
             }
             else if (OperatingSystem.IsLinux())
             {
                 string qcmaConf = getQcmaConfFile();
-                return getQcmaConfigSetting(qcmaConf, "appsPath");
+                return getQcmaConfigSetting(qcmaConf, settingName);
             }
             else if (OperatingSystem.IsMacOS())
             {
@@ -172,6 +193,14 @@ namespace Vita.ContentManager
                 // TODO: read file
             }
             return null;
+        }
+        private static string? getQcmaLastAccount()
+        {
+            return readQcmaConfig("lastAccountId");
+        }
+        private static string? getQcmaPSVitaFolder()
+        {
+            return readQcmaConfig("appsPath");
         }
     }
 }

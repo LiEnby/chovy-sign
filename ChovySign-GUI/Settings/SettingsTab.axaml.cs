@@ -3,6 +3,8 @@ using GameBuilder.Pops.LibCrypt;
 using GameBuilder;
 using System.IO;
 using Vita.ContentManager;
+using System;
+using System.Globalization;
 
 namespace ChovySign_GUI.Settings
 {
@@ -39,11 +41,26 @@ namespace ChovySign_GUI.Settings
             }
         }
 
-        public bool DevkitMode
+        public bool DownloadPs1Covers
         {
             get
             {
-                return devkitAccount.IsToggled;
+                return downloadCovers.IsToggled;
+            }
+            set
+            {
+                downloadCovers.IsToggled = value;
+            }
+        }
+        public UInt64 AccountId
+        {
+            get
+            {
+                return cmaAccountId.Value;
+            }
+            set
+            {
+                cmaAccountId.Value = value;
             }
         }
         public bool PackagePsvimg
@@ -62,9 +79,8 @@ namespace ChovySign_GUI.Settings
             libCryptMode.Items = new string[2] { "Magic Word in ISO Header", "Sub Channel PGD" };
             streamType.Items = new string[2] { "MemoryStream - Create EBOOT in memory, faster, but high memory usage", "FileStream - Create EBOOT with temporary files, slower, but less memory usage" };
 
-            if (!Directory.Exists(this.CmaDirectory))
-                cmaDirectory.Value = SettingsReader.BackupsFolder;
-
+            cmaDirectory.Default = SettingsReader.BackupsFolder;
+            cmaAccountId.Default = SettingsReader.AccountId;
 
             Settings = this;
         }

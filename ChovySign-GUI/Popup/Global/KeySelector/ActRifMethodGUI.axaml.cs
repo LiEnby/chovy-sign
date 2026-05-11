@@ -8,6 +8,7 @@ using GameBuilder.Psp;
 using System;
 using System.IO;
 using static ChovySign_GUI.Popup.Global.MessageBox;
+using ChovySign_GUI.Settings;
 
 namespace ChovySign_GUI.Popup.Global.KeySelector
 {
@@ -107,21 +108,21 @@ namespace ChovySign_GUI.Popup.Global.KeySelector
         {
             NpDrmInfo[] keys = new NpDrmInfo[0x5];
 
-            Window? currentWindow = this.VisualRoot as Window;
+            Window? currentWindow = TopLevel.GetTopLevel(this) as Window;
             if (currentWindow is not Window) throw new Exception("could not find current window");
 
             try
             {
                 // read data
-                byte[] idps = MathUtil.StringToByteArray(idpsInput.Text);
-                byte[] act = File.ReadAllBytes(actFile.FilePath);
-                byte[] rif = File.ReadAllBytes(rifFile.FilePath);
+                byte[] idpsbytes = MathUtil.StringToByteArray(idpsInput.Text);
+                byte[] actbytes = File.ReadAllBytes(actFile.FilePath);
+                byte[] rifbytes = File.ReadAllBytes(rifFile.FilePath);
 
                 // generate keys
                 for (int i = 0; i < 0x5; i++)
-                    keys[i] = ActRifMethod.GetVersionKey(act, rif, idps, i);
+                    keys[i] = ActRifMethod.GetVersionKey(actbytes, rifbytes, idpsbytes, i);
 
-                this.rif = new NpDrmRif(rif);
+                this.rif = new NpDrmRif(rifbytes);
 
                 this.Close(keys);
 

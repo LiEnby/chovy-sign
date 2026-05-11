@@ -7,11 +7,30 @@ namespace ChovySign_GUI.Settings
 {
     public partial class ConfigDropDown : ConfigControl
     {
+        private int defaultSetting = 0;
         internal override void init()
         {
+            loaded = false;
+
             int? cfgInt = ChovyConfig.CurrentConfig.GetInt(ConfigKey);
-            if (cfgInt is null) cfgInt = 0;
+            if (cfgInt is not null) loaded = true;
+            if (cfgInt is null) cfgInt = defaultSetting;
             this.configComboBox.SelectedIndex = (int)cfgInt;
+        }
+        public int Default
+        {
+            get
+            {
+                return defaultSetting;
+            }
+            set
+            {
+                defaultSetting = value;
+                init();
+
+                if (!loaded)
+                    this.SelectedIndex = defaultSetting;
+            }
         }
         public string Label
         {
@@ -54,8 +73,6 @@ namespace ChovySign_GUI.Settings
         public ConfigDropDown()
         {
             InitializeComponent();
-            init();
-
             this.configComboBox.SelectionChanged += onSelectionChange;
         }
 

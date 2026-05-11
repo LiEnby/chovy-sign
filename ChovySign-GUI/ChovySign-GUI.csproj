@@ -60,6 +60,9 @@
     <Compile Update="Settings\ConfigPath.axaml.cs">
       <DependentUpon>ConfigPath.axaml</DependentUpon>
     </Compile>
+    <Compile Update="Settings\ConfigU64.axaml.cs">
+      <DependentUpon>ConfigU64.axaml</DependentUpon>
+    </Compile>
     <Compile Update="Settings\ConfigToggle.axaml.cs">
       <DependentUpon>ConfigToggle.axaml</DependentUpon>
     </Compile>

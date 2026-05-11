@@ -10,6 +10,8 @@ namespace ChovySign_GUI.Settings
     public abstract class ConfigControl : UserControl
     {
         private string? configKey = null;
+        internal bool loaded = false;
+
         public string ConfigKey
         {
             get

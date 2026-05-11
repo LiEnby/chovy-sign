@@ -4,6 +4,7 @@ using Avalonia.Interactivity;
 using Avalonia.Remote.Protocol.Input;
 using ChovySign_GUI.Popup.Global;
 using ChovySign_GUI.Popup.Global.KeySelector;
+using ChovySign_GUI.Settings;
 using GameBuilder.Psp;
 using Ionic.Zlib;
 using Li.Utilities;
@@ -12,6 +13,7 @@ using LibChovy.VersionKey;
 using SixLabors.ImageSharp.PixelFormats;
 using System;
 using System.ComponentModel;
+using System.Globalization;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
@@ -129,7 +131,7 @@ namespace ChovySign_GUI.Global
 
             btn.IsEnabled = false;
 
-            Window? currentWindow = this.VisualRoot as Window;
+            Window? currentWindow = TopLevel.GetTopLevel(this) as Window;
             if (currentWindow is not Window) throw new Exception("could not find current window");
 
             KeyObtainMethods keyObt = new KeyObtainMethods();
@@ -149,7 +151,9 @@ namespace ChovySign_GUI.Global
 
                     key = keys[keyIndex];
                     rif = actRifMethodGUI.Rif;
-                    
+
+                    // change settings to use accountid from rif
+                    SettingsTab.Settings.AccountId = rif.AccountIdBE;
                     break;
                 case VersionKeyMethod.EBOOT_PBP_METHOD:
                     CmaBackupPicker ebootBackupSelector = new CmaBackupPicker();
@@ -162,6 +166,10 @@ namespace ChovySign_GUI.Global
 
                     key = CMAVersionKeyHelper.GetKeyFromGamePsvimg(gameBackupFolder, accountId, this.keyIndex);
                     rif = CMAVersionKeyHelper.GetRifFromLicensePsvimg(gameBackupFolder, accountId);
+
+                    // change settings to match newly selected info
+                    SettingsTab.Settings.AccountId = UInt64.Parse(accountId, NumberStyles.HexNumber);
+                    
                     break;
                 case VersionKeyMethod.NOPSPEMUDRM_METHOD:
                     NoPspEmuDrmMethodGUI noPspEmuDrmMethodGUI = new NoPspEmuDrmMethodGUI();
@@ -170,6 +178,7 @@ namespace ChovySign_GUI.Global
 
                     key = keys[keyIndex];
                     rif = noPspEmuDrmMethodGUI.Rif;
+
                     break;
                 case VersionKeyMethod.KEYS_TXT_METHOD:
                     CmaBackupPicker pspLicenseBackupSelector = new CmaBackupPicker();

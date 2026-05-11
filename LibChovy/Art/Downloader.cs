@@ -11,7 +11,7 @@ namespace LibChovy.Art
 {
     public class Downloader
     {
-        private const string coverApi = "https://raw.githubusercontent.com/xlenore/psx-covers/main/covers/";
+        private const string coverApi = "https://raw.githubusercontent.com/xlenore/psx-covers/main/covers/default/";
         private static HttpClient httpClient = new HttpClient();
 
         public static async Task<byte[]> DownloadCover(PSInfo game)

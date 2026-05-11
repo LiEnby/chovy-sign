@@ -1,17 +1,38 @@
-using Avalonia.Controls;
 using ChovySign_GUI.Global;
 using LibChovy.Config;
 using System;
+using System.IO;
 
 namespace ChovySign_GUI.Settings
 {
     public partial class ConfigPath : ConfigControl
     {
+        private string defaultSetting = "";
         internal override void init()
         {
+            loaded = false;
+
             string? cfgText = ChovyConfig.CurrentConfig.GetString(ConfigKey);
-            if (cfgText is null) cfgText = "";
+            if (cfgText is not null) loaded = true;
+            if (cfgText is null) cfgText = defaultSetting;
+
             configPath.FilePath = cfgText;
+        }
+        public string Default
+        {
+            get
+            {
+                return defaultSetting;
+            }
+            set
+            {
+                defaultSetting = value;
+                init();
+
+                if (!loaded)
+                    this.Value = defaultSetting; 
+
+            }
         }
         public string Label
         {
@@ -28,7 +49,9 @@ namespace ChovySign_GUI.Settings
         {
             get
             {
-                return this.configPath.FilePath;
+                string path = this.configPath.FilePath;
+                if (Path.Exists(path)) return path;
+                return defaultSetting;
             }
             set
             {
@@ -75,8 +98,6 @@ namespace ChovySign_GUI.Settings
         public ConfigPath()
         {
             InitializeComponent();
-            init();
-
             this.configPath.FileChanged += onFileChange;
         }
 

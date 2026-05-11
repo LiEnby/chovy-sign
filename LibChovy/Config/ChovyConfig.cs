@@ -44,11 +44,13 @@ namespace LibChovy.Config
         public abstract string? GetString(string key);
         public abstract bool? GetBool(string key);
         public abstract int? GetInt(string key);
+        public abstract UInt64? GetInt64(string key);
         public abstract byte[]? GetBytes(string key);
 
         public abstract void SetString(string key, string value);
         public abstract void SetBool(string key, bool value);
         public abstract void SetInt(string key, int value);
+        public abstract void SetInt64(string key, UInt64 value);
         public abstract void SetBytes(string key, byte[] value);
 
         private static ChovyConfig? config = null;

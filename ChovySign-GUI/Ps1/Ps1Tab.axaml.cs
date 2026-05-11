@@ -35,7 +35,7 @@ namespace ChovySign_GUI.Ps1
             gameInfo.IsEnabled = true;
             SettingsTab.Settings.IsEnabled = true;
 
-            Window? currentWindow = this.VisualRoot as Window;
+            Window? currentWindow = TopLevel.GetTopLevel(this) as Window;
             if (currentWindow is not Window) throw new Exception("could not find current window");
 
             _ = App.PlayFinishSound();
@@ -67,7 +67,7 @@ namespace ChovySign_GUI.Ps1
             popsParameters.Pic1    =   gameInfo.Pic1;
 
             // read settings from settings tab.
-            if (SettingsTab.Settings.DevkitMode) popsParameters.Account = new Account(0);
+            popsParameters.Account = new Account(SettingsTab.Settings.AccountId);
             
             popsParameters.CrackMethod = SettingsTab.Settings.LibcryptMode;
             SettingsReader.BackupsFolder = SettingsTab.Settings.CmaDirectory;

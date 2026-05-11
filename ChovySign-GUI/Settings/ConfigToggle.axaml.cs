@@ -3,7 +3,6 @@ using Avalonia.Interactivity;
 using ChovySign_GUI.Popup.Global;
 using LibChovy.Config;
 using System;
-using System.Collections.Generic;
 using static ChovySign_GUI.Popup.Global.MessageBox;
 
 namespace ChovySign_GUI.Settings
@@ -16,8 +15,12 @@ namespace ChovySign_GUI.Settings
         private bool defaultSetting = false;
         internal override void init()
         {
+            loaded = false;
+
             bool? isToggleChecked = ChovyConfig.CurrentConfig.GetBool(ConfigKey);
-            if(isToggleChecked is null) isToggleChecked = defaultSetting;
+            if (isToggleChecked is not null) loaded = true;
+            if (isToggleChecked is null) isToggleChecked = defaultSetting;
+
 
             this.disableEvents = true;
             configCheckbox.IsChecked = isToggleChecked;
@@ -33,8 +36,9 @@ namespace ChovySign_GUI.Settings
             set
             {
                 defaultSetting = value;
+                init();
 
-                if (ChovyConfig.CurrentConfig.GetBool(ConfigKey) is null)
+                if (!loaded)
                     this.IsToggled = defaultSetting;
             }
         }
@@ -76,7 +80,7 @@ namespace ChovySign_GUI.Settings
 
             if (promptMsg is not null)
             {
-                Window? currentWindow = this.VisualRoot as Window;
+                Window? currentWindow = TopLevel.GetTopLevel(this) as Window;
                 if (currentWindow is not Window) throw new Exception("could not find current window");
 
                 MessageBoxResult res = await MessageBox.Show(currentWindow, Prompt, "Are you sure?", MessageBoxButtons.YesNo);
@@ -123,8 +127,6 @@ namespace ChovySign_GUI.Settings
         public ConfigToggle()
         {
             InitializeComponent();
-            init();
-
             configCheckbox.IsCheckedChanged += onCheckedChanged;
 
         }

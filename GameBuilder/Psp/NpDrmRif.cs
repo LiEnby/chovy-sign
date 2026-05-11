@@ -29,7 +29,16 @@ namespace GameBuilder.Psp
                 return Convert.ToBase64String(ZlibStream.CompressBuffer(Rif));
             }
         }
-
+        public UInt64 AccountIdBE
+        {
+            get
+            {
+                byte[] aidbytes = new byte[8];
+                Array.Copy(Rif, 8, aidbytes, 0, aidbytes.Length);
+                Array.Reverse(aidbytes);
+                return BitConverter.ToUInt64(aidbytes);
+            }
+        }
         public UInt64 AccountId
         {
             get

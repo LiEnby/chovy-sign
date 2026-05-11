@@ -88,7 +88,7 @@ namespace GameBuilder.Cue
         {
             CueTrack track = GetTrackNumber(trackNo);
             // total iso (size / sector size)
-            int startSector = IdxToSector(track.TrackIndex[trackNo]);
+            int startSector = IdxToSector(track.TrackIndex.Last());
             int fileSectorSz = Convert.ToInt32(track.binFileSz / track.SectorSz);
             int endSector = Convert.ToInt32(startSector + (fileSectorSz - startSector));
 
@@ -99,7 +99,7 @@ namespace GameBuilder.Cue
                 if (cTrack is not null)
                 {
                     if (cTrack.TrackNo <= track.TrackNo) continue;
-                    int sector = IdxToSector(cTrack.TrackIndex[0]);
+                    int sector = IdxToSector(cTrack.TrackIndex.First());
 
                     if (sector < endSector) endSector = sector;
                 }

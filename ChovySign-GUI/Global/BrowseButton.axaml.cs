@@ -2,6 +2,7 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Platform.Storage;
+using Org.BouncyCastle.Asn1.X509;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -16,6 +17,7 @@ namespace ChovySign_GUI.Global
         private bool directory;
 
         public event EventHandler<EventArgs>? FileChanged;
+        public event EventHandler<EventArgs>? FileRemoved;
 
         protected virtual void OnFileChanged(EventArgs e)
         {
@@ -23,6 +25,11 @@ namespace ChovySign_GUI.Global
                 FileChanged(this, e);
         }
 
+        protected virtual void OnFileRemoved(EventArgs e)
+        {
+            if (FileRemoved is not null)
+                FileRemoved(this, e);
+        }
         public string Extension
         {
             get
@@ -120,7 +127,7 @@ namespace ChovySign_GUI.Global
 
         private async void browseClick(object sender, RoutedEventArgs e)
         {
-            Window? currentWindow = this.VisualRoot as Window;
+            Window? currentWindow = TopLevel.GetTopLevel(this) as Window;
             if (currentWindow is not Window) throw new Exception("could not find current window");
 
             Button? btn = sender as Button;
@@ -139,10 +146,15 @@ namespace ChovySign_GUI.Global
 
                     // open directory
                     var folders = await currentWindow.StorageProvider.OpenFolderPickerAsync(selectdir);
-                    string? localPath = folders.First().TryGetLocalPath();
 
-                    if (localPath is not null)
-                        this.FilePath = localPath;
+                    var storageFolder = folders.FirstOrDefault();
+                    if (storageFolder is not null)
+                    {
+                        string? localPath = storageFolder.TryGetLocalPath();
+
+                        if (localPath is not null)
+                            this.FilePath = localPath;
+                    }
                 }
                 else
                 {
@@ -163,10 +175,15 @@ namespace ChovySign_GUI.Global
                     }
 
                     var files = await currentWindow.StorageProvider.OpenFilePickerAsync(selectfile);
-                    string? localPath = files.First().TryGetLocalPath();
+                    var storageFiles = files.FirstOrDefault();
+                    if(storageFiles is not null)
+                    {
+                        string? localPath = storageFiles.TryGetLocalPath();
 
-                    if (localPath is not null)
-                        this.FilePath = localPath;
+                        if (localPath is not null)
+                            this.FilePath = localPath;
+
+                    }
                 }
 
                 btn.IsEnabled = true;
@@ -193,8 +210,10 @@ namespace ChovySign_GUI.Global
             if (e.Property.Name == "Text")
             {
                 if (txt.Text is null) return;
-                if (!ContainsFile) return;
-                OnFileChanged(new EventArgs());
+                if (ContainsFile)
+                    OnFileChanged(new EventArgs());
+                else
+                    OnFileRemoved(new EventArgs());                    
             }
         }
     }

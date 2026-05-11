@@ -1,14 +1,8 @@
 ﻿using DiscUtils.Iso9660Ps1;
-using DiscUtils.Raw;
 using DiscUtils.Streams;
 using GameBuilder.Cue;
 using GameBuilder.Pops.LibCrypt;
 using Li.Utilities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace GameBuilder.Pops
 {

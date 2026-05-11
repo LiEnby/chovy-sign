@@ -40,7 +40,7 @@ namespace ChovySign_GUI.Psp
             isoSelector.IsEnabled = true;
             SettingsTab.Settings.IsEnabled = true;
 
-            Window? currentWindow = this.VisualRoot as Window;
+            Window? currentWindow = TopLevel.GetTopLevel(this) as Window;
             if (currentWindow is not Window) throw new Exception("could not find current window");
 
             _ = App.PlayFinishSound();
@@ -67,7 +67,7 @@ namespace ChovySign_GUI.Psp
             pspParameters.Compress = isoSelector.Compress;
 
             // read settings from settings tab.
-            pspParameters.Account.Devkit = SettingsTab.Settings.DevkitMode;
+            pspParameters.Account = new Account(SettingsTab.Settings.AccountId);
             SettingsReader.BackupsFolder = SettingsTab.Settings.CmaDirectory;
             pspParameters.CreatePsvImg = SettingsTab.Settings.PackagePsvimg;
 

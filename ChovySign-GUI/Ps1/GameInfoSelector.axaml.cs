@@ -2,6 +2,7 @@ using Avalonia.Controls;
 using Avalonia.Media.Imaging;
 using ChovySign_GUI.Global;
 using ChovySign_GUI.Popup.Global;
+using ChovySign_GUI.Settings;
 using GameBuilder.Pops;
 using LibChovy.Art;
 using System;
@@ -15,6 +16,7 @@ namespace ChovySign_GUI.Ps1
 {
     public partial class GameInfoSelector : UserControl
     {
+        private byte[] defaultIcon = LibChovy.Resources.ICON0;
 
         private byte[] iconCache;
         private byte[] pic0Cache;
@@ -51,8 +53,10 @@ namespace ChovySign_GUI.Ps1
             }
             set
             {
-                if(value is not null)
+                if (value is not null)
                     iconCache = value;
+                else
+                    iconCache = defaultIcon;
 
                 loadIcon(iconCache);
             }
@@ -68,6 +72,9 @@ namespace ChovySign_GUI.Ps1
             {
                 if (value is not null)
                     pic0Cache = value;
+                else
+                    iconCache = LibChovy.Resources.PIC0;
+
             }
         }
 
@@ -81,6 +88,9 @@ namespace ChovySign_GUI.Ps1
             {
                 if (value is not null)
                     pic1Cache = value;
+                else
+                    iconCache = LibChovy.Resources.PIC1;
+
             }
         }
 
@@ -99,15 +109,21 @@ namespace ChovySign_GUI.Ps1
                 Title = disc.DiscName;
                 DiscId = disc.DiscId;
 
-                if (!File.Exists(this.iconFile.FilePath))
+                if (!File.Exists(this.iconFile.FilePath) && SettingsTab.Settings.DownloadPs1Covers)
                 {
-                    byte[] newCover = await Downloader.DownloadCover(disc);
-                    loadIcon(newCover);
-                    iconCache = newCover;
+                    byte[] imgData = await Downloader.DownloadCover(disc);
+                    if(imgData is not null)
+                    {
+                        defaultIcon = imgData;
+                        Icon0 = imgData;
+                        return;
+                    }
                 }
+                defaultIcon = LibChovy.Resources.ICON0;
+
             }
             catch (Exception e) {
-                Window? currentWindow = this.VisualRoot as Window;
+                Window? currentWindow = TopLevel.GetTopLevel(this) as Window;
                 if (currentWindow is not Window) throw new Exception("could not find current window");
 
                 await MessageBox.Show(currentWindow, "unable to read cue sheet: " + Path.GetFileName(cueFile) + "\n" + e.Message + "\n\nSTACKTRACE: " + e.StackTrace, "cannot load cue sheet", MessageBox.MessageBoxButtons.Ok);  
@@ -129,7 +145,7 @@ namespace ChovySign_GUI.Ps1
                 }
                 catch (Exception)
                 {
-                    Window? currentWindow = this.VisualRoot as Window;
+                    Window? currentWindow = TopLevel.GetTopLevel(this) as Window;
                     if (currentWindow is not Window) throw new Exception("could not find current window");
 
                     await MessageBox.Show(currentWindow, "The image you selected is could not be loaded!", "Invalid image.", MessageBox.MessageBoxButtons.Ok);
@@ -177,15 +193,18 @@ namespace ChovySign_GUI.Ps1
         public GameInfoSelector()
         {
             InitializeComponent();
-            iconCache = LibChovy.Resources.ICON0;
-            pic0Cache = LibChovy.Resources.PIC0;
-            pic1Cache = LibChovy.Resources.PIC1;
-
-            loadIcon(iconCache);
+            Icon0 = null;
+            Pic0 = null;
+            Pic1 = null;
 
             this.iconFile.FileChanged += onIconChange;
             this.pic0File.FileChanged += onPic0Change;
             this.pic1File.FileChanged += onPic1Change;
+
+            this.iconFile.FileRemoved += onIconChange;
+            this.pic0File.FileRemoved += onPic0Change;
+            this.pic1File.FileRemoved += onPic1Change;
+
 
             this.gameTitle.TextChanged += onTitleChange;
             this.discId.TextChanged += onDiscIdChange;

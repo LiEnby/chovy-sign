@@ -1,6 +1,7 @@
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using ChovySign_GUI.Global;
+using ChovySign_GUI.Settings;
 using GameBuilder.Psp;
 using LibChovy.Config;
 using Org.BouncyCastle.Asn1;
@@ -22,9 +23,6 @@ namespace ChovySign_GUI.Popup.Global
         private string[]? filter;
 
         private string? cmaAccountId = null;
-        private string? cmaBackupDir = null;
-
-        private const string backupPickerCmaDirectoryConfigKey = "BACKUP_PICKER_CMA_DIRECTORY";
 
         public string[] Filter
         {
@@ -50,22 +48,13 @@ namespace ChovySign_GUI.Popup.Global
         {
             get
             {
-                if(cmaBackupDir is null)
-                {
-                    string? savedBackupFolder = ChovyConfig.CurrentConfig.GetString(backupPickerCmaDirectoryConfigKey);
-                    if (savedBackupFolder is null) savedBackupFolder = SettingsReader.BackupsFolder;
-
-                    cmaBackupDir = savedBackupFolder;
-                }
-
-                return cmaBackupDir;
+                return SettingsTab.Settings.CmaDirectory;
             }
             set
             {
                 if (Directory.Exists(value))
                 {
-                    cmaBackupDir = value;
-                    ChovyConfig.CurrentConfig.SetString(backupPickerCmaDirectoryConfigKey, cmaBackupDir);
+                    SettingsTab.Settings.CmaDirectory = value; 
                 }
             }
         }

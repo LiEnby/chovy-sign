@@ -7,11 +7,33 @@ namespace ChovySign_GUI.Settings
 {
     public partial class ConfigText : ConfigControl
     {
+        private string defaultSetting = "";
         internal override void init()
         {
+            loaded = false;
+
             string? cfgText = ChovyConfig.CurrentConfig.GetString(ConfigKey);
-            if (cfgText is null) cfgText = "";
+            if (cfgText is null) cfgText = defaultSetting;
+            if (cfgText is not null) loaded = true;
+
             configText.Text = cfgText;
+        }
+
+
+        public String Default
+        {
+            get
+            {
+                return defaultSetting;
+            }
+            set
+            {
+                defaultSetting = value;
+                init();
+
+                if (!loaded)
+                    this.Value = defaultSetting;
+            }
         }
         public string Label
         {
@@ -41,8 +63,6 @@ namespace ChovySign_GUI.Settings
         public ConfigText()
         {
             InitializeComponent();
-            init();
-
             this.configText.TextChanged += onTextChange;
         }
 

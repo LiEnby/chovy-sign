@@ -39,8 +39,7 @@ namespace ChovySign_GUI.Global
 
         private async void goClick(object sender, RoutedEventArgs e)
         {
-
-            Window? currentWindow = this.VisualRoot as Window;
+            Window? currentWindow = TopLevel.GetTopLevel(this) as Window;
             if (currentWindow is not Window) throw new Exception("could not find current window");
 
             this.goButton.IsEnabled = false;

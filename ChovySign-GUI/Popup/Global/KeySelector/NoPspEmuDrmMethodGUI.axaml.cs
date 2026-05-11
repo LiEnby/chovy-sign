@@ -64,7 +64,7 @@ namespace ChovySign_GUI.Popup.Global.KeySelector
         {
             NpDrmInfo[] keys = new NpDrmInfo[0x5];
 
-            Window? currentWindow = this.VisualRoot as Window;
+            Window? currentWindow = TopLevel.GetTopLevel(this) as Window;
             if (currentWindow is not Window) throw new Exception("could not find current window");
 
             try
