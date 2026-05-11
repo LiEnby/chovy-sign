@@ -1,10 +1,5 @@
 ﻿using Microsoft.Win32;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
+
 #pragma warning disable CA1416 // Validate platform compatibility
 // platform is checked in constructor, however .net seems to wants me to check again in every function, No.
 
