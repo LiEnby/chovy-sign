@@ -68,12 +68,6 @@ jobs:
         dotnet restore ChovySign-CLI
         dotnet restore PbpResign
 
-    - name: Setup flatpak
-      continue-on-error: false
-      run: |
-        sudo apt install -y flatpak
-        flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
-        flatpak install -y org.flatpak.Builder
 
     - name: Build linux
       continue-on-error: false
@@ -82,18 +76,6 @@ jobs:
         dotnet publish -p:PublishProfile=Linux64 ChovySign-CLI
         dotnet publish -p:PublishProfile=Linux64 PbpResign
 
-    - name: Build linux flatpak
-      continue-on-error: false
-      run: |
-        cd Flatpak-data
-        ./quickpak build bundle
-        cd ..
-
-    - name: Upload linux gui flatpak
-      uses: actions/upload-artifact@v4
-      with:
-        name: ChovySign2-GUI-Linux-x64-Flatpak
-        path: Flatpak-data/codes.silica.chovysign.flatpak
 
     - name: Upload linux gui
       uses: actions/upload-artifact@v4
@@ -112,3 +94,17 @@ jobs:
       with:
         name: PbpResign-Linux-x64
         path: PbpResign/bin/publish/linux
+
+  build-flatpak:
+    runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/flathub-infra/flatpak-github-actions:gnome-48
+      options: --privileged
+    steps:
+    - uses: actions/checkout@v4
+    - uses: flatpak/flatpak-github-actions/flatpak-builder@v6
+      with:
+        bundle: ChovySign2-GUI-Linux-x64.flatpak
+        manifest-path: Flatpak-data/codes.silica.chovysign.yml
+        cache-key: flatpak-builder-${{ github.sha }}
+        upload-artifact: true
