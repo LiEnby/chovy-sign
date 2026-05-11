@@ -1,0 +1,40 @@
+<?xml version='1.0' encoding='utf-8'?>
+<component type="desktop-application">
+  <!--Created with jdAppStreamEdit 9.2-->
+  <id>codes.silica.chovysign</id>
+  <name>Chovy Sign V2</name>
+  <name xml:lang="C">Chovy Sign V2</name>
+  <name xml:lang="C.UTF-8">Chovy Sign V2</name>
+  <summary>Tool to convert PSP and PS1 ISO's to be used on PSVita</summary>
+  <summary xml:lang="C">An application to allow you to convert PSP and PS1 ISO's to be playable on unmodified PSVita</summary>
+  <summary xml:lang="C.UTF-8">An application to allow you to convert PSP and PS1 ISO's to be playable on unmodified PSVita</summary>
+  <developer id="codes.silica">
+    <name>Li</name>
+  </developer>
+  <metadata_license>MIT</metadata_license>
+  <project_license>GPL-3.0-or-later</project_license>
+  <description>
+    <p>Chovy Sign V2 is an application to allow you to convert PSP and PS1 ISO's to be playable on unmodified PSVita.</p>
+    <p>Warning: App requires a valid and working (offical) PSP or PS1 license;</p>
+    <p>Instructions to use the tool are included in the Porject's README</p>
+  </description>
+  <releases type="external"/>
+  <url type="homepage">https://git.silica.codes/Li/chovy-sign</url>
+  <url type="bugtracker">https://git.silica.codes/Li/chovy-sign/issues</url>
+  <url type="faq">https://git.silica.codes/Li/chovy-sign/src/branch/master/README.md</url>
+  <url type="help">https://git.silica.codes/Li/chovy-sign/src/branch/master/README.md</url>
+  <url type="contact">https://silica.codes</url>
+  <url type="vcs-browser">https://git.silica.codes/Li/chovy-sign/</url>
+  <categories>
+    <category>Utility</category>
+  </categories>
+  <recommends>
+    <control>pointing</control>
+    <control>keyboard</control>
+  </recommends>
+  <content_rating type="oars-1.1"/>
+  <launchable type="desktop-id">codes.silica.chovysign.desktop</launchable>
+  <provides>
+    <binary>"ChovySign</binary>
+  </provides>
+</component>

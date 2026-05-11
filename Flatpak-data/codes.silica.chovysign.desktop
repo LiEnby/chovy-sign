@@ -1,0 +1,12 @@
+[Desktop Entry]
+Type=Application
+Icon=codes.silica.chovysign
+Name=Chovy Sign V2
+Name[C]=Chovy Sign V2
+Name[C.UTF-8]=Chovy Sign V2
+Comment=An application to allow you to convert PSP and PS1 ISO's to be playable on unmodified PSVita
+Comment[C]=An application to allow you to convert PSP and PS1 ISO's to be playable on unmodified PSVita
+Comment[C.UTF-8]=An application to allow you to convert PSP and PS1 ISO's to be playable on unmodified PSVita
+Exec="ChovySign v2"
+Categories=Utility
+

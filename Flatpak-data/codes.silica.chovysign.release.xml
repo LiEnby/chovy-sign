@@ -1,0 +1,73 @@
+<?xml version='1.0' encoding='utf-8'?>
+<releases>
+  <!--Created with jdAppStreamEdit 9.2-->
+  <release version="CHOVY-SIGN 2.0.6" date="2026-05-11" type="stable">
+    <url>https://git.silica.codes/Li/chovy-sign/releases/tag/v2.0.6</url>
+    <description>
+      <ul>
+        <li>fixed saving settings on linux</li>
+        <li>fixed an issue where clearing selected png would not reset the image used</li>
+        <li>update to .net 10.0</li>
+        <li>fixed simple.dat pgd key (maybe?)</li>
+        <li>fixed cover downloads</li>
+        <li>fixed nopspemdrm option using the wrong accountid</li>
+      </ul>
+    </description>
+  </release>
+  <release version="CHOVY-SIGN 2.0.5" date="2025-03-16" type="stable">
+    <url>https://git.silica.codes/Li/chovy-sign/releases/tag/v2.0.5</url>
+    <description>
+      <ul>
+        <li>Added ability to use temporary files instead of doing it all in memory (useful if you dont have alot of RAM...)</li>
+        <li>Added ability to use NoPspEmuDrm for users with a hacked console</li>
+        <li>Updated to .NET 9.0</li>
+        <li>Also uploaded a build of the original PBPResign tool by SquallATF (some ppl wanted it idk)</li>
+      </ul>
+    </description>
+  </release>
+  <release version="CHOVY-SIGN 2.0.4" date="2024-01-11" type="stable">
+    <url>https://git.silica.codes/Li/chovy-sign/releases/tag/v2.0.4</url>
+    <description>
+      <ul>
+        <li>Fix a bug relating to icons</li>
+        <li>Fix a bug where you cant turn on the psvimg build option again after disabling it again</li>
+      </ul>
+    </description>
+  </release>
+  <release version="CHOVY-SIGN 2.0.2" date="2023-06-19" type="stable">
+    <url>https://git.silica.codes/Li/chovy-sign/releases/tag/v2.02</url>
+    <description/>
+  </release>
+  <release version="CHOVY-SIGN 2.0.1" date="2023-05-01" type="stable">
+    <url>https://git.silica.codes/Li/chovy-sign/releases/tag/v2.0.1</url>
+    <description>
+      <ul>
+        <li>Add Support for games protected with the LibCrypt Copy Protection</li>
+        <li>Add Support to read .SBI files</li>
+        <li>Add a little settings menu to change between libcrypt methods (magic word / subchannel)</li>
+        <li>Add option to force a different disc id</li>
+        <li>Fix a bug with Multi Disc and PSP Signatures not generating properly</li>
+      </ul>
+    </description>
+  </release>
+  <release version="CHOVY-SIGN 2.0" date="2023-04-26" type="stable">
+    <url>https://git.silica.codes/Li/chovy-sign/releases/tag/2.0</url>
+    <description/>
+  </release>
+  <release version="chovy-sign PUBLIC BETA 3" date="2019-10-10" type="development">
+    <url>https://git.silica.codes/Li/chovy-sign/releases/tag/BETA03</url>
+    <description/>
+  </release>
+  <release version="chovy-sign PUBLIC BETA 2" date="2019-08-22" type="development">
+    <url>https://git.silica.codes/Li/chovy-sign/releases/tag/BETA02</url>
+    <description/>
+  </release>
+  <release version="chovy-sign PUBLIC BETA" date="2019-08-18" type="development">
+    <url>https://git.silica.codes/Li/chovy-sign/releases/tag/BETA01</url>
+    <description/>
+  </release>
+  <release version="CHOVY-SIGN 2.0.3" date="1970-01-01" type="stable">
+    <url>https://git.silica.codes/Li/chovy-sign/releases/tag/v2.0.3</url>
+    <description/>
+  </release>
+</releases>
