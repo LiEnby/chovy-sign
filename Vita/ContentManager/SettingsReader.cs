@@ -10,20 +10,25 @@ namespace Vita.ContentManager
             get
             {
                 string? accountId = getQcmaLastAccount();
-                if (accountId is not null) return UInt64.Parse(accountId, NumberStyles.HexNumber);
-                accountId = Directory.EnumerateDirectories(AppFolder).FirstOrDefault(o => o.Length == 16);
 
-                if (accountId is not null) return UInt64.Parse(accountId, NumberStyles.HexNumber);
-                accountId = Directory.EnumerateDirectories(PspSavedataFolder).FirstOrDefault(o => o.Length == 16);
+                try
+                {
+                    if (accountId is not null) return UInt64.Parse(accountId, NumberStyles.HexNumber);
+                    accountId = Directory.EnumerateDirectories(AppFolder).FirstOrDefault(o => o.Length == 16);
 
-                if (accountId is not null) return UInt64.Parse(accountId, NumberStyles.HexNumber);
-                accountId = Directory.EnumerateDirectories(PspFolder).FirstOrDefault(o => o.Length == 16);
+                    if (accountId is not null) return UInt64.Parse(accountId, NumberStyles.HexNumber);
+                    accountId = Directory.EnumerateDirectories(PspSavedataFolder).FirstOrDefault(o => o.Length == 16);
 
-                if (accountId is not null) return UInt64.Parse(accountId, NumberStyles.HexNumber);
-                accountId = Directory.EnumerateDirectories(Ps1Folder).FirstOrDefault(o => o.Length == 16);
+                    if (accountId is not null) return UInt64.Parse(accountId, NumberStyles.HexNumber);
+                    accountId = Directory.EnumerateDirectories(PspFolder).FirstOrDefault(o => o.Length == 16);
 
-                if (accountId is not null) return UInt64.Parse(accountId, NumberStyles.HexNumber);
-                accountId = Directory.EnumerateDirectories(PsmFolder).FirstOrDefault(o => o.Length == 16);
+                    if (accountId is not null) return UInt64.Parse(accountId, NumberStyles.HexNumber);
+                    accountId = Directory.EnumerateDirectories(Ps1Folder).FirstOrDefault(o => o.Length == 16);
+
+                    if (accountId is not null) return UInt64.Parse(accountId, NumberStyles.HexNumber);
+                    accountId = Directory.EnumerateDirectories(PsmFolder).FirstOrDefault(o => o.Length == 16);
+                }
+                catch (Exception) { return 0ul; };
 
 
                 return 0ul;
