@@ -52,7 +52,9 @@ build() {
 lint() {
   # shellcheck disable=SC2068
   flatpak run --command=flatpak-builder-lint org.flatpak.Builder \
-  --exceptions --debug repo repo $@ || true
+  --exceptions --debug appstream codes.silica.chovysign.metainfo.xml && \
+  flatpak run --command=flatpak-builder-lint org.flatpak.Builder \
+  --exceptions repo repo $@ || true
 }
 
 source_gen() {
