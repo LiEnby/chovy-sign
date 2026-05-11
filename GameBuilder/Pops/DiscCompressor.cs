@@ -180,7 +180,7 @@ namespace GameBuilder.Pops
                 {
                     uint key = Rng.RandomUInt();
 
-                    AtracdencEncoder enc = new AtracdencEncoder();
+                    Atrac3ToolEncoder enc = new Atrac3ToolEncoder();
 
                     byte[] pcmData = new byte[audioStream.Length];
                     audioStream.Read(pcmData, 0x00, pcmData.Length);

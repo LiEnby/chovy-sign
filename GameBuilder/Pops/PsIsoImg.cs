@@ -23,7 +23,7 @@ namespace GameBuilder.Pops
 
         public PsIsoImg(NpDrmInfo versionKey, PSInfo disc) : base(versionKey)
         {
-            this.compressor = new DiscCompressor(this, disc, new AtracdencEncoder());
+            this.compressor = new DiscCompressor(this, disc, new Atrac3ToolEncoder());
             this.compressor.RegisterCallback(onProgress);
         }
 

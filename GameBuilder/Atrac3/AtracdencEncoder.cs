@@ -73,7 +73,7 @@ namespace GameBuilder.Atrac3
                 string stdout = proc.StandardOutput.ReadToEnd();
                 proc.WaitForExit();
 
-                if (!stdout.Contains("End of input file."))
+                if (!stdout.Contains("Done"))
                     throw new Exception(stdout);
             }
         }

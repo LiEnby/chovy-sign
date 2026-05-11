@@ -49,11 +49,11 @@ namespace ChovySign_GUI.Global
         {
             get
             {
-                return this.txtBox.Watermark;
+                return this.txtBox.PlaceholderText;
             }
             set
             {
-                this.txtBox.Watermark = value;
+                this.txtBox.PlaceholderText = value;
             }
         }
         public string? AllowedChars

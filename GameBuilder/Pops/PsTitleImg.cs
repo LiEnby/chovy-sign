@@ -39,7 +39,7 @@ namespace GameBuilder.Pops
                 }
                 else
                 {
-                    compressors[i] = new DiscCompressor(this, discs[i], new AtracdencEncoder());
+                    compressors[i] = new DiscCompressor(this, discs[i], new Atrac3ToolEncoder());
                     compressors[i].RegisterCallback(onProgress);
                 }
             }

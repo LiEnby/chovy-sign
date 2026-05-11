@@ -69,11 +69,11 @@ namespace ChovySign_GUI.Global
         {
             get
             {
-                return this.filePath.Watermark;
+                return this.filePath.PlaceholderText;
             }
             set
             {
-                this.filePath.Watermark = value;
+                this.filePath.PlaceholderText = value;
             }
         }
         public string Label
