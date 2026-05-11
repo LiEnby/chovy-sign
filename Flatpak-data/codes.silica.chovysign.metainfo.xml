@@ -18,6 +18,16 @@
     <p>Warning: App requires a valid and working (offical) PSP or PS1 license;</p>
     <p>Instructions to use the tool are included in the Porject's README</p>
   </description>
+  <screenshots>
+    <screenshot type="default">
+      <caption>The main menu of the applet, the PlayStation Portable tab, it asks for a License and Game UMD.</caption>
+      <image type="source">https://git.silica.codes/Li/chovy-sign/raw/commit/bc6f6c9373d0f3f3ef9f9e493d3617d2060f7964/Flatpak-data/Screenshots/PSP_Menu.png</image>
+    </screenshot>
+    <screenshot>
+      <caption>The PlayStation One tab, asks for up to 5 game discs, icons and a License file.</caption>
+      <image type="source">https://git.silica.codes/Li/chovy-sign/raw/commit/bc6f6c9373d0f3f3ef9f9e493d3617d2060f7964/Flatpak-data/Screenshots/PSOne_Menu.png</image>
+    </screenshot>
+  </screenshots>
   <releases type="external"/>
   <url type="homepage">https://git.silica.codes/Li/chovy-sign</url>
   <url type="bugtracker">https://git.silica.codes/Li/chovy-sign/issues</url>
