@@ -5,6 +5,7 @@
     <TargetFramework>net10.0</TargetFramework>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <BaseOutputPath>$(SolutionDir)build\$(MSBuildProjectName)</BaseOutputPath>
+	<IntermediateOutputPath>$(SolutionDir)build\$(MSBuildProjectName)\inter</IntermediateOutputPath>
   </PropertyGroup>
 
   <ItemGroup>

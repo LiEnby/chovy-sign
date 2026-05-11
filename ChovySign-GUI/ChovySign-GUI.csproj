@@ -9,6 +9,7 @@
     <ApplicationIcon>ICON.ICO</ApplicationIcon>
     <Authors>SquallATF, Li, Dots-Tb</Authors>
     <BaseOutputPath>$(SolutionDir)build\$(MSBuildProjectName)</BaseOutputPath>
+	<IntermediateOutputPath>$(SolutionDir)build\$(MSBuildProjectName)\inter</IntermediateOutputPath>
   </PropertyGroup>
   
   <ItemGroup>

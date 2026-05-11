@@ -5,6 +5,8 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <BaseOutputPath>$(SolutionDir)build\$(MSBuildProjectName)</BaseOutputPath>
+	<IntermediateOutputPath>$(SolutionDir)build\$(MSBuildProjectName)\inter</IntermediateOutputPath>
+
   </PropertyGroup>
 
 </Project>

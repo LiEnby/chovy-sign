@@ -15,14 +15,15 @@ namespace GameBuilder.Pops
     public abstract class PopsImg : NpDrmPsar
     {
         
-        public PopsImg(NpDrmInfo versionKey) : base(versionKey)
+        public PopsImg(NpDrmInfo npdrmInfo) : base(npdrmInfo)
         {
             simple = new BuildStream();
             simpleUtil = new StreamUtil(simple);
 
             this.StartDat = NpDrmPsar.CreateStartDat(Resources.STARTDATPOPS);
             this.createSimpleDat();
-            this.SimplePgd = CreatePgd(simple.ToArray());
+
+            this.SimplePgd = CreatePgd(simple.ToArray(), npdrmInfo.GetFixedKey());
 
             this.EbootElf = Resources.DATAPSPSD;
             this.ConfigBin = Resources.DATAPSPSDCFG;
@@ -39,14 +40,14 @@ namespace GameBuilder.Pops
 
             simpleUtil.WriteBytes(Resources.SIMPLE);
         }
-        public byte[] CreatePgd(byte[] buffer)
+        public byte[] CreatePgd(byte[] buffer, byte[]? versionkey = null)
         {
 
             int bufferSz = DNASHelper.CalculateSize(buffer.Length, 0x400);
             byte[] bufferEnc = new byte[bufferSz];
 
             // get pgd
-            int sz = DNASHelper.Encrypt(bufferEnc, buffer, DrmInfo.VersionKey, buffer.Length, DrmInfo.KeyIndex, 1, blockSize: 0x400);
+            int sz = DNASHelper.Encrypt(bufferEnc, buffer, versionkey is null ? DrmInfo.VersionKey : versionkey, buffer.Length, DrmInfo.KeyIndex, 1, blockSize: 0x400);
             byte[] pgd = bufferEnc.ToArray();
             Array.Resize(ref pgd, sz);
 

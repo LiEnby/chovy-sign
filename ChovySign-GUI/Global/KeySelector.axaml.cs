@@ -10,19 +10,8 @@ using Ionic.Zlib;
 using Li.Utilities;
 using LibChovy.Config;
 using LibChovy.VersionKey;
-using SixLabors.ImageSharp.PixelFormats;
 using System;
-using System.ComponentModel;
 using System.Globalization;
-using System.IO;
-using System.IO.Compression;
-using System.Linq;
-using System.Net.Sockets;
-using System.Text;
-using System.Threading.Tasks;
-using Vita.ContentManager;
-using Vita.PsvImgTools;
-using static ChovySign_GUI.Popup.Global.MessageBox;
 using static PspCrypto.SceNpDrm;
 
 namespace ChovySign_GUI.Global
