@@ -56,7 +56,20 @@ jobs:
         dotnet publish -p:PublishProfile=Linux64 ChovySign-GUI
         dotnet publish -p:PublishProfile=Linux64 ChovySign-CLI
         dotnet publish -p:PublishProfile=Linux64 PbpResign
-        
+
+    - name: Build linux
+      continue-on-error: false
+      run: |
+        cd Flatpak-data
+        ./quickpak build bundle
+        cd ..
+
+    - name: Upload linux gui flatpak
+      uses: actions/upload-artifact@v4
+      with:
+        name: ChovySign2-GUI-Linux-x64-Flatpak
+        path: Flatpak-data/codes.silica.chovysign.flatpak
+
     - name: Upload linux gui
       uses: actions/upload-artifact@v4
       with:
