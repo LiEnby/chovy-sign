@@ -10,21 +10,23 @@ namespace LibChovy.Config
 
         private void saveDict()
         {
-            using (StreamWriter cfgWriter = new StreamWriter(new ZlibStream(File.Open(configFileName, FileMode.Create, FileAccess.Write), CompressionMode.Compress)))
+            using (StreamWriter cfgWriter = new StreamWriter(File.Open(configFileName, FileMode.Create, FileAccess.Write)))
             {
-                foreach(KeyValuePair<string, object> configOption in config)
+                foreach (KeyValuePair<string, object> configOption in config)
                 {
 
                     string[] line = new string[3];
-                    line[0] = configOption.Key.Replace(SEPERATOR.ToString(), "").ToLowerInvariant();
+                    line[0] = configOption.Key.Replace(SEPERATOR.ToString(), "").ToUpperInvariant();
                     string? type = null;
                     string? value = null;
 
                     if (configOption.Value is string) { type = "string"; value = (string)(configOption.Value); }
-                    if (configOption.Value is int)    { type = "int";    value = ((int)(configOption.Value)).ToString(); };
-                    if (configOption.Value is UInt64) { type = "uint64";    value = ((UInt64)(configOption.Value)).ToString(); };
-                    if (configOption.Value is bool)   { type = "bool";   value = (((bool)(configOption.Value)) ? "1" : "0"); }
-                    if (configOption.Value is byte[]) { type = "byte";   value = Convert.ToBase64String(ZlibStream.CompressBuffer((byte[])configOption.Value)); }
+                    if (configOption.Value is int) { type = "int"; value = ((int)(configOption.Value)).ToString(); }
+                    ;
+                    if (configOption.Value is UInt64) { type = "uint64"; value = ((UInt64)(configOption.Value)).ToString(); }
+                    ;
+                    if (configOption.Value is bool) { type = "bool"; value = (((bool)(configOption.Value)) ? "1" : "0"); }
+                    if (configOption.Value is byte[]) { type = "byte"; value = Convert.ToBase64String(ZlibStream.CompressBuffer((byte[])configOption.Value)); }
 
                     if (type is null || value is null) continue;
 
@@ -41,7 +43,7 @@ namespace LibChovy.Config
             if (!File.Exists(configFileName))
                 saveDict();
 
-            using (StreamReader cfgReader = new StreamReader(new ZlibStream(File.Open(configFileName, FileMode.Open, FileAccess.Read), CompressionMode.Decompress)))
+            using (StreamReader cfgReader = new StreamReader(File.Open(configFileName, FileMode.Open, FileAccess.Read)))
             {
                 for(string? line = cfgReader.ReadLine();
                     line is not null;
@@ -52,7 +54,7 @@ namespace LibChovy.Config
                     string[] cfg = line.Split(SEPERATOR);
                     if (cfg.Length != 3) continue;
 
-                    string key = cfg[0].Replace(SEPERATOR.ToString(), "").ToLowerInvariant();
+                    string key = cfg[0].Replace(SEPERATOR.ToString(), "").ToUpperInvariant();
                     string type = cfg[1];
                     string value = cfg[2];
 
@@ -91,61 +93,61 @@ namespace LibChovy.Config
 
         public override bool? GetBool(string key)
         {
-            if (!config.ContainsKey(key)) return null;
-            return config[key] as bool?;
+            if (!config.ContainsKey(key.ToUpperInvariant())) return null;
+            return config[key.ToUpperInvariant()] as bool?;
         }
 
         public override byte[]? GetBytes(string key)
         {
-            if (!config.ContainsKey(key)) return null;
-            return config[key] as byte[];
+            if (!config.ContainsKey(key.ToUpperInvariant())) return null;
+            return config[key.ToUpperInvariant()] as byte[];
         }
 
         public override int? GetInt(string key)
         {
-            if (!config.ContainsKey(key)) return null;
-            return config[key] as int?;
+            if (!config.ContainsKey(key.ToUpperInvariant())) return null;
+            return config[key.ToUpperInvariant()] as int?;
         }
         public override UInt64? GetInt64(string key)
         {
-            if (!config.ContainsKey(key)) return null;
-            return config[key] as UInt64?;
+            if (!config.ContainsKey(key.ToUpperInvariant())) return null;
+            return config[key.ToUpperInvariant()] as UInt64?;
         }
         public override string? GetString(string key)
         {
-            if (!config.ContainsKey(key)) return null;
-            return config[key] as string;
+            if (!config.ContainsKey(key.ToUpperInvariant())) return null;
+            return config[key.ToUpperInvariant()] as string;
         }
 
         public override void SetBool(string key, bool value)
         {
-            config[key] = value;
+            config[key.ToUpperInvariant()] = value;
             saveDict();
         }
 
         public override void SetBytes(string key, byte[] value)
         {
-            config[key] = value;
+            config[key.ToUpperInvariant()] = value;
             saveDict();
         }
 
         public override void SetInt(string key, int value)
         {
-            config[key] = value;
+            config[key.ToUpperInvariant()] = value;
             saveDict();
 
         }
 
         public override void SetInt64(string key, UInt64 value)
         {
-            config[key] = value;
+            config[key.ToUpperInvariant()] = value;
             saveDict();
 
         }
 
         public override void SetString(string key, string value)
         {
-            config[key] = value;
+            config[key.ToUpperInvariant()] = value;
             saveDict();
         }
     }

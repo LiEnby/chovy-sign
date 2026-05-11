@@ -1,12 +1,9 @@
 using Avalonia.Controls;
-using Avalonia.Input;
 using Avalonia.Interactivity;
-using Avalonia.Remote.Protocol.Input;
 using ChovySign_GUI.Popup.Global;
 using ChovySign_GUI.Popup.Global.KeySelector;
 using ChovySign_GUI.Settings;
 using GameBuilder.Psp;
-using Ionic.Zlib;
 using Li.Utilities;
 using LibChovy.Config;
 using LibChovy.VersionKey;
