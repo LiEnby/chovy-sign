@@ -85,28 +85,31 @@ And discovering a bug in \_\_sce_ebootpbp handling that makes it possible to use
 
 Li: (for writing the original chovy-sign,
 Developing the GUI, finding the original psp bubbles method and,
-[Sfo.NET](https://github.com/KuromeSan/Sfo.NET/blob/master/README.md) A Simple SFO Parser,             
+[Sfo.NET](https://github.com/KuromeSan/Sfo.NET/blob/master/README.md) A Simple SFO Parser,
+
 Writing the PS1 Disc Compresison algorithm, making it possible to use custom ISOs,
-Writing C# Implementation of PSVIMGTOOLS,
-Being transgender)
+Writing C# Implementation of PSVIMGTOOLS, Being transgender)
 				
-dots-tb (for [chovy-gen](https://github.com/dots-tb/chovy-gen) (\_\_sce_ebootpbp signing)         
+dots-tb (for [chovy-gen](https://github.com/dots-tb/chovy-gen) (\_\_sce_ebootpbp signing)
 
 Sony Computer Enterainment: (For at3tool)
 
 yifanlu & xyz for the original [psvimgtools](https://github.com/yifanlu/psvimgtools). 
 
-Mathieulh (Found psp signing keys?)            
+Mathieulh (Found psp signing keys?)
 
-Motoharu (For helping dots with \_\_sce_ebootpbp)                 
+Motoharu (For helping dots with \_\_sce_ebootpbp)
+
 Davee (For finding the PS1 Signing Key)
-xlenore (For [PS1 Cover Art](https://github.com/xlenore/psx-covers))              
-RupertAvery (For their fork of DiscUtils to add PS1 Support)  
+
+xlenore (For [PS1 Cover Art](https://github.com/xlenore/psx-covers))
+
+RupertAvery (For their fork of DiscUtils to add PS1 Support)
 
 SquallATF's PBPResigner and PSPCrypto were derived from :
 
-xdotnano ([PSXTract](https://github.com/xdotnano/PSXtract))             
+xdotnano ([PSXTract](https://github.com/xdotnano/PSXtract))
 
-swarzesherz ([sign_np](https://github.com/swarzesherz/sign_np))             
+swarzesherz ([sign_np](https://github.com/swarzesherz/sign_np))
 
-tpunix ([kirk_engine](https://github.com/tpunix/kirk_engine))             
+tpunix ([kirk_engine](https://github.com/tpunix/kirk_engine))
