@@ -58,16 +58,4 @@
     <url>https://git.silica.codes/Li/chovy-sign/releases/tag/2.0</url>
     <description/>
   </release>
-  <release version="chovy-sign PUBLIC BETA 3" date="2019-10-10" type="development">
-    <url>https://git.silica.codes/Li/chovy-sign/releases/tag/BETA03</url>
-    <description/>
-  </release>
-  <release version="chovy-sign PUBLIC BETA 2" date="2019-08-22" type="development">
-    <url>https://git.silica.codes/Li/chovy-sign/releases/tag/BETA02</url>
-    <description/>
-  </release>
-  <release version="chovy-sign PUBLIC BETA" date="2019-08-18" type="development">
-    <url>https://git.silica.codes/Li/chovy-sign/releases/tag/BETA01</url>
-    <description/>
-  </release>
 </releases>
