@@ -1,6 +1,6 @@
 id: codes.silica.chovysign
 runtime: org.freedesktop.Platform
-runtime-version: '25.08'
+runtime-version: &rt '25.08'
 sdk: org.freedesktop.Sdk
 sdk-extensions:
 - org.freedesktop.Sdk.Extension.dotnet10
@@ -10,12 +10,20 @@ build-options:
   prepend-pkg-config-path: "/usr/lib/sdk/dotnet10/lib/pkgconfig"
 command: "ChovySign v2"
 finish-args:
-    # Super display sisters
-  - --share=ipc
-  - --socket=x11
-    # Needed for downloading game covers
-  - --share=network
-  - --filesystem=home
+  # Super display sisters
+- --share=ipc
+- --socket=x11
+  # Needed for downloading game covers
+- --share=network
+  # Needed to allow for cue files to find their bin
+- --filesystem=home
+  # needed for atractool
+- --allow=multiarch
+
+add-extensions:
+  org.freedesktop.Platform.Compat.i386:
+    directory: lib/i386-linux-gnu
+    version: *rt
 
 cleanup:
   - '*.a'
@@ -52,7 +60,25 @@ modules:
   buildsystem: simple
   build-commands:
   - ln -s "/app/bin/ChovySign v2" /app/bin/ChovySignGUI || exit
+  - ln -s /app/bin/tools/libatrac.so.1 /app/lib/
   - install -Dm644 Flatpak-data/codes.silica.chovysign.metainfo.xml -t /app/share/metainfo/
   - install -Dm644 Flatpak-data/codes.silica.chovysign.releases.xml -t /app/share/metainfo/releases/
   - install -Dm644 Flatpak-data/codes.silica.chovysign.png -t /app/share/icons/hicolor/128x128/apps
   - install -Dm644 Flatpak-data/codes.silica.chovysign.desktop -t /app/share/applications
+
+- name: platform-bootstrap
+  buildsystem: simple
+  build-commands:
+  - |
+    set -e
+    mkdir -p /app/bin
+    mkdir -p /app/lib/i386-linux-gnu
+    cp /usr/bin/addr2line /app/bin/
+    cp /usr/lib/x86_64-linux-gnu/libbfd-*.so /app/lib/
+    install -Dm644 -t /app/etc ld.so.conf
+    mkdir -p /app/links/lib
+    ln -srv /app/lib /app/links/lib/x86_64-linux-gnu
+    ln -srv /app/lib32 /app/links/lib/i386-linux-gnu
+  sources:
+  - type: file
+    path: ld.so.conf
