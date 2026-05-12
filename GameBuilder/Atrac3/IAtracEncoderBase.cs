@@ -2,6 +2,6 @@
 {
     public interface IAtracEncoderBase
     {
-        public byte[] EncodeToAtrac(byte[] pcmData);
+        public abstract byte[] EncodeToAtrac(byte[] pcmData);
     }
 }
