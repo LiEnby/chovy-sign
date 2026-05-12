@@ -35,4 +35,7 @@ LiLib/obj/*
 Vita/bin/*
 Vita/obj/*
 
+Flatpak-data/.flatpak-builder/*
+Flatpak-data/build/*
+
 build/*
