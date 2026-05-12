@@ -7,8 +7,11 @@ namespace GameBuilder.Atrac3
 {
     public class Atrac3ToolEncoder : IAtracEncoderBase
     {
-        [DllImport("libc")]
+        [DllImport("libc", SetLastError = true)]
         private static extern int setenv(string name, string value, bool overwrite);
+        [DllImport("libc", SetLastError = true)]
+        static extern int chmod(string pathname, int mode);
+
 
         private static string TOOLS_DIRECTORY = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "tools");
 
@@ -49,8 +52,12 @@ namespace GameBuilder.Atrac3
             if (libaryPath is null) libaryPath = TOOLS_DIRECTORY;
             else libaryPath += ";" + TOOLS_DIRECTORY;
 
+            // setup libraries for the file
             Environment.SetEnvironmentVariable(libaryPath, libaryPath);
             setenv(LD_LIBRARY_PATH, libaryPath, true);
+
+            // make file executable
+            chmod(AT3TOOL_LINUX, 755);
 
             return libaryPath;
         }
@@ -59,7 +66,11 @@ namespace GameBuilder.Atrac3
             using(Process proc = new Process())
             {
                 if (OperatingSystem.IsLinux())
+                {
+
                     proc.StartInfo.Environment.Add(LD_LIBRARY_PATH, setupLibaryPath());
+
+                }
 
                 proc.StartInfo.FileName = AT3TOOL_LOCATION;
                 proc.StartInfo.Arguments = "-br 132 -e \"" + tempWav + "\" \"" + tempAt9 + "\"";
