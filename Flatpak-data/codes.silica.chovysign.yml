@@ -15,7 +15,7 @@ finish-args:
   - --socket=x11
     # Needed for downloading game covers
   - --share=network
-  - --persist=.
+  - --filesystem=home
 
 cleanup:
   - '*.a'
