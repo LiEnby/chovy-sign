@@ -128,7 +128,7 @@ namespace Vita.ContentManager
         {
             if (OperatingSystem.IsLinux())
             {
-                return Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "codestation", "qcma.conf");
+                return Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".config", "codestation", "qcma.conf");
             }
             else if (OperatingSystem.IsMacOS())
             {
