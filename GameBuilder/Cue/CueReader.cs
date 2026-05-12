@@ -1,10 +1,4 @@
 ﻿using Li.Utilities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Linq.Expressions;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace GameBuilder.Cue
 {
@@ -373,7 +367,7 @@ namespace GameBuilder.Cue
                         if(!File.Exists(binFileName))
                             binFileName = Path.ChangeExtension(cueFile, ".bin");
 
-                        if (!File.Exists(binFileName)) throw new FileNotFoundException("unable to find bin file.");
+                        if (!File.Exists(binFileName)) throw new FileNotFoundException("Failure in parsing Cue Sheet, the binary file \""+binFileName+"\" was not found");
 
                         curTrack = new CueTrack(binFileName);
                     }
