@@ -33,7 +33,5 @@ namespace GameBuilder.Cue
             this.TrackNo = 0xFF;
         }
 
-        
-
     }
 }

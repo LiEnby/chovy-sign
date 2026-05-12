@@ -4,6 +4,9 @@ namespace GameBuilder.Cue
 {
     public class CueReader : IDisposable
     {
+        public const int INDEX_PREGAP = 0;
+        public const int INDEX_TRACK_START = 1;
+
         public int FirstDataTrackNo
         {
             get
@@ -34,7 +37,7 @@ namespace GameBuilder.Cue
         }
         public static int IdxToSectorRel(DiscIndex index)
         {
-            int offset = (((index.Mrel * 60) + index.Srel) * 75 + index.Frel);
+            int offset = (((index.mRelative * 60) + index.sRelative) * 75 + index.fRelative);
             return offset;
         }
         public static int IdxToSector(DiscIndex index)
@@ -54,21 +57,16 @@ namespace GameBuilder.Cue
             int s = x % 60;
             int m = Convert.ToInt32(Math.Floor(Convert.ToDouble(x) / 60.0));
 
-            idx.Mrel = Convert.ToInt16(m);
-            idx.Srel = Convert.ToInt16(s);
-            idx.Frel = Convert.ToInt16(f);
+            idx.MRelative = Convert.ToInt16(m);
+            idx.SRelative = Convert.ToInt16(s);
+            idx.FRelative = Convert.ToInt16(f);
 
             return idx; 
         }
 
         private int getFirstDataTrackNo()
         {
-            foreach (CueTrack track in tracks)
-                if (track is not null)
-                    if (track.TrackType == TrackType.TRACK_MODE2_2352) return track.TrackNo;
-
-            // no non-data tracks? 
-            return 1;
+            return tracks.Where(track => track is not null).First(track => track.TrackType == TrackType.TRACK_MODE2_2352).TrackNo;
         }
         private void setTrackNumber(int trackNo, ref CueTrack? track)
         {
@@ -81,25 +79,31 @@ namespace GameBuilder.Cue
         private int findTrackSz(int trackNo)
         {
             CueTrack track = GetTrackNumber(trackNo);
+
             // total iso (size / sector size)
-            int startSector = IdxToSector(track.TrackIndex.Last());
+            int startSector = IdxToSector(track.TrackIndex[INDEX_TRACK_START]);
+            int pregapSectorSz = IdxToSectorRel(track.TrackIndex[INDEX_TRACK_START]);
+
             int fileSectorSz = Convert.ToInt32(track.binFileSz / track.SectorSz);
-            int endSector = Convert.ToInt32(startSector + (fileSectorSz - startSector));
+            int endSector = Convert.ToInt32(startSector + (fileSectorSz - pregapSectorSz));
 
             // find first track to start after this one ..
-            for (int i = 0; i < tracks.Length; i++)
+            for (int tid = 0; tid < tracks.Length; tid++)
             {
-                CueTrack? cTrack = tracks[i];
-                if (cTrack is not null)
-                {
-                    if (cTrack.TrackNo <= track.TrackNo) continue;
-                    int sector = IdxToSector(cTrack.TrackIndex.First());
+                if (tracks[tid] is null) continue;
+                if (tracks[tid].TrackNo <= track.TrackNo) continue;
 
-                    if (sector < endSector) endSector = sector;
+                for(int idx = 0; idx < tracks[tid].TrackIndex.Length; idx++)
+                {
+                    if (tracks[tid].TrackIndex[idx] is null) continue;
+
+                    int gotSector = IdxToSector(tracks[tid].TrackIndex[idx]);
+                    if (gotSector > startSector && gotSector < endSector) endSector = gotSector;
                 }
+                
             }
             
-            int sectorsLength = Math.Max(endSector, startSector) - Math.Min(endSector, startSector); ;
+            int sectorsLength = Math.Max(endSector, startSector) - Math.Min(endSector, startSector);
             return sectorsLength;
         }
 
@@ -108,10 +112,12 @@ namespace GameBuilder.Cue
             if (!openTracks.ContainsKey(trackNo))
             {
                 CueTrack track = GetTrackNumber(trackNo);
-                int sectorStart = IdxToSectorRel(track.TrackIndex[1]);
+                int sectorStart = IdxToSectorRel(track.TrackIndex[INDEX_TRACK_START]);
                 int sectorLen = findTrackSz(trackNo);
 
-                CueStream trackBin = new CueStream(File.OpenRead(track.binFileName), sectorStart * track.SectorSz, sectorLen * track.SectorSz);
+                CueStream trackBin = new CueStream(File.OpenRead(track.binFileName),
+                                                    sectorStart * track.SectorSz, 
+                                                    sectorLen * track.SectorSz);
                 openTracks[trackNo] = trackBin;
                 return trackBin;
             }
@@ -214,51 +220,47 @@ namespace GameBuilder.Cue
             return absolutePosition;
         }
 
+        private int calcDifference(int val1, int val2)
+        {
+            return Math.Min(val1, val2) - Math.Max(val1, val2);
+        }
         private void fixUpMsf()
         {
 
-            Dictionary<string, int> positions = new Dictionary<string, int>();
+            Dictionary<string, int> binPositions = new Dictionary<string, int>();
             int totalPosition = 0;
 
+            // get the absolute position every binary file would be on the actual disc.
             for (int i = 0; i < tracks.Length; i++)
             {
                 if (tracks[i] is null) continue;
 
-                if (!positions.ContainsKey(tracks[i].binFileName))
+                if (!binPositions.ContainsKey(tracks[i].binFileName)) 
                 {
-                    positions[tracks[i].binFileName] = totalPosition;
-                    double sz = Convert.ToDouble(tracks[i].binFileSz) / Convert.ToDouble(tracks[i].SectorSz);
+                    binPositions[tracks[i].binFileName] = totalPosition;
+                    int sz = Convert.ToInt32(Convert.ToDouble(tracks[i].binFileSz) / Convert.ToDouble(tracks[i].SectorSz));
 
                     totalPosition += Convert.ToInt32(sz);
                 }
 
             }
 
-            for (int i = 0; i < tracks.Length; i++)
+            // update to absolute disc positions
+            for (int tid = 0; tid < tracks.Length; tid++)
             {
-                if (tracks[i] is null) continue;
-                int pos = positions[tracks[i].binFileName];
+                if (tracks[tid] is null) continue;
+                DiscIndex discIdx = SectorToIdx(binPositions[tracks[tid].binFileName]);
 
-                DiscIndex idx = SectorToIdx(pos);
-                // pregap not included on first track
+                for (int idx = 0; idx < tracks[tid].TrackIndex.Length; idx++)
+                {
+                    if (tracks[tid].TrackIndex[idx] is null) continue;
 
-                if (tracks[i].TrackNo == 1) tracks[i].TrackIndex[0].Sdelta = 0;
-
-                // add pregap
-                idx.Mdelta = Convert.ToInt16(tracks[i].TrackIndex[1].Mrel - tracks[i].TrackIndex[0].Mrel);
-                idx.Sdelta = Convert.ToInt16(tracks[i].TrackIndex[1].Srel - tracks[i].TrackIndex[0].Srel);
-                idx.Fdelta = Convert.ToInt16(tracks[i].TrackIndex[1].Frel - tracks[i].TrackIndex[0].Frel);
-
-                tracks[i].TrackIndex[0].Mdelta = idx.m;
-                tracks[i].TrackIndex[0].Sdelta = idx.s;
-                tracks[i].TrackIndex[0].Fdelta = idx.f;
-
-                // index is always ofset by 2 thou
-                idx.Sdelta = 2;
-                tracks[i].TrackIndex[1].Mdelta = idx.m;
-                tracks[i].TrackIndex[1].Sdelta = idx.s;
-                tracks[i].TrackIndex[1].Fdelta = idx.f;
+                    tracks[tid].TrackIndex[idx].Mdelta = discIdx.m;
+                    tracks[tid].TrackIndex[idx].Sdelta = discIdx.s;
+                    tracks[tid].TrackIndex[idx].Fdelta = discIdx.f;
+                }
             }
+
         }
 
         public byte[] CreateToc()
@@ -296,7 +298,7 @@ namespace GameBuilder.Cue
 
         private string getFilename(string str)
         {
-            if (!str.Contains(' ')) throw new Exception("cue specifies no bin file.");
+            if (!str.Contains(' ')) throw new FileNotFoundException("No binary file specified in the cue sheet");
             if (!str.Contains('"')) return str.Split(' ')[1];
 
             int start = str.IndexOf('"');
@@ -312,6 +314,9 @@ namespace GameBuilder.Cue
             openTracks = new Dictionary<int, CueStream>();
             for (int trackNo = 0; trackNo < tracks.Length; trackNo++) tracks[trackNo] = null;
 
+            // for parsing "PREGAP" sections, have to loop over all once done;
+            Dictionary<int, DiscIndex> pregaps = new Dictionary<int, DiscIndex>();
+
             using (TextReader cueReader = File.OpenText(cueFile))
             {
                 CueTrack? curTrack = null;
@@ -325,20 +330,35 @@ namespace GameBuilder.Cue
 
                     if (cueLn[0] == "INDEX")
                     {
-                        if (curTrack is null) throw new Exception("tried to create new index, when track was null");
+                        if (curTrack is null) throw new NullReferenceException("Tried to specify index information, without a track selected");
 
                         int indexNumber = Convert.ToByte(int.Parse(cueLn[1]));
                         string[] msf = cueLn[2].Split(':');
 
-                        curTrack.TrackIndex[indexNumber].Mrel = Convert.ToByte(Int32.Parse(msf[0]));
-                        curTrack.TrackIndex[indexNumber].Srel = Convert.ToByte(Int32.Parse(msf[1]));
-                        curTrack.TrackIndex[indexNumber].Frel = Convert.ToByte(Int32.Parse(msf[2]));
+                        curTrack.TrackIndex[indexNumber].MRelative = Convert.ToByte(Int32.Parse(msf[0]));
+                        curTrack.TrackIndex[indexNumber].SRelative = Convert.ToByte(Int32.Parse(msf[1]));
+                        curTrack.TrackIndex[indexNumber].FRelative = Convert.ToByte(Int32.Parse(msf[2]));
 
                         setTrackNumber(curTrack.TrackNo, ref curTrack);
                     }
+                    else if (cueLn[0] == "PREGAP")
+                    {
+                        if (curTrack is null) throw new NullReferenceException("Tried to specify pregap information, without a track selected");
+                        string[] msf = cueLn[1].Split(':');
+
+                        // set pregap for this track, 
+                        // will be handled by fixUpMsf at the end of this;
+
+                        DiscIndex idx = new DiscIndex(0);
+                        idx.MRelative = Convert.ToByte(Int32.Parse(msf[0]));
+                        idx.SRelative = Convert.ToByte(Int32.Parse(msf[1]));
+                        idx.FRelative = Convert.ToByte(Int32.Parse(msf[2]));
+                        pregaps[curTrack.TrackNo] = idx;
+
+                    }
                     else if (cueLn[0] == "TRACK")
                     {
-                        if (curTrack is null) throw new Exception("tried to create new track, when track was null");
+                        if (curTrack is null) throw new NullReferenceException("Tried to specify track information, without a track selected");
 
                         if (curTrack.TrackNo != 0xFF)
                         {
@@ -351,6 +371,7 @@ namespace GameBuilder.Cue
                             curTrack.TrackType = TrackType.TRACK_MODE2_2352;
                         else if (cueLn[2] == "AUDIO")
                             curTrack.TrackType = TrackType.TRACK_CDDA;
+
                         setTrackNumber(curTrack.TrackNo, ref curTrack);
                     }
                     else if (cueLn[0] == "FILE")
@@ -367,11 +388,23 @@ namespace GameBuilder.Cue
                         if(!File.Exists(binFileName))
                             binFileName = Path.ChangeExtension(cueFile, ".bin");
 
-                        if (!File.Exists(binFileName)) throw new FileNotFoundException("Failure in parsing Cue Sheet, the binary file \""+binFileName+"\" was not found");
+                        if (!File.Exists(binFileName)) throw new FileNotFoundException("The referenced binary file \""+binFileName+"\" was not found");
 
                         curTrack = new CueTrack(binFileName);
                     }
                 }
+            }
+
+            // apply pregaps
+            foreach (KeyValuePair<int, DiscIndex> pregap in pregaps)
+            {
+                CueTrack track = GetTrackNumber(pregap.Key);
+
+                track.TrackIndex[INDEX_PREGAP].MRelative = Convert.ToInt16(track.TrackIndex[INDEX_TRACK_START].MRelative - pregap.Value.MRelative);
+                track.TrackIndex[INDEX_PREGAP].SRelative = Convert.ToInt16(track.TrackIndex[INDEX_TRACK_START].SRelative - pregap.Value.MRelative);
+                track.TrackIndex[INDEX_PREGAP].FRelative = Convert.ToInt16(track.TrackIndex[INDEX_TRACK_START].FRelative - pregap.Value.MRelative);
+
+                setTrackNumber(track.TrackNo, ref track);
             }
 
             fixUpMsf();

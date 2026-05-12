@@ -1,43 +1,61 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace GameBuilder.Cue
+﻿namespace GameBuilder.Cue
 {
     public class DiscIndex
     {
         public byte IndexNumber;
-        public short Mrel;
-        public short Srel;
-        public short Frel;
+
+
+        public short MRelative;
+        public short SRelative;
+        public short FRelative;
 
         public short Mdelta;
         public short Sdelta;
         public short Fdelta;
 
-        internal int mTtl
+        internal int mRelative
         {
             get
             {
-                return (Mrel + Mdelta);
+                return MRelative;
+            }
+        }
+        internal int sRelative
+        {
+            get
+            {
+                return SRelative;
+            }
+        }
+        internal int fRelative
+        {
+            get
+            {
+                return FRelative;
             }
         }
 
-        internal int sTtl
+        internal int mTotal
         {
             get
             {
-                return (Srel + Sdelta);
+                return (mRelative + Mdelta);
             }
         }
 
-        internal int fTtl
+        internal int sTotal
         {
             get
             {
-                return (Frel + Fdelta);
+                return (sRelative + Sdelta);
+            }
+        }
+
+        internal int fTotal
+        {
+            get
+            {
+                return (fRelative + Fdelta);
             }
         }
 
@@ -45,10 +63,10 @@ namespace GameBuilder.Cue
         {
             get
             {
-                int carryF = Convert.ToInt32(Math.Floor(Convert.ToDouble(fTtl) / 75.0));
-                int carryS = Convert.ToInt32(Math.Floor(Convert.ToDouble(sTtl + carryF) / 60.0));
+                int carryF = Convert.ToInt32(Math.Floor(Convert.ToDouble(fTotal) / 75.0));
+                int carryS = Convert.ToInt32(Math.Floor(Convert.ToDouble(sTotal + carryF) / 60.0));
 
-                return Convert.ToByte(mTtl + carryS);
+                return Convert.ToByte(mTotal + carryS);
             }
         }
 
@@ -56,9 +74,9 @@ namespace GameBuilder.Cue
         {
             get
             {
-                int carryF = Convert.ToInt32(Math.Floor(Convert.ToDouble(fTtl) / 75.0));
+                int carryF = Convert.ToInt32(Math.Floor(Convert.ToDouble(fTotal) / 75.0));
 
-                return Convert.ToByte(((Srel + Sdelta) + carryF) % 60);
+                return Convert.ToByte(((SRelative + Sdelta) + carryF) % 60);
             }
         }
 
@@ -66,7 +84,7 @@ namespace GameBuilder.Cue
         {
             get
             {
-                return Convert.ToByte((fTtl) % 75);
+                return Convert.ToByte((fTotal) % 75);
             }
         }
         public byte M 
@@ -96,12 +114,15 @@ namespace GameBuilder.Cue
         internal DiscIndex(byte indexNumber)
         {
             IndexNumber = indexNumber;
-            Mrel = 0;
-            Srel = 0;
-            Frel = 0;
+            
+            MRelative = 0;
+            SRelative = 0;
+            FRelative = 0;
+            
             Mdelta = 0;
             Sdelta = 0;
             Fdelta = 0;
+
         }
     }
 }

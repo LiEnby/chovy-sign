@@ -27,9 +27,9 @@ namespace GameBuilder.Cue
             byte i = CueReader.BinaryDecimalToDecimal(sbiUtil.ReadByte());
 
             DiscIndex idx = new DiscIndex(i);
-            idx.Mrel = m;
-            idx.Srel = s;
-            idx.Frel = f;
+            idx.MRelative = m;
+            idx.SRelative = s;
+            idx.FRelative = f;
             return idx;
         }
 

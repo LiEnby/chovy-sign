@@ -103,6 +103,9 @@ namespace ChovySign_GUI.Ps1
 
         public async Task GetGameInfo(string cueFile)
         {
+            Window? currentWindow = TopLevel.GetTopLevel(this) as Window;
+            if (currentWindow is not Window) throw new Exception("Could not find current window");
+
             try
             {
                 PSInfo disc = new PSInfo(cueFile);
@@ -122,11 +125,12 @@ namespace ChovySign_GUI.Ps1
                 defaultIcon = LibChovy.Resources.ICON0;
 
             }
+            catch (FileNotFoundException e)
+            {
+                await MessageBox.Show(currentWindow, "Error while parsing cue sheet: " + Path.GetFileName(cueFile) + "\n\t" + e.Message, "Failed to read cue sheet", MessageBox.MessageBoxButtons.Ok);
+            }
             catch (Exception e) {
-                Window? currentWindow = TopLevel.GetTopLevel(this) as Window;
-                if (currentWindow is not Window) throw new Exception("could not find current window");
-
-                await MessageBox.Show(currentWindow, "unable to read cue sheet: " + Path.GetFileName(cueFile) + "\n" + e.Message + "\n\nSTACKTRACE: " + e.StackTrace, "cannot load cue sheet", MessageBox.MessageBoxButtons.Ok);  
+                await MessageBox.Show(currentWindow, "Unknown exception occured while parsing the cue sheet: " + Path.GetFileName(cueFile) + "\n\t" + e.Message + "\n\nSTACKTRACE: " + e.StackTrace, "Failed to read cue sheet", MessageBox.MessageBoxButtons.Ok);  
             }
         }
 
