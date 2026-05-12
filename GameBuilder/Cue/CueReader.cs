@@ -385,9 +385,6 @@ namespace GameBuilder.Cue
                         if (folderContainingCue != null)
                             binFileName = Path.Combine(folderContainingCue, binFileName);
 
-                        if(!File.Exists(binFileName))
-                            binFileName = Path.ChangeExtension(cueFile, ".bin");
-
                         if (!File.Exists(binFileName)) throw new FileNotFoundException("The referenced binary file \""+binFileName+"\" was not found");
 
                         curTrack = new CueTrack(binFileName);
