@@ -1,0 +1,14 @@
+<Project>
+    <PropertyGroup>
+		<BaseOutputPath>..\build\$(MSBuildProjectName)</BaseOutputPath>
+		<OutputPath>..\build\$(MSBuildProjectName)</OutputPath>
+		<IntermediateOutputPath>..\build\$(MSBuildProjectName)\inter\</IntermediateOutputPath>
+		<BaseIntermediateOutputPath>..\build\$(MSBuildProjectName)\inter\</BaseIntermediateOutputPath>
+        <MSBuildProjectExtensionsPath>..\build\$(MSBuildProjectName)\inter\</MSBuildProjectExtensionsPath>
+    </PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)'=='Release'">
+		<DebugType>none</DebugType>
+		<TrimmerRemoveSymbols>true</TrimmerRemoveSymbols>
+	</PropertyGroup>
+</Project>

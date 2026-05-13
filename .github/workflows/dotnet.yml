@@ -35,19 +35,19 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: ChovySign2-GUI-Windows-x86_64
-        path: ChovySign-GUI/bin/publish/windows
+        path: build\publish\ChovySign-GUI\windows
 
     - name: Upload windows cli
       uses: actions/upload-artifact@v4
       with:
         name: ChovySign2-CLI-Windows-x86_64
-        path: ChovySign-CLI/bin/publish/windows
+        path: build\publish\ChovySign-CLI\windows
 
     - name: Upload windows PbpResign
       uses: actions/upload-artifact@v4
       with:
         name: PbpResign-Windows-x86_64
-        path: PbpResign/bin/publish/windows
+        path: build\publish\PbpResign\windows
 
   build-linux:
     runs-on: ubuntu-latest
@@ -81,19 +81,19 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: ChovySign2-GUI-Linux-x86_64
-        path: ChovySign-GUI/bin/publish/linux
+        path: build\publish\ChovySign-GUI\linux
 
     - name: Upload linux cli
       uses: actions/upload-artifact@v4
       with:
         name: ChovySign2-CLI-Linux-x86_64
-        path: ChovySign-CLI/bin/publish/linux
+        path: build\publish\ChovySign-CLI\linux
 
     - name: Upload linux PbpResign
       uses: actions/upload-artifact@v4
       with:
         name: PbpResign-Linux-x86_64
-        path: PbpResign/bin/publish/linux
+        path: build\publish\PbpResign\linux
 
   build-flatpak:
     runs-on: ubuntu-latest

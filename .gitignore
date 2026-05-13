@@ -4,6 +4,7 @@
 *.7z
 *.pdn
 *.user
+*.flatpak
 *launchSettings.json
 *Thumbs.db
 
@@ -37,5 +38,6 @@ Vita/obj/*
 
 Flatpak-data/.flatpak-builder/*
 Flatpak-data/build/*
+Flatpak-data/*.flatpak
 
 build/*
