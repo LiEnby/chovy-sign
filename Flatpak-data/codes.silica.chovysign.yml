@@ -79,5 +79,12 @@ modules:
     ln -srv /app/lib /app/links/lib/x86_64-linux-gnu
     ln -srv /app/lib32 /app/links/lib/i386-linux-gnu
   sources:
-  - type: file
-    path: ld.so.conf
+  - type: inline
+    dest-filename: ld.so.conf
+    contents: |
+      # taken from steam flatpak lol
+      # We just make any GL32 extension have higher priority
+      include /run/flatpak/ld.so.conf.d/app-*-org.freedesktop.Platform.GL32.*.conf
+      /app/lib32
+      /app/lib/i386-linux-gnu
+      /lib64
