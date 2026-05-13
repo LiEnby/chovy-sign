@@ -34,7 +34,9 @@ usage() {
 }
 
 bundle() {
-  flatpak build-bundle repo "$FLATPAK_MANIFEST_NAME".flatpak "$FLATPAK_MANIFEST_NAME" --runtime-repo=https://flathub.org/repo/flathub.flatpakrepo
+  echo Bundling main app
+  flatpak build-bundle repo "$FLATPAK_MANIFEST_NAME.flatpak" "$FLATPAK_MANIFEST_NAME" --runtime-repo=https://flathub.org/repo/flathub.flatpakrepo
+
 }
 
 clean() {
