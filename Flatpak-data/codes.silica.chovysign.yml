@@ -48,7 +48,7 @@ modules:
   build-commands:
   - dotnet publish -p:PublishProfile=Linux64 -c Release --source ./nuget-sources ChovySign-GUI/ChovySign-GUI.csproj --self-contained true --source /usr/lib/sdk/dotnet10/nuget/packages
   - mkdir -p /app/bin
-  - cp -r build/publish/ChovySign-GUI/linux* /app/bin/
+  - cp -r build/publish/ChovySign-GUI/linux/* /app/bin/
 - name: metadata
   sources:
   - type: git
@@ -73,7 +73,6 @@ modules:
     set -e
     mkdir -p /app/bin
     mkdir -p /app/lib/i386-linux-gnu
-    cp /usr/bin/addr2line /app/bin/
     cp /usr/lib/x86_64-linux-gnu/libbfd-*.so /app/lib/
     install -Dm644 -t /app/etc ld.so.conf
     mkdir -p /app/links/lib
