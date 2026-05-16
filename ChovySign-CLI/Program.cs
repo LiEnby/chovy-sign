@@ -24,6 +24,12 @@ namespace ChovySign_CLI
         private static NpDrmRif? rifFile = null;
         private static NpDrmInfo? drmInfo = null;
 
+        // --simple-dat
+        private static string? simpleDat = null;
+
+        // --start-dat
+        private static string? startDat = null;
+
         // cma
         private static bool packagePsvImg = true;
         private static string? outputFolder = null; 
@@ -56,6 +62,7 @@ namespace ChovySign_CLI
             VERSIONKEY,
             VERSIONKEY_EXTRACT,
             VERSIONKEY_GENERATOR,
+            NOPSPEMUDRM_GEN,
             
             CMA_DEVKIT,
             CMA_OUTPUT_FOLDER,
@@ -67,7 +74,10 @@ namespace ChovySign_CLI
             ACCOUNT_ID,
 
             KEYS_TXT_GEN,
-            RIF
+            RIF,
+
+            STARTDAT_FILEPATH,
+            SIMPLEDAT_FILEPATH
         }
         public static int Error(string errorMsg, int ret)
         {
@@ -157,6 +167,11 @@ namespace ChovySign_CLI
                     if(parameters.Count != 4) return Error("--vkey-gen: expect 4 arguments. ("+parameters.Count+" given)", 4);
                     drmInfo = ActRifMethod.GetVersionKey(File.ReadAllBytes(parameters[0]), File.ReadAllBytes(parameters[1]), StringToByteArray(parameters[2]), int.Parse(parameters[3]));
                     break;
+                case ArgumentParsingMode.NOPSPEMUDRM_GEN:
+                    if (parameters.Count != 1) return Error("--nopspemudrm: expect 1 arguments. (" + parameters.Count + " given)", 4);
+                    drmInfo = NoPspEmuDrmMethod.GetVersionKey(parameters[0], 0);
+                    rifFile = NpDrmRif.CreateNoPspEmuDrmRif(parameters[0]);
+                    break;
                 case ArgumentParsingMode.POPS_INFO:
                     if (parameters.Count < 2) return Error("--pops-info takes at least 1 arguments ("+parameters.Count+" given)", 4);
                     if (parameters.Count > 3) return Error("--pops-info takes no more than 3 arguments("+parameters.Count+" given)", 4);
@@ -171,6 +186,14 @@ namespace ChovySign_CLI
                     actDat = File.ReadAllBytes(parameters[0]);
                     idps = StringToByteArray(parameters[1]);
                     rifFolder = parameters[2];
+                    break;
+                case ArgumentParsingMode.STARTDAT_FILEPATH:
+                    if (parameters.Count != 1) return Error("--start-dat takes 1 arguments, (" + parameters.Count + " given)", 4);
+                    startDat = parameters[0];
+                    break;
+                case ArgumentParsingMode.SIMPLEDAT_FILEPATH:
+                    if (parameters.Count != 1) return Error("--simple-dat takes 1 arguments, (" + parameters.Count + " given)", 4);
+                    simpleDat = parameters[0];
                     break;
                 case ArgumentParsingMode.POPS_EBOOT:
                     if (parameters.Count < 1) return Error("--pops-eboot-sign expects at most 1 arguments", 4);
@@ -276,6 +299,10 @@ namespace ChovySign_CLI
                 Console.WriteLine("--vkey-gen [act.dat] [license.rif] [console_id] [key_index]");
                 
                 Console.WriteLine("--keys-txt-gen [act.dat] [console_id] [psp_license_folder]");
+
+                Console.WriteLine("--nopspemudrm [content_id] (specify generates nopspemudrm rif and vkey)");
+                Console.WriteLine("--start-dat [filepath] (specify custom startdat.png)");
+                Console.WriteLine("--simple-dat [filepath] (specify custom simple.png)");
             }
 
 
@@ -329,6 +356,19 @@ namespace ChovySign_CLI
                                     return Error("versionkey is already set", 3);
 
                                 break;
+                            case "--nopspemudrm":
+                                mode = ArgumentParsingMode.NOPSPEMUDRM_GEN;
+                                
+                                if (drmInfo is not null && rifFile is not null)
+                                    return Error("versionkey or rif is already set", 3);
+
+                                break;
+                            case "--start-dat":
+                                mode = ArgumentParsingMode.STARTDAT_FILEPATH;
+                                break;
+                            case "--simple-dat":
+                                mode = ArgumentParsingMode.SIMPLEDAT_FILEPATH;
+                                break;
                             case "--keys-txt-gen":
                                 mode = ArgumentParsingMode.KEYS_TXT_GEN;
 
@@ -345,6 +385,7 @@ namespace ChovySign_CLI
                             case "--pops-eboot":
                                 mode = ArgumentParsingMode.POPS_EBOOT;
                                 break;
+
                             case "--output-folder":
                                 mode = ArgumentParsingMode.CMA_OUTPUT_FOLDER;
                                 break;
@@ -368,7 +409,10 @@ namespace ChovySign_CLI
                     case ArgumentParsingMode.POPS_DISC:
                     case ArgumentParsingMode.POPS_EBOOT:
                     case ArgumentParsingMode.POPS_INFO:
+                    case ArgumentParsingMode.NOPSPEMUDRM_GEN:
                     case ArgumentParsingMode.RIF:
+                    case ArgumentParsingMode.SIMPLEDAT_FILEPATH:
+                    case ArgumentParsingMode.STARTDAT_FILEPATH:
                     default:
                         parameters.Add(arg);
                         break;
@@ -379,7 +423,7 @@ namespace ChovySign_CLI
 
             generateKeysTxt();
 
-            if (drmInfo is null) return Error("no versionkey was found, exiting", 6);
+            if (drmInfo is null) return Error("no versionkey was found, exiting, use --nopspemudrm or (one of) --vkey args", 6);
             if (pbpMode is null) return Error("no pbp mode was set, exiting", 7);
 
             int targetKeyIndex = (pbpMode == PbpMode.PSP) ? 2 : 1;
@@ -389,7 +433,7 @@ namespace ChovySign_CLI
                 drmInfo.KeyIndex = targetKeyIndex;
             }
 
-            if (rifFile is null) return Error("Rif is not set, use --rif to specify base game RIF", 8);
+            if (rifFile is null) return Error("Rif is not set, use --rif or --nopspemudrm to specify base game RIF ", 8);
             
             ChovySign csign = new ChovySign();
             csign.RegisterCallback(onProgress);
@@ -412,6 +456,12 @@ namespace ChovySign_CLI
                 if (outputFolder is not null)
                     popsParameters.OutputFolder = outputFolder;
 
+                if (startDat is not null)
+                    popsParameters.StartPngFilepath = startDat;
+
+                if (simpleDat is not null)
+                    popsParameters.SimplePngFilepath = simpleDat;
+
                 popsParameters.CreatePsvImg = packagePsvImg;
 
 
@@ -431,6 +481,9 @@ namespace ChovySign_CLI
 
                 if (outputFolder is not null)
                     pspParameters.OutputFolder = outputFolder;
+
+                if (startDat is not null)
+                    pspParameters.StartPngFilepath = startDat;
 
                 pspParameters.CreatePsvImg = packagePsvImg;
 
