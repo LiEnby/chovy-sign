@@ -2,9 +2,11 @@ using Avalonia.Controls;
 using ChovySign_GUI.Global;
 using ChovySign_GUI.Popup.Global;
 using ChovySign_GUI.Settings;
+using GameBuilder.Atrac3;
 using GameBuilder.Psp;
 using LibChovy;
 using System;
+using System.IO;
 using System.Linq;
 using Vita.ContentManager;
 using static ChovySign_GUI.Popup.Global.MessageBox;
@@ -33,7 +35,7 @@ namespace ChovySign_GUI.Ps1
             keySelector.IsEnabled = true;
             discSelector.IsEnabled = true;
             gameInfo.IsEnabled = true;
-            SettingsTab.Settings.IsEnabled = true;
+            if (SettingsTab.Settings is not null) SettingsTab.Settings.IsEnabled = true;
 
             Window? currentWindow = TopLevel.GetTopLevel(this) as Window;
             if (currentWindow is not Window) throw new Exception("could not find current window");
@@ -44,13 +46,11 @@ namespace ChovySign_GUI.Ps1
 
         private void onProcessStarting(object? sender, EventArgs e)
         {
-            keySelector.IsEnabled = false;
-            discSelector.IsEnabled = false;
-            gameInfo.IsEnabled = false;
-            SettingsTab.Settings.IsEnabled = false;
 
-            if (keySelector.Rif is null) return;
-            if (keySelector.VersionKey is null) return;
+            if (SettingsTab.Settings is null) throw new NullReferenceException("SettingsTab.Settings is null");
+            if (keySelector.Rif is null) throw new NullReferenceException("keySelector.Rif is null");
+            if (keySelector.VersionKey is null) throw new NullReferenceException("keySelector.VersionKey is null");
+            if (!Directory.Exists(SettingsTab.Settings.CmaDirectory)) throw new FileNotFoundException("SettingsTab.Settings.CmaDirectory not found!");
 
             NpDrmRif rifInfo = new NpDrmRif(keySelector.Rif);
             NpDrmInfo drmInfo = new NpDrmInfo(keySelector.VersionKey, rifInfo.ContentId, keySelector.KeyIndex);
@@ -60,21 +60,26 @@ namespace ChovySign_GUI.Ps1
             foreach (string disc in discSelector.Discs)
                 popsParameters.AddCd(disc);
 
-            popsParameters.Name    =   gameInfo.Title;
-            popsParameters.DiscId  =   gameInfo.DiscId;
-            popsParameters.Icon0   =   gameInfo.Icon0;
-            popsParameters.Pic0    =   gameInfo.Pic0;
-            popsParameters.Pic1    =   gameInfo.Pic1;
+            popsParameters.Name = gameInfo.Title;
+            popsParameters.DiscId = gameInfo.DiscId;
+            popsParameters.Icon0 = gameInfo.Icon0;
+            popsParameters.Pic0 = gameInfo.Pic0;
+            popsParameters.Pic1 = gameInfo.Pic1;
 
             // read settings from settings tab.
             popsParameters.Account = new Account(SettingsTab.Settings.AccountId);
-            
+
             popsParameters.CrackMethod = SettingsTab.Settings.LibcryptMode;
             popsParameters.OutputFolder = SettingsTab.Settings.CmaDirectory;
             popsParameters.CreatePsvImg = SettingsTab.Settings.PackagePsvimg;
 
+
             progressStatus.Parameters = popsParameters;
 
+            keySelector.IsEnabled = false;
+            discSelector.IsEnabled = false;
+            gameInfo.IsEnabled = false;
+            SettingsTab.Settings.IsEnabled = false;
 
         }
 
@@ -90,7 +95,13 @@ namespace ChovySign_GUI.Ps1
 
         private void check()
         {
-            this.progressStatus.IsEnabled = (discSelector.AnyDiscsSelected && keySelector.IsValid && gameInfo.Title != "" && gameInfo.DiscId.Length == 9);      
+            this.progressStatus.IsEnabled = (
+                discSelector.AnyDiscsSelected && 
+                keySelector.IsValid && 
+                gameInfo.Title != String.Empty && 
+                gameInfo.DiscId.Length == 9 &&
+                SettingsTab.Settings is not null &&
+                Directory.Exists(SettingsTab.Settings.CmaDirectory));      
         }
         private void onKeyValidityChanged(object? sender, EventArgs e)
         {

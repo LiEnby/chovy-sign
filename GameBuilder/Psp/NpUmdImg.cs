@@ -11,6 +11,27 @@ namespace GameBuilder.Psp
         const int BLOCK_BASIS = 0x10;
         const int SECTOR_SZ = 2048;
         const int BLOCK_SZ = BLOCK_BASIS * SECTOR_SZ;
+
+        private Int64 isoBlocks;
+        private bool compress;
+
+        UmdInfo umdImage;
+
+        private byte[] headerKey;
+        private byte[] dataKey;
+
+
+        private BuildStream npHdr;
+        private StreamUtil npHdrUtil;
+
+        private BuildStream npHdrBody;
+        private StreamUtil npHdrBodyUtil;
+
+        private BuildStream isoData;
+        private StreamUtil isoDataUtil;
+
+        private BuildStream npTbl;
+        private StreamUtil npTblUtil;
         public NpUmdImg(NpDrmInfo drmInfo, UmdInfo umdImage, bool compress) : base(drmInfo)
         {
             this.compress = compress;
@@ -31,6 +52,8 @@ namespace GameBuilder.Psp
 
             this.umdImage = umdImage;
             isoBlocks = Convert.ToInt64((umdImage.IsoStream.Length + BLOCK_SZ - 1) / BLOCK_SZ);
+
+            this.StartDat = (umdImage.Minis ? Resources.STARTDATMINIS : Resources.STARTDATPSP);
 
         }
 
@@ -94,7 +117,6 @@ namespace GameBuilder.Psp
 
         public override byte[] GenerateDataPsp()
         {
-            byte[] startDat = CreateStartDat(umdImage.Minis ? Resources.STARTDATMINIS : Resources.STARTDATPSP);
             using (BuildStream dataPsp = new BuildStream())
             {
                 StreamUtil dataPspUtil = new StreamUtil(dataPsp);
@@ -106,7 +128,7 @@ namespace GameBuilder.Psp
                 dataPspUtil.WriteInt32(0);
                 dataPspUtil.WriteInt32(0);
                 dataPspUtil.WriteInt32(0);
-                dataPspUtil.WriteBytes(startDat);
+                dataPspUtil.WriteBytes(StartDat);
                 return dataPsp.ToArray();
             }
         }
@@ -273,25 +295,5 @@ namespace GameBuilder.Psp
             base.Dispose();
         }
 
-        private Int64 isoBlocks;
-        private bool compress;
-
-        UmdInfo umdImage;
-
-        private byte[] headerKey;
-        private byte[] dataKey;
-
-
-        private BuildStream npHdr;
-        private StreamUtil npHdrUtil;
-
-        private BuildStream npHdrBody;
-        private StreamUtil npHdrBodyUtil;
-
-        private BuildStream isoData;
-        private StreamUtil isoDataUtil;
-
-        private BuildStream npTbl;
-        private StreamUtil npTblUtil;
     }
 }

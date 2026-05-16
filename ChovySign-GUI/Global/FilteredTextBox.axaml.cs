@@ -49,6 +49,7 @@ namespace ChovySign_GUI.Global
         {
             get
             {
+                if (this.txtBox.PlaceholderText is null) return String.Empty;
                 return this.txtBox.PlaceholderText;
             }
             set

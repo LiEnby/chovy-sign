@@ -34,9 +34,10 @@ namespace ChovySign_GUI.Popup.Global
             {
                 Title = title
             };
-            msgbox.FindControl<TextBlock>("Text").Text = text;
-            var buttonPanel = msgbox.FindControl<StackPanel>("Buttons");
+            var textBlock = msgbox.FindControl<TextBlock>("Text");
+            if(textBlock is not null) textBlock.Text = text;
 
+            var buttonPanel = msgbox.FindControl<StackPanel>("Buttons");
             var res = MessageBoxResult.Ok;
 
             void AddButton(string caption, MessageBoxResult r, bool def = false)
@@ -46,7 +47,7 @@ namespace ChovySign_GUI.Popup.Global
                     res = r;
                     msgbox.Close();
                 };
-                buttonPanel.Children.Add(btn);
+                if(buttonPanel is not null) buttonPanel.Children.Add(btn);
                 if (def)
                     res = r;
             }

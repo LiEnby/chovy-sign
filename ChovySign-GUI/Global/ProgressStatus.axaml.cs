@@ -43,12 +43,22 @@ namespace ChovySign_GUI.Global
             if (currentWindow is not Window) throw new Exception("could not find current window");
 
             this.goButton.IsEnabled = false;
-            
-            OnBeforeStart(new EventArgs());
-            // sanity check it
-            if(Parameters is null) { await MessageBox.Show(currentWindow, "ChovySignParameters was null, cannot start!", "Invalid Parameters", MessageBoxButtons.Ok); return; }
-            // apply settings that are global to all signs
-            if(SettingsTab.Settings is not null) Parameters.BuildStreamType = SettingsTab.Settings.BuildStreamType;
+            try
+            {
+                OnBeforeStart(new EventArgs());
+                
+                // Sanity check that paramaters is not null
+                if (Parameters is null) { await MessageBox.Show(currentWindow, "ChovySignParameters was null, cannot start!", "Invalid Parameters", MessageBoxButtons.Ok); return; }
+                
+                // apply settings that are global to all paramater types;
+                if (SettingsTab.Settings is not null) Parameters.BuildStreamType = SettingsTab.Settings.BuildStreamType;
+            }
+            catch(Exception ex)
+            {
+                await MessageBox.Show(currentWindow, "Error starting build: " + ex.Message, "ERROR", MessageBoxButtons.Ok);
+                this.goButton.IsEnabled = true; 
+                return;
+            }
 
             try
             {
@@ -59,6 +69,7 @@ namespace ChovySign_GUI.Global
             catch (Exception ex)
             {
                 await MessageBox.Show(currentWindow, "Error building: " + ex.Message + "\n\nSTACKTRACE: " + ex.StackTrace, "ERROR", MessageBoxButtons.Ok);
+                this.goButton.IsEnabled = true;
                 return;
             }
             OnFinished(new EventArgs());

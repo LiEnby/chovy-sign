@@ -1,4 +1,3 @@
-using Avalonia.Controls;
 using ChovySign_GUI.Global;
 using LibChovy.Config;
 using System;
@@ -13,8 +12,8 @@ namespace ChovySign_GUI.Settings
             loaded = false;
 
             string? cfgText = ChovyConfig.CurrentConfig.GetString(ConfigKey);
-            if (cfgText is null) cfgText = defaultSetting;
             if (cfgText is not null) loaded = true;
+            if (cfgText is null) cfgText = defaultSetting;
 
             configText.Text = cfgText;
         }

@@ -1,16 +1,14 @@
 using Avalonia.Controls;
 using GameBuilder.Pops.LibCrypt;
 using GameBuilder;
-using System.IO;
 using Vita.ContentManager;
 using System;
-using System.Globalization;
 
 namespace ChovySign_GUI.Settings
 {
     public partial class SettingsTab : UserControl
     {
-        public static SettingsTab? Settings;
+        public static SettingsTab? Settings = null;
 
         public StreamType BuildStreamType
         {

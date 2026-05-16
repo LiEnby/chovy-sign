@@ -1,7 +1,9 @@
 ﻿using GameBuilder;
+using GameBuilder.Atrac3;
 using GameBuilder.Pops;
 using GameBuilder.Psp;
 using Li.Progress;
+using Org.BouncyCastle.Security;
 using PspCrypto;
 using Vita.PsvImgTools;
 
@@ -17,10 +19,28 @@ namespace LibChovy
 
         private void createPSP(PspParameters parameters)
         {
-            using(NpUmdImg img = new NpUmdImg(parameters.DrmInfo, parameters.Umd, parameters.Compress))
+            if (parameters.Umd is null) throw new NullReferenceException("Paramaters.UMD was null");
+            if (parameters.Umd.DataFiles["ICON0.PNG"] is null) throw new NullReferenceException("ICON0 was null");
+            if (parameters.Umd.DataFiles["PARAM.SFO"] is null) throw new NullReferenceException("PARAM.SFO was null");
+
+            using (NpUmdImg img = new NpUmdImg(parameters.DrmInfo, parameters.Umd, parameters.Compress))
             {
                 img.PatchSfo();
-                using (PbpBuilder pbpBuilder = new PbpBuilder(parameters.Umd.DataFiles["PARAM.SFO"], parameters.Umd.DataFiles["ICON0.PNG"], parameters.Umd.DataFiles["ICON1.PMF"], parameters.Umd.DataFiles["PIC0.PNG"], parameters.Umd.DataFiles["PIC1.PNG"], parameters.Umd.DataFiles["SND0.AT3"], img, 1))
+
+                // override startdat
+                if (parameters.startPngOverride is not null)
+                {
+                    img.StartDat = parameters.startPngOverride;
+                }
+
+                using (PbpBuilder pbpBuilder = new PbpBuilder(parameters.Umd.DataFiles["PARAM.SFO"], 
+                                                              parameters.Umd.DataFiles["ICON0.PNG"], 
+                                                              parameters.Umd.DataFiles["ICON1.PMF"], 
+                                                              parameters.Umd.DataFiles["PIC0.PNG"], 
+                                                              parameters.Umd.DataFiles["PIC1.PNG"], 
+                                                              parameters.Umd.DataFiles["SND0.AT3"], 
+                                                              img, 
+                                                              1))
                 {
                     pbpBuilder.RegisterCallback(onProgress);
                     pbpBuilder.CreatePsarAndPbp();
@@ -50,7 +70,7 @@ namespace LibChovy
             psfo.AddKey("CATEGORY", "ME", 4);
             psfo.AddKey("DISC_ID", parameters.FirstDisc.DiscId, 16);
             psfo.AddKey("DISC_VERSION", "1.00", 8);
-            psfo.AddKey("LICENSE", "Chovy-Sign is licensed under the GPLv3, And was made possible by SquallATF and Li.", 512);
+            psfo.AddKey("LICENSE", "Chovy-Signv2 is licensed under the GPLv3, And was made possible by SquallATF and Li.", 512);
             psfo.AddKey("PARENTAL_LEVEL", 0, 4);
             psfo.AddKey("PSP_SYSTEM_VER", "6.61", 8);
             psfo.AddKey("REGION", 32768, 4);
@@ -59,19 +79,42 @@ namespace LibChovy
 
             PopsImg img;
             if (parameters.MultiDisc)
+            {
                 img = new PsTitleImg(parameters.DrmInfo, parameters.Discs);
+            }
             else
+            {
                 img = new PsIsoImg(parameters.DrmInfo, parameters.FirstDisc);
+            }
 
-            // apply eboot elf overrides
-            if(parameters.EbootElfOverride is not null)
+            // override pops simple.prx elf
+            if (parameters.EbootElfOverride is not null)
             {
                 img.EbootElf = parameters.EbootElfOverride;
                 img.PatchEboot = false;
             }
+
+            // override emulator config
             if (parameters.ConfigBinOverride is not null)
             {
                 img.ConfigBin = parameters.ConfigBinOverride;
+            }
+
+            // override atrac3tool encoder
+            if (parameters.Atrac3EncoderOverride is not null) 
+            {
+                img.AtracEncoder = parameters.Atrac3EncoderOverride;
+            }
+
+            // override startdat
+            if(parameters.startPngOverride is not null)
+            {
+                img.StartDat = parameters.startPngOverride;
+            }
+            // override simple.dat;
+            if (parameters.simplePngOverride is not null)
+            {
+                img.SimplePgd = parameters.simplePngOverride;
             }
 
             using (PbpBuilder pbpBuilder = new PbpBuilder(sfo, parameters.Icon0, null, parameters.Pic0, parameters.Pic1, null, img, 0))
@@ -149,7 +192,6 @@ namespace LibChovy
         {
 
             SceNpDrm.Aid = parameters.DrmRif.AccountId;
-
             BuildStream.BuildUsingStreamType = parameters.BuildStreamType;
 
             if (!Directory.Exists(parameters.OutputFolder))
@@ -157,8 +199,10 @@ namespace LibChovy
 
             if (parameters.Type == ChovyTypes.PSP)
                 createPSP((PspParameters)parameters);
-            else
+            else if (parameters.Type == ChovyTypes.POPS)
                 createPOPS((PopsParameters)parameters);
+            else
+                throw new InvalidDataException("ChovySignParamaters is not PSP or POPS!; (got- " + parameters.Type + ")");
         }
     }
 }

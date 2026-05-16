@@ -1,10 +1,5 @@
 ﻿using DiscUtils.Iso9660;
 using DiscUtils.Streams;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace GameBuilder.Psp
 {
@@ -49,11 +44,11 @@ namespace GameBuilder.Psp
             }
 
             byte[]? paramFile = DataFiles["PARAM.SFO"];
-            if (paramFile is null) throw new Exception("ISO contains no PARAM.SFO file, so this is not a valid PSP game.");
+            if (paramFile is null) throw new InvalidDataException("ISO contains no PARAM.SFO file, so this is not a valid PSP game.");
             
             Sfo sfo = Sfo.ReadSfo(paramFile);
             string? discId = sfo["DISC_ID"] as String;
-            if (discId is null) throw new Exception("PARAM.SFO does not contain \"DISC_ID\"");
+            if (discId is null) throw new InvalidDataException("PARAM.SFO does not contain \"DISC_ID\"");
 
             this.DiscId = discId;
 

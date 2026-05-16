@@ -109,10 +109,10 @@ namespace GameBuilder.Pops
             if (discName == "") discName = Path.GetFileNameWithoutExtension(cueFile);
             if (discId is null) discId = "SLUS00001";
 
-            if (this.SbiFile is not null)
-                this.lc = new SbiLibCrypt(new SbiReader(this.SbiFile), LibCryptMethod.METHOD_MAGIC_WORD);
+            if (SbiFile is not null)
+                lc = new SbiLibCrypt(new SbiReader(this.SbiFile), LibCryptMethod.METHOD_MAGIC_WORD);
             else
-                this.lc = new DbLibCrypt(discId, LibCryptMethod.METHOD_MAGIC_WORD);
+                lc = new DbLibCrypt(discId, LibCryptMethod.METHOD_MAGIC_WORD);
 
         }
     }

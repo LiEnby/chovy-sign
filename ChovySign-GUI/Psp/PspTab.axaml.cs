@@ -1,14 +1,10 @@
 using Avalonia.Controls;
-using Avalonia.Interactivity;
 using ChovySign_GUI.Popup.Global;
 using ChovySign_GUI.Settings;
 using GameBuilder.Psp;
 using LibChovy;
-using LibChovy.Config;
 using System;
-using System.Media;
-using System.Runtime.CompilerServices;
-using System.Threading.Tasks;
+using System.IO;
 using Vita.ContentManager;
 using static ChovySign_GUI.Popup.Global.MessageBox;
 
@@ -19,7 +15,12 @@ namespace ChovySign_GUI.Psp
 
         private void check()
         {
-            this.progressStatus.IsEnabled = (this.keySelector.IsValid && this.isoSelector.HasUmd);
+            this.progressStatus.IsEnabled = (
+                this.keySelector.IsValid && 
+                this.isoSelector.HasUmd &&
+                SettingsTab.Settings is not null &&
+                Directory.Exists(SettingsTab.Settings.CmaDirectory)
+            );
         }
         public PspTab()
         {
@@ -38,6 +39,7 @@ namespace ChovySign_GUI.Psp
         {
             keySelector.IsEnabled = true;
             isoSelector.IsEnabled = true;
+            if (SettingsTab.Settings is null) return;
             SettingsTab.Settings.IsEnabled = true;
 
             Window? currentWindow = TopLevel.GetTopLevel(this) as Window;
@@ -49,19 +51,17 @@ namespace ChovySign_GUI.Psp
 
         private void onProcessStarting(object? sender, EventArgs e)
         {
-            keySelector.IsEnabled = false;
-            isoSelector.IsEnabled = false;
-            SettingsTab.Settings.IsEnabled = false;
-
-            if (keySelector.Rif is null) return;
-            if (keySelector.VersionKey is null) return;
+            if (SettingsTab.Settings is null) throw new NullReferenceException("SettingsTab.Settings is null");
+            if (keySelector.Rif is null) throw new NullReferenceException("keySelector.Rif is null");
+            if (keySelector.VersionKey is null) throw new NullReferenceException("keySelector.VersionKey is null");
+            if (!Directory.Exists(SettingsTab.Settings.CmaDirectory)) throw new FileNotFoundException("SettingsTab.Settings.CmaDirectory not found!");
 
             NpDrmRif rifInfo = new NpDrmRif(keySelector.Rif);
             NpDrmInfo drmInfo = new NpDrmInfo(keySelector.VersionKey, rifInfo.ContentId, keySelector.KeyIndex);
             PspParameters pspParameters = new PspParameters(drmInfo, rifInfo);
 
             UmdInfo? umd = isoSelector.Umd;
-            if (umd is null) return;
+            if (umd is null) throw new NullReferenceException("UmdInfo is null");
 
             pspParameters.Umd = umd;
             pspParameters.Compress = isoSelector.Compress;
@@ -72,6 +72,11 @@ namespace ChovySign_GUI.Psp
             pspParameters.CreatePsvImg = SettingsTab.Settings.PackagePsvimg;
 
             progressStatus.Parameters = pspParameters;
+
+
+            keySelector.IsEnabled = false;
+            isoSelector.IsEnabled = false;
+            SettingsTab.Settings.IsEnabled = false;
         }
 
         private void onUmdChanged(object? sender, EventArgs e)

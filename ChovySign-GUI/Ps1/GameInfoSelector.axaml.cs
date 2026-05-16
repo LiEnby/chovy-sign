@@ -10,7 +10,12 @@ using System.IO;
 using System.Threading.Tasks;
 
 #pragma warning disable CS8601 // Possible null reference assignment.
-// beacuse im checking if its null in the setter, but visual studio doesnt seem to understand :d
+// beacuse im checking if its null in the setter, but msbuild doesnt seem to understand :d
+#pragma warning disable CS8625 // Cannot convert null literal to non-nullable reference type.
+// setting it as null is explicit behaviour inside the Setter/Getter, and does not really set underlying values to null
+#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
+// we are setting this in the setter for Pic0/Icon0/Pic1, etc but msbuild doesnt seem to get that;
+
 
 namespace ChovySign_GUI.Ps1
 {
@@ -112,7 +117,7 @@ namespace ChovySign_GUI.Ps1
                 Title = disc.DiscName;
                 DiscId = disc.DiscId;
 
-                if (!File.Exists(this.iconFile.FilePath) && SettingsTab.Settings.DownloadPs1Covers)
+                if (!File.Exists(this.iconFile.FilePath) && SettingsTab.Settings is not null && SettingsTab.Settings.DownloadPs1Covers)
                 {
                     byte[] imgData = await Downloader.DownloadCover(disc);
                     if(imgData is not null)

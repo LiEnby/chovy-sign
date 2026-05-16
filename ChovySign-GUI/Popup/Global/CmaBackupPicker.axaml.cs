@@ -48,12 +48,14 @@ namespace ChovySign_GUI.Popup.Global
         {
             get
             {
+                if (SettingsTab.Settings is null) throw new NullReferenceException("SettingsTab is null");
                 return SettingsTab.Settings.CmaDirectory;
             }
             set
             {
                 if (Directory.Exists(value))
                 {
+                    if (SettingsTab.Settings is null) throw new NullReferenceException("SettingsTab is null");
                     SettingsTab.Settings.CmaDirectory = value; 
                 }
             }

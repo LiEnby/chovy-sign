@@ -3,12 +3,7 @@ using Li.Progress;
 using GameBuilder.Cue;
 using GameBuilder.Psp;
 using PspCrypto;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
 using Li.Utilities;
 using GameBuilder.Pops.LibCrypt;
 
@@ -16,6 +11,17 @@ namespace GameBuilder.Pops
 {
     public class DiscCompressor : ProgressTracker, IDisposable
     {
+
+        private PSInfo disc;
+        private CueReader cue;
+        private PopsImg srcImg;
+
+        public BuildStream IsoHeader;
+        public BuildStream CompressedIso;
+
+        private StreamUtil isoHeaderUtil;
+        private IAtracEncoderBase atrac3Encoder;
+
         const int COMPRESS_BLOCK_SZ = 0x9300;
         const int DEFAULT_ISO_OFFSET = 0x100000;
         public int IsoOffset;
@@ -180,12 +186,9 @@ namespace GameBuilder.Pops
                 {
                     uint key = Rng.RandomUInt();
 
-                    IAtracEncoderBase enc = new Atrac3ToolEncoder();
-
                     byte[] pcmData = new byte[audioStream.Length];
                     audioStream.ReadExactly(pcmData);
-
-                    byte[] atracData = enc.EncodeToAtrac(pcmData);
+                    byte[] atracData = atrac3Encoder.EncodeToAtrac(pcmData);
 
                     writeCDAEntry(Convert.ToInt32(CompressedIso.Position), atracData.Length, key);
 
@@ -237,14 +240,5 @@ namespace GameBuilder.Pops
             cue.Dispose();
         }
 
-        private PSInfo disc;
-        private CueReader cue;
-        private PopsImg srcImg;
-
-        public BuildStream IsoHeader;
-        public BuildStream CompressedIso;
-
-        private StreamUtil isoHeaderUtil;
-        private IAtracEncoderBase atrac3Encoder;
     }
 }

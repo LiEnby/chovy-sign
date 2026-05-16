@@ -55,8 +55,8 @@ namespace GameBuilder.Pops
             Int64 startDatLocation = Psar.Position;
             psarUtil.WriteBytes(StartDat);
 
-            // write pgd
-            psarUtil.WriteBytes(this.SimplePgd);
+            // write SIMPLE PGD
+            psarUtil.WriteBytes(SimplePgd);
 
             // set STARTDAT location
             Psar.Seek(0xC, SeekOrigin.Begin);

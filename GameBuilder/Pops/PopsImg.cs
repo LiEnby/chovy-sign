@@ -1,52 +1,62 @@
-﻿using GameBuilder;
-using GameBuilder.Cue;
+﻿using GameBuilder.Atrac3;
 using GameBuilder.Psp;
 using Li.Utilities;
 using PspCrypto;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
+
 
 namespace GameBuilder.Pops
 {
     public abstract class PopsImg : NpDrmPsar
     {
-        
+
+        private byte[] simplePng = Resources.SIMPLE;
+
+        public byte[] EbootElf;
+        public byte[] ConfigBin;
+        public bool PatchEboot;
+        public IAtracEncoderBase AtracEncoder = new Atrac3ToolEncoder();
+
+        public byte[] SimplePgd
+        {
+            get
+            {
+                using (BuildStream simple = new BuildStream())
+                {
+                    StreamUtil simpleUtil = new StreamUtil(simple);
+
+                    simpleUtil.WriteStr("SIMPLE  ");
+                    simpleUtil.WriteInt32(100);
+                    simpleUtil.WriteInt32(16);
+                    simpleUtil.WriteInt32(simplePng.Length);
+                    simpleUtil.WriteInt32(0);
+                    simpleUtil.WriteInt32(0);
+
+                    simpleUtil.WriteBytes(simplePng);
+
+                    return CreatePgd(simple.ToArray(), DrmInfo.GetFixedKey());
+                }
+            }
+            set
+            {
+                simplePng = value;
+            }
+        }
         public PopsImg(NpDrmInfo npdrmInfo) : base(npdrmInfo)
         {
-            simple = new BuildStream();
-            simpleUtil = new StreamUtil(simple);
-
-            this.StartDat = NpDrmPsar.CreateStartDat(Resources.STARTDATPOPS);
-            this.createSimpleDat();
-
-            this.SimplePgd = CreatePgd(simple.ToArray(), npdrmInfo.GetFixedKey());
+            this.StartDat = Resources.STARTDATPOPS;
 
             this.EbootElf = Resources.DATAPSPSD;
             this.ConfigBin = Resources.DATAPSPSDCFG;
             this.PatchEboot = true;
         }
-        internal void createSimpleDat()
-        {
-            simpleUtil.WriteStr("SIMPLE  ");
-            simpleUtil.WriteInt32(100);
-            simpleUtil.WriteInt32(16);
-            simpleUtil.WriteInt32(Resources.SIMPLE.Length);
-            simpleUtil.WriteInt32(0);
-            simpleUtil.WriteInt32(0);
 
-            simpleUtil.WriteBytes(Resources.SIMPLE);
-        }
         public byte[] CreatePgd(byte[] buffer, byte[]? versionkey = null)
         {
 
             int bufferSz = DNASHelper.CalculateSize(buffer.Length, 0x400);
             byte[] bufferEnc = new byte[bufferSz];
 
-            // get pgd
+            // encrypt pgd
             int sz = DNASHelper.Encrypt(bufferEnc, buffer, versionkey is null ? DrmInfo.VersionKey : versionkey, buffer.Length, DrmInfo.KeyIndex, 1, blockSize: 0x400);
             byte[] pgd = bufferEnc.ToArray();
             Array.Resize(ref pgd, sz);
@@ -85,15 +95,6 @@ namespace GameBuilder.Pops
             return loaderEnc.ToArray();
         }
 
-        private BuildStream simple;
-        private StreamUtil simpleUtil;
-
-        public byte[] EbootElf;
-        public byte[] ConfigBin;
-        public bool PatchEboot;
-
-        public byte[] StartDat;
-        public byte[] SimplePgd;
 
     }
 }

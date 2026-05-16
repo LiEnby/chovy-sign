@@ -103,7 +103,8 @@ namespace ChovySign_GUI.Global
         {
             get
             {
-                if (!ContainsFile) return "";
+                if (!ContainsFile) return String.Empty;
+                if (this.filePath.Text is null) return String.Empty;
                 return this.filePath.Text;
             }
             set
@@ -113,7 +114,7 @@ namespace ChovySign_GUI.Global
                     if (File.Exists(value))
                         this.filePath.Text = value;
                     else
-                        this.filePath.Text = "";
+                        this.filePath.Text = String.Empty;
                 }
                 else
                 {

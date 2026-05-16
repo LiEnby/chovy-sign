@@ -1,4 +1,5 @@
-﻿using GameBuilder.Pops;
+﻿using GameBuilder.Atrac3;
+using GameBuilder.Pops;
 using GameBuilder.Pops.LibCrypt;
 using GameBuilder.Psp;
 using LibChovy.Art;
@@ -8,30 +9,25 @@ namespace LibChovy
 {
     public class PopsParameters : ChovySignParameters
     {
+        private string? discIdOverride = null;
+        private string? nameOverride = null;
+        private List<PSInfo> discList = new List<PSInfo>();
+        private LibCryptMethod libCryptMethod = LibCryptMethod.METHOD_MAGIC_WORD;
+
+        private byte[]? pic0 = null;
+        private byte[]? pic1 = null;
+        private byte[]? icon0 = null;
+        
+        internal byte[]? simplePngOverride = null;
+
+        public byte[]? EbootElfOverride = null;
+        public byte[]? ConfigBinOverride = null;
+        public IAtracEncoderBase? Atrac3EncoderOverride;
+        
         public PopsParameters(NpDrmInfo drmInfo, NpDrmRif rif) : base(drmInfo, rif)
         {
             Type = ChovyTypes.POPS;
-            discList = new List<PSInfo>();
-
-            EbootElfOverride = null;
-            ConfigBinOverride = null;
-
-            discIdOverride = null;
-            nameOverride = null;
-            libCryptMethod = LibCryptMethod.METHOD_MAGIC_WORD;
         }
-        private string? discIdOverride;
-        private string? nameOverride;
-        private List<PSInfo> discList;
-        private LibCryptMethod libCryptMethod;
-
-        private byte[]? pic0;
-        private byte[]? pic1;
-        private byte[]? icon0;
-
-
-        public byte[]? EbootElfOverride;
-        public byte[]? ConfigBinOverride;
 
         public PSInfo FirstDisc
         {
@@ -45,6 +41,7 @@ namespace LibChovy
         {
             get
             {
+                if (backupsFolder is null) throw new NullReferenceException("BackupsFolder is null");
                 return Path.Combine(SettingsReader.GetPs1Folder(backupsFolder), Account.AccountIdStr);
             }
             set
@@ -197,5 +194,15 @@ namespace LibChovy
                 return Discs.Length > 1;
             }
         }
+
+        public virtual string SimplePngFilepath
+        {
+            set
+            {
+                if (File.Exists(value))
+                    this.simplePngOverride = File.ReadAllBytes(value);
+            }
+        }
+
     }
 }

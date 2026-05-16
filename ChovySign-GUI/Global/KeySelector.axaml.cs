@@ -137,9 +137,10 @@ namespace ChovySign_GUI.Global
 
                     key = keys[keyIndex];
                     rif = actRifMethodGUI.Rif;
+                    if (rif is null) return;
 
                     // change settings to use accountid from rif
-                    SettingsTab.Settings.AccountId = rif.AccountIdBE;
+                    if(SettingsTab.Settings is not null) SettingsTab.Settings.AccountId = rif.AccountIdBE;
                     break;
                 case VersionKeyMethod.EBOOT_PBP_METHOD:
                     CmaBackupPicker ebootBackupSelector = new CmaBackupPicker();
@@ -154,7 +155,7 @@ namespace ChovySign_GUI.Global
                     rif = CMAVersionKeyHelper.GetRifFromLicensePsvimg(gameBackupFolder, accountId);
 
                     // change settings to match newly selected info
-                    SettingsTab.Settings.AccountId = UInt64.Parse(accountId, NumberStyles.HexNumber);
+                    if(SettingsTab.Settings is not null) SettingsTab.Settings.AccountId = UInt64.Parse(accountId, NumberStyles.HexNumber);
                     
                     break;
                 case VersionKeyMethod.NOPSPEMUDRM_METHOD:

@@ -1,54 +1,57 @@
 ﻿using Li.Progress;
 using Li.Utilities;
-using PspCrypto;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace GameBuilder.Psp
 {
     public abstract class NpDrmPsar : ProgressTracker, IDisposable
     {
+        private byte[]? startPng = null;
+        public NpDrmInfo DrmInfo;
+
+        public BuildStream Psar;
+        internal StreamUtil psarUtil;
+
         public NpDrmPsar(NpDrmInfo npDrmInfo)
         {
             DrmInfo = npDrmInfo;
-            Psar = new BuildStream();
-
+            Psar = new BuildStream(); 
             psarUtil = new StreamUtil(Psar);
-
         }
 
-        public NpDrmInfo DrmInfo;
-        public BuildStream Psar;
-        internal StreamUtil psarUtil;
-        public abstract void CreatePsar();
-        public abstract byte[] GenerateDataPsp();
-        public static byte[] CreateStartDat(byte[] image)
+        public byte[] StartDat
         {
-            using(BuildStream startDatStream = new BuildStream())
+            get
             {
-                StreamUtil startDatUtil = new StreamUtil(startDatStream);
+                if (startPng is null) throw new NullReferenceException("no startdat png found");
 
-                startDatUtil.WriteStr("STARTDAT");
-                startDatUtil.WriteInt32(0x1);
-                startDatUtil.WriteInt32(0x1);
-                startDatUtil.WriteInt32(0x50);
-                startDatUtil.WriteInt32(image.Length);
-                startDatUtil.WriteInt32(0x0);
-                startDatUtil.WriteInt32(0x0);
+                using (BuildStream startDatStream = new BuildStream())
+                {
+                    StreamUtil startDatUtil = new StreamUtil(startDatStream);
 
-                startDatUtil.WritePadding(0, 0x30);
+                    startDatUtil.WriteStr("STARTDAT");
+                    startDatUtil.WriteInt32(0x1);
+                    startDatUtil.WriteInt32(0x1);
+                    startDatUtil.WriteInt32(0x50);
+                    startDatUtil.WriteInt32(startPng.Length);
+                    startDatUtil.WriteInt32(0x0);
+                    startDatUtil.WriteInt32(0x0);
 
-                startDatUtil.WriteBytes(image);
+                    startDatUtil.WritePadding(0, 0x30);
 
-                startDatStream.Seek(0x00, SeekOrigin.Begin);
-                return startDatStream.ToArray();
+                    startDatUtil.WriteBytes(startPng);
+
+                    startDatStream.Seek(0x00, SeekOrigin.Begin);
+                    return startDatStream.ToArray();
+                }
+            }
+            set
+            {
+                startPng = value;
             }
         }
+
+        public abstract void CreatePsar();
+        public abstract byte[] GenerateDataPsp();
 
         public virtual void Dispose()
         {
