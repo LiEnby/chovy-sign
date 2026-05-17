@@ -349,7 +349,7 @@ namespace ChovySign_CLI
                 Console.WriteLine("\t--vkey <versionkey> <content_id> [key_index] - Manually specify versionkey, contentid, and keyindex");
                 Console.WriteLine("\t--vkey-extract <eboot.pbp> [key_index] - Extract versionkey from an eboot.pbp.");
                 Console.WriteLine("\t--vkey-gen <act.dat> <license.rif> <console_id> [key_index] - Generate versionkey from act.dat, rif and consoleid.");
-                Console.WriteLine("\t--nopspemudrm [content_id] - Don't use a base game, generate a nopspemudrm fake rif; for a given contentid instead (defalt contentid: EP0099-ULUS09999_00-CHOVYSIGN0000000)");
+                Console.WriteLine("\t--nopspemudrm [content_id] - Don't use a base game, generate a nopspemudrm fake rif (default contentid: EP0099-ULUS09999_00-CHOVYSIGN0000000)");
 
                 Console.WriteLine("Packaging: ");
                 Console.WriteLine("\t--start-dat [start.png] - Override start.dat (startup image)");
@@ -485,7 +485,7 @@ namespace ChovySign_CLI
             tryGenerateKeysTxt();
 
             if (pbpMode is null) return Error("no pbp mode was set, use either --psp or --pops", 7);
-            if (drmInfo is null) return Error("no versionkey was found, exiting, use (one of) --vkey options; (or --nopspemudrm)", 6);
+            if (drmInfo is null) return Error("no versionkey was found, use (one of) --vkey options; (or --nopspemudrm)", 6);
             if (rifFile is null) return Error("no rif was found, use --rif to specify base game RIF (or --nopspemudrm) ", 8);
             
             int targetKeyIndex = (pbpMode == PbpMode.PSP) ? 2 : 1;
