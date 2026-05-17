@@ -212,13 +212,13 @@ namespace ChovySign_CLI
 
                     break;
                 case ArgumentParsingMode.POPS_INFO:
-                    if (parameters.Count < 2) return Error("--pops-info takes at least 1 arguments ("+parameters.Count+" given)", 4);
+                    if (parameters.Count < 1) return Error("--pops-info takes at least 1 arguments ("+parameters.Count+" given)", 4);
                     if (parameters.Count > 3) return Error("--pops-info takes no more than 3 arguments("+parameters.Count+" given)", 4);
                     popsDiscName = parameters[0];
 
-                    if (parameters.Count > 1 && File.Exists(parameters[1]))
+                    if (parameters.Count >= 2 && File.Exists(parameters[1]))
                         popsIcon0File = File.ReadAllBytes(parameters[1]);
-                    if (parameters.Count > 2 && File.Exists(parameters[2])) 
+                    if (parameters.Count >= 3 && File.Exists(parameters[2])) 
                         popsPic0File = File.ReadAllBytes(parameters[2]);
                     break;
                 case ArgumentParsingMode.KEYS_TXT_GEN:
