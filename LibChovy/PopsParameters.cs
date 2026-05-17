@@ -41,7 +41,7 @@ namespace LibChovy
         {
             get
             {
-                if (backupsFolder is null) throw new NullReferenceException("BackupsFolder is null");
+                if (backupsFolder is null) backupsFolder = SettingsReader.BackupsFolder; // set to default backup folder
                 return Path.Combine(SettingsReader.GetPs1Folder(backupsFolder), Account.AccountIdStr);
             }
             set
@@ -159,7 +159,7 @@ namespace LibChovy
             {
                 if (nameOverride is null)
                 {
-                    if (FirstDisc.DiscName == "") return FirstDisc.DiscId;
+                    if (FirstDisc.DiscName == String.Empty) return FirstDisc.DiscId;
                     else return FirstDisc.DiscName;
                 }
                 else return nameOverride;

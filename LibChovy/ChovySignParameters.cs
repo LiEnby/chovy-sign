@@ -31,7 +31,7 @@ namespace LibChovy
         {
             get
             {
-                if (backupsFolder is null) throw new NullReferenceException("BackupsFolder is Null!");
+                if (backupsFolder is null) backupsFolder = SettingsReader.BackupsFolder; // set to default backup folder
                 return Path.Combine(SettingsReader.GetPspFolder(backupsFolder), Account.AccountIdStr);
             }
             set

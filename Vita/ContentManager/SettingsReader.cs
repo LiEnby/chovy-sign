@@ -121,7 +121,7 @@ namespace Vita.ContentManager
 
         private static string getDefaultCmaPSVitaFolder()
         {
-             return Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Personal), "PS Vita");
+             return Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "PS Vita");
         }
 
         private static string getQcmaConfFile()

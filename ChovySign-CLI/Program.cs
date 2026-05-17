@@ -1,13 +1,14 @@
-﻿using Li.Progress;
-using GameBuilder.Pops;
+﻿using GameBuilder.Pops;
 using GameBuilder.Psp;
+using Li.Progress;
 using LibChovy;
 using LibChovy.VersionKey;
-using System.Text;
-using Vita.ContentManager;
 using PspCrypto;
 using System.ComponentModel;
 using System.Globalization;
+using System.Text;
+using System.Text.RegularExpressions;
+using Vita.ContentManager;
 
 namespace ChovySign_CLI
 {
@@ -99,7 +100,7 @@ namespace ChovySign_CLI
             Console.Write(msg + emptySpace + "\r");
         }
 
-        private static void generateKeysTxt()
+        private static void tryGenerateKeysTxt()
         {
             if (rifFolder is null || actDat is null || idps is null) return;
             UInt64 accountId = BitConverter.ToUInt64(actDat, 0x8);
@@ -142,10 +143,17 @@ namespace ChovySign_CLI
                     if (parameters.Count > 5) return Error("--pops: no more than 5 disc images allowed in a single game (sony's rules, not mine)", 4);
                     if (parameters.Count < 1) return Error("--pops: at least 1 disc image file is required.", 4);
                     discs = parameters.ToArray();
+                    
+                    foreach(string disc in discs) 
+                        if(!Path.Exists(disc)) 
+                            return Error("--pops: file not found", 4);
+
                     break;
                 case ArgumentParsingMode.PSP_UMD:
                     if (parameters.Count < 1) return Error("--psp: a path to a disc image is required", 4);
                     if (parameters.Count > 2) return Error("--psp: no more than 2 arguments. ("+parameters.Count+" given)", 4);
+                    if (!File.Exists(parameters[0])) return Error("--psp: file not found", 4);
+
                     discs = new string[1];
                     discs[0] = parameters[0];
                     
@@ -156,26 +164,57 @@ namespace ChovySign_CLI
 
                     break;
                 case ArgumentParsingMode.VERSIONKEY:
-                    if (parameters.Count != 3) return Error("--vkey: expect 3 arguments. ("+parameters.Count+" given)", 4);
-                    drmInfo = new NpDrmInfo(StringToByteArray(parameters[0]), parameters[1], int.Parse(parameters[2]));
+                    if (parameters.Count > 3) return Error("--vkey: takes no more than 3 arguments. (" + parameters.Count+" given)", 4);
+                    if (parameters.Count < 2) return Error("--vkey: takes atleast 2 arguments. (" + parameters.Count + " given)", 4);
+
+                    int keyIndex = 0;
+                    if (parameters.Count >= 3)
+                        keyIndex = int.Parse(parameters[2]);
+
+                    drmInfo = new NpDrmInfo(StringToByteArray(parameters[0]), parameters[1], keyIndex);
                     break;
                 case ArgumentParsingMode.VERSIONKEY_EXTRACT:
-                    if (parameters.Count != 2) return Error("--vkey-extract: expect 2 arguments. ("+parameters.Count+" given)", 4);
-                    drmInfo = EbootPbpMethod.GetVersionKey(File.OpenRead(parameters[0]), int.Parse(parameters[1]));
+                    if (parameters.Count > 2) return Error("--vkey-extract: takes no more than 2 arguments. (" + parameters.Count+" given)", 4);
+                    if (parameters.Count < 1) return Error("--vkey-extract: takes at least 1 argument. (" + parameters.Count + " given)", 4);
+                    if (!File.Exists(parameters[0])) return Error("--vkey-extract: file not found", 4);
+
+                    keyIndex = 0;
+                    if (parameters.Count >= 2)
+                        keyIndex = int.Parse(parameters[1]);
+
+                    drmInfo = EbootPbpMethod.GetVersionKey(File.OpenRead(parameters[0]), keyIndex);
                     break;
                 case ArgumentParsingMode.VERSIONKEY_GENERATOR:
-                    if(parameters.Count != 4) return Error("--vkey-gen: expect 4 arguments. ("+parameters.Count+" given)", 4);
-                    drmInfo = ActRifMethod.GetVersionKey(File.ReadAllBytes(parameters[0]), File.ReadAllBytes(parameters[1]), StringToByteArray(parameters[2]), int.Parse(parameters[3]));
+                    if(parameters.Count > 4) return Error("--vkey-gen: takes no more than 4 arguments. (" + parameters.Count+" given)", 4);
+                    if (parameters.Count < 3) return Error("--vkey-gen: takes at least 3 arguments. (" + parameters.Count + " given)", 4);
+                    if (!File.Exists(parameters[0])) return Error("--vkey-gen: act file not found", 4);
+                    if (!File.Exists(parameters[1])) return Error("--vkey-gen: rif file not found", 4);
+
+                    keyIndex = 0;
+                    if(parameters.Count >= 4)
+                        keyIndex = int.Parse(parameters[3]);
+
+                    drmInfo = ActRifMethod.GetVersionKey(File.ReadAllBytes(parameters[0]), 
+                                                         File.ReadAllBytes(parameters[1]), 
+                                                         StringToByteArray(parameters[2]), 
+                                                         keyIndex);
                     break;
                 case ArgumentParsingMode.NOPSPEMUDRM_GEN:
-                    if (parameters.Count != 1) return Error("--nopspemudrm: expect 1 arguments. (" + parameters.Count + " given)", 4);
-                    drmInfo = NoPspEmuDrmMethod.GetVersionKey(parameters[0], 0);
-                    rifFile = NpDrmRif.CreateNoPspEmuDrmRif(parameters[0]);
+                    if (parameters.Count > 1) return Error("--nopspemudrm: takes no more than 1 arguments. (" + parameters.Count + " given)", 4);
+                    string contentId = "EP0099-ULUS09999_00-CHOVYSIGN0000000";
+
+                    if(parameters.Count >= 1) contentId = parameters[0];
+                    if (Regex.Matches(contentId, "^[A-Z]{2}[0-9]{4}-[A-Z]{4}[0-9]{5}_[0-9]{2}-[A-Z0-9]{16}$").Count <= 0) return Error("Content ID does not match the format XXYYYY-XXXXYYYYY_YY-ZZZZZZZZZZZZZZZZ\nWhere, X = A-Z, Y = 0-9, and Z = A-Z or 0-9.", 5);
+                    
+                    drmInfo = NoPspEmuDrmMethod.GetVersionKey(contentId, 0);
+                    rifFile = NpDrmRif.CreateNoPspEmuDrmRif(contentId);
+
                     break;
                 case ArgumentParsingMode.POPS_INFO:
                     if (parameters.Count < 2) return Error("--pops-info takes at least 1 arguments ("+parameters.Count+" given)", 4);
                     if (parameters.Count > 3) return Error("--pops-info takes no more than 3 arguments("+parameters.Count+" given)", 4);
                     popsDiscName = parameters[0];
+
                     if (parameters.Count > 1 && File.Exists(parameters[1]))
                         popsIcon0File = File.ReadAllBytes(parameters[1]);
                     if (parameters.Count > 2 && File.Exists(parameters[2])) 
@@ -183,42 +222,47 @@ namespace ChovySign_CLI
                     break;
                 case ArgumentParsingMode.KEYS_TXT_GEN:
                     if (parameters.Count != 3) return Error("--keys-txt-gen takes 3 arguments, (" + parameters.Count + " given)", 4);
+                    if (!File.Exists(parameters[0])) return Error("--keys-txt-gen: act file not found", 4);
+                    if (!Directory.Exists(parameters[2])) return Error("--keys-txt-gen: rif folder not found", 4);
+
                     actDat = File.ReadAllBytes(parameters[0]);
                     idps = StringToByteArray(parameters[1]);
                     rifFolder = parameters[2];
                     break;
                 case ArgumentParsingMode.STARTDAT_FILEPATH:
                     if (parameters.Count != 1) return Error("--start-dat takes 1 arguments, (" + parameters.Count + " given)", 4);
+                    if (!File.Exists(parameters[0])) return Error("--start-dat: file not found", 4);
+
                     startDat = parameters[0];
                     break;
                 case ArgumentParsingMode.SIMPLEDAT_FILEPATH:
                     if (parameters.Count != 1) return Error("--simple-dat takes 1 arguments, (" + parameters.Count + " given)", 4);
+                    if (!File.Exists(parameters[0])) return Error("--simple-dat: file not found", 4);
+
                     simpleDat = parameters[0];
                     break;
                 case ArgumentParsingMode.POPS_EBOOT:
-                    if (parameters.Count < 1) return Error("--pops-eboot-sign expects at most 1 arguments", 4);
-                    if (!File.Exists(parameters[0])) return Error("--pops-eboot-sign: file not found", 4);
+                    if (parameters.Count < 1) return Error("--pops-eboot takes at most 1 arguments, (" + parameters.Count + " given)", 4);
+                    if (!File.Exists(parameters[0])) return Error("--pops-eboot: file not found", 4);
                     ebootElf = File.ReadAllBytes(parameters[0]);
 
                     if (parameters.Count >= 2 && File.Exists(parameters[1]))
                         configBin = File.ReadAllBytes(parameters[1]);
-                    else
-                        configBin = GameBuilder.Resources.DATAPSPSDCFG;
                     
                     break;
                 case ArgumentParsingMode.CMA_OUTPUT_FOLDER:
-                    if (parameters.Count < 1) return Error("--output-folder expects 1 output", 4);
+                    if (parameters.Count < 1) return Error("--output-folder takes 1 arguments, (" + parameters.Count + " given)", 4);
                     if (!Directory.Exists(parameters[0])) return Error("--output-folder: directory not found", 4);
 
                     outputFolder = parameters[0];
                     break;
                 case ArgumentParsingMode.ACCOUNT_ID:
-                    if (parameters.Count < 1) return Error("--account-id expects 1 output", 4);
+                    if (parameters.Count < 1) return Error("--account-id takes onlnt 1 output, (" + parameters.Count + " given)", 4);
 
                     accountId = UInt64.Parse(parameters[0], NumberStyles.HexNumber);
                     break;
                 case ArgumentParsingMode.RIF:
-                    if (parameters.Count != 1) return Error("--rif expects only 1 argument,", 4);
+                    if (parameters.Count != 1) return Error("--rif takes only 1 argument, (" + parameters.Count + " given)", 4);
                     rifFile = new NpDrmRif(File.ReadAllBytes(parameters[0]));
                     break;
             }
@@ -282,27 +326,35 @@ namespace ChovySign_CLI
             if (args.Length == 0)
             {
                 Console.WriteLine("Chovy-Sign v2 (CLI)");
-                Console.WriteLine("--pops [disc1.cue] [disc2.cue] [disc3.cue] ... (up to 5)");
-                Console.WriteLine("--pops-info [game title] [icon0.png] (optional) [pic1.png] (optional)");
-                Console.WriteLine("--pops-eboot [eboot.elf] [config.bin] (optional)");
 
-                Console.WriteLine("--psp [umd.iso] [compress; true/false] (optional)");
-                
-                Console.WriteLine("--rif [GAME.RIF]");
-                
-                Console.WriteLine("--account-id [ACCOUNT_ID] (specify cma account id)");
-                Console.WriteLine("--no-psvimg (Disable creating a .psvimg file)");
-                Console.WriteLine("--output-folder [output_folder]");
+                Console.WriteLine("PS1 Options: ");
+                Console.WriteLine("\t--pops [disc1.cue] [disc2.cue] [disc3.cue] ... (up to 5) - Specifiy PS1 Disc Images");
+                Console.WriteLine("\t--pops-info [game title] [icon0.png] (optional) [pic1.png] (optional) - Specify PS1 Game information");
+                Console.WriteLine("\t--pops-eboot [eboot.elf] [config.bin] (optional) - Override PS1 simple.prx and config.bin data");
 
-                Console.WriteLine("--vkey [versionkey] [contentid] [key_index]");
-                Console.WriteLine("--vkey-extract [eboot.pbp] [key_index]");
-                Console.WriteLine("--vkey-gen [act.dat] [license.rif] [console_id] [key_index]");
-                
-                Console.WriteLine("--keys-txt-gen [act.dat] [console_id] [psp_license_folder]");
+                Console.WriteLine("PSP Options: ");
+                Console.WriteLine("\t--psp [umd.iso] [compress; true/false] (optional) - Specify PSP Disc Image");
 
-                Console.WriteLine("--nopspemudrm [content_id] (specify generates nopspemudrm rif and vkey)");
-                Console.WriteLine("--start-dat [filepath] (specify custom startdat.png)");
-                Console.WriteLine("--simple-dat [filepath] (specify custom simple.png)");
+                Console.WriteLine("Vita CMA Options: ");
+                Console.WriteLine("\t--account-id [account_id] - Override CMA account id");
+                Console.WriteLine("\t--no-psvimg - Don't create a .psvimg CMA backup");
+                Console.WriteLine("\t--output-folder [output_folder] - Override CMA Backups Directory");
+
+                Console.WriteLine("NpDrm Options: ");
+                Console.WriteLine("\t--rif [license.rif] - Specify Base Game RIF");
+                Console.WriteLine("\t--vkey [versionkey] [content_id] [key_index] (optional) - Manually specify versionkey, contentid, and keyindex");
+                Console.WriteLine("\t--vkey-extract [eboot.pbp] [key_index] (optional) - Extract versionkey from an eboot.pbp.");
+                Console.WriteLine("\t--vkey-gen [act.dat] [license.rif] [console_id] [key_index] (optional) - Generate versionkey from act.dat, rif and consoleid.");
+                Console.WriteLine("\t--nopspemudrm [content_id] (optional) - Dont use a base game, generate a nopspemudrm rif from a specified Content ID.");
+
+                Console.WriteLine("Packaging: ");
+                Console.WriteLine("\t--simple-dat [simple.png] - Override simple.dat (Copyright image), this option does nothing in --psp mode");
+                Console.WriteLine("\t--start-dat [start.png] - Override start.dat (startup image)");
+
+
+                //Console.WriteLine("Debug: ");
+                //Console.WriteLine("\t--keys-txt-gen [act.dat] [console_id] [psp_license_folder] - Generate keys.txt from a folder of RIFs");
+
             }
 
 
@@ -421,11 +473,14 @@ namespace ChovySign_CLI
             int res = complete();
             if(res != 0) return res;
 
-            generateKeysTxt();
+            // debug feature, was used for generating keys.txt initally;
+            // keys.txt method generally not needed anymore
+            tryGenerateKeysTxt();
 
-            if (drmInfo is null) return Error("no versionkey was found, exiting, use --nopspemudrm or (one of) --vkey args", 6);
-            if (pbpMode is null) return Error("no pbp mode was set, exiting", 7);
-
+            if (pbpMode is null) return Error("no pbp mode was set, use either --psp or --pops", 7);
+            if (drmInfo is null) return Error("no versionkey was found, exiting, use (one of) --vkey options; (or --nopspemudrm)", 6);
+            if (rifFile is null) return Error("no rif was found, use --rif to specify base game RIF (or --nopspemudrm) ", 8);
+            
             int targetKeyIndex = (pbpMode == PbpMode.PSP) ? 2 : 1;
             if (drmInfo.KeyIndex != targetKeyIndex)
             {
@@ -433,7 +488,10 @@ namespace ChovySign_CLI
                 drmInfo.KeyIndex = targetKeyIndex;
             }
 
-            if (rifFile is null) return Error("Rif is not set, use --rif or --nopspemudrm to specify base game RIF ", 8);
+            Console.WriteLine("Mode: " + pbpMode.ToString());
+            Console.WriteLine("Using ContentID: " + drmInfo.ContentId);
+            Console.WriteLine("Using KeyIndex: " + drmInfo.KeyIndex);
+            Console.WriteLine("Using VersionKey: " + BitConverter.ToString(drmInfo.VersionKey).Replace("-", ""));
             
             ChovySign csign = new ChovySign();
             csign.RegisterCallback(onProgress);
@@ -449,6 +507,9 @@ namespace ChovySign_CLI
                 
                 if(popsIcon0File is not null)
                     popsParameters.Icon0 = popsIcon0File;
+
+                if (popsPic0File is not null)
+                    popsParameters.Pic0 = popsPic0File;
 
                 if (accountId is not null)
                     popsParameters.Account = new Account(Convert.ToUInt64(accountId));
