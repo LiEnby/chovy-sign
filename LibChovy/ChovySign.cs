@@ -164,7 +164,7 @@ namespace LibChovy
 
             string pspFolder = Path.Combine(outputFolder, "PSP");
             string gameFolder = Path.Combine(pspFolder, "GAME", discId);
-            string licenseFolder = Path.Combine(pspFolder, "LICENSE", discId);
+            string licenseFolder = Path.Combine(pspFolder, "LICENSE");
 
             if (!Directory.Exists(pspFolder))     Directory.CreateDirectory(pspFolder);
             if (!Directory.Exists(gameFolder))    Directory.CreateDirectory(gameFolder);
