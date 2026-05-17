@@ -1,14 +1,15 @@
-﻿using GameBuilder.Pops;
-using GameBuilder.Psp;
+﻿using GameBuilder.Psp;
 using Li.Progress;
+using Li.Utilities;
 using LibChovy;
 using LibChovy.VersionKey;
 using PspCrypto;
-using System.ComponentModel;
 using System.Globalization;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.RegularExpressions;
 using Vita.ContentManager;
+using static PspCrypto.SceNpDrm;
 
 namespace ChovySign_CLI
 {
@@ -16,7 +17,7 @@ namespace ChovySign_CLI
     {
         private static ArgumentParsingMode mode = ArgumentParsingMode.ARG;
         private static List<string> parameters = new List<string>();
-        private static string[] discs = new string[] { };
+        private static string[] discs = Array.Empty<string>();
         private static bool pspCompress = false;
         private static string? popsDiscName;
         private static byte[]? popsIcon0File;
@@ -25,7 +26,7 @@ namespace ChovySign_CLI
         private static NpDrmRif? rifFile = null;
         private static NpDrmInfo? drmInfo = null;
 
-        // --simple-dat
+        // --pops-simple-dat
         private static string? simpleDat = null;
 
         // --start-dat
@@ -40,7 +41,7 @@ namespace ChovySign_CLI
         private static byte[]? idps = null;
         private static string? rifFolder = null;
 
-        // --pops-eboot-sign
+        // --pops-eboot
         private static byte[]? ebootElf = null;
         private static byte[]? configBin = null;
 
@@ -236,8 +237,8 @@ namespace ChovySign_CLI
                     startDat = parameters[0];
                     break;
                 case ArgumentParsingMode.SIMPLEDAT_FILEPATH:
-                    if (parameters.Count != 1) return Error("--simple-dat takes 1 arguments, (" + parameters.Count + " given)", 4);
-                    if (!File.Exists(parameters[0])) return Error("--simple-dat: file not found", 4);
+                    if (parameters.Count != 1) return Error("--pops-simple-dat takes 1 arguments, (" + parameters.Count + " given)", 4);
+                    if (!File.Exists(parameters[0])) return Error("--pops-simple-dat: file not found", 4);
 
                     simpleDat = parameters[0];
                     break;
@@ -271,7 +272,7 @@ namespace ChovySign_CLI
             parameters.Clear();
             return 0;
         }
-        /*
+
         public static void generateRif(byte[] idps, byte[] actBuf, byte[] versionKey, int versionKeyType, ulong accountId, string contentId)
         {
             byte[] vkey2 = new byte[versionKey.Length];
@@ -287,8 +288,8 @@ namespace ChovySign_CLI
             // get the act key
             byte[] actKey = new byte[0x10];
             
-            SceNpDrm.SetPSID(idps);
-            SceNpDrm.Aid = accountId;
+            SetPSID(idps);
+            Aid = accountId;
 
             Act act = MemoryMarshal.AsRef<Act>(actBuf);
             GetActKey(actKey, act.PrimKeyTable[(keyId * 0x10)..], 1);
@@ -309,7 +310,7 @@ namespace ChovySign_CLI
                 rifUtil.WriteInt32(0x2);
                 rifUtil.WriteUInt64(accountId);
 
-                rifUtil.WriteStrWithPadding(contentId, 0x00, 0x30);
+                rifUtil.WriteCStrWithPadding(contentId, 0x00, 0x30);
 
                 rifUtil.WriteBytes(encKey1); // enckey1
                 rifUtil.WriteBytes(encKey2); // enckey2
@@ -320,7 +321,7 @@ namespace ChovySign_CLI
                 rifUtil.WritePadding(0xFF, 0x28);
             }
         }
-        */
+
         public static int Main(string[] args)
         {
             if (args.Length == 0)
@@ -328,33 +329,39 @@ namespace ChovySign_CLI
                 Console.WriteLine("Chovy-Sign v2 (CLI)");
 
                 Console.WriteLine("PS1 Options: ");
-                Console.WriteLine("\t--pops [disc1.cue] [disc2.cue] [disc3.cue] ... (up to 5) - Specifiy PS1 Disc Images");
-                Console.WriteLine("\t--pops-info [game title] [icon0.png] (optional) [pic1.png] (optional) - Specify PS1 Game information");
-                Console.WriteLine("\t--pops-eboot [eboot.elf] [config.bin] (optional) - Override PS1 simple.prx and config.bin data");
+                Console.WriteLine("\t--pops <disc1.cue> [disc2.cue] [disc3.cue] [disc4.cue] [disc5.cue] - Specifiy PS1 Disc Images");
+                Console.WriteLine("\t--pops-info <game title> [icon0.png] [pic1.png] - Specify PS1 Game information");
+                
+                Console.WriteLine("PS1 Advanced Options: ");
+                Console.WriteLine("\t--pops-eboot <eboot.elf> [config.bin] - Override PS1 simple.prx and config.bin data");
+                Console.WriteLine("\t--pops-simple-dat <simple.png> - Override simple.dat copyright image");
 
                 Console.WriteLine("PSP Options: ");
-                Console.WriteLine("\t--psp [umd.iso] [compress; true/false] (optional) - Specify PSP Disc Image");
+                Console.WriteLine("\t--psp <umd.iso> [compress; true/false] - Specify PSP UMD Disc Image");
 
                 Console.WriteLine("Vita CMA Options: ");
-                Console.WriteLine("\t--account-id [account_id] - Override CMA account id");
+                Console.WriteLine("\t--account-id <account_id> - Override CMA account id");
+                Console.WriteLine("\t--output-folder <output_folder> - Override CMA Backups Directory");
                 Console.WriteLine("\t--no-psvimg - Don't create a .psvimg CMA backup");
-                Console.WriteLine("\t--output-folder [output_folder] - Override CMA Backups Directory");
 
                 Console.WriteLine("NpDrm Options: ");
-                Console.WriteLine("\t--rif [license.rif] - Specify Base Game RIF");
-                Console.WriteLine("\t--vkey [versionkey] [content_id] [key_index] (optional) - Manually specify versionkey, contentid, and keyindex");
-                Console.WriteLine("\t--vkey-extract [eboot.pbp] [key_index] (optional) - Extract versionkey from an eboot.pbp.");
-                Console.WriteLine("\t--vkey-gen [act.dat] [license.rif] [console_id] [key_index] (optional) - Generate versionkey from act.dat, rif and consoleid.");
-                Console.WriteLine("\t--nopspemudrm [content_id] (optional) - Dont use a base game, generate a nopspemudrm rif from a specified Content ID.");
+                Console.WriteLine("\t--rif <license.rif> - Specify Base Game RIF");
+                Console.WriteLine("\t--vkey <versionkey> <content_id> [key_index] - Manually specify versionkey, contentid, and keyindex");
+                Console.WriteLine("\t--vkey-extract <eboot.pbp> [key_index] - Extract versionkey from an eboot.pbp.");
+                Console.WriteLine("\t--vkey-gen <act.dat> <license.rif> <console_id> [key_index] - Generate versionkey from act.dat, rif and consoleid.");
+                Console.WriteLine("\t--nopspemudrm [content_id] - Don't use a base game, generate a nopspemudrm fake rif; for a given contentid instead (defalt contentid: EP0099-ULUS09999_00-CHOVYSIGN0000000)");
 
                 Console.WriteLine("Packaging: ");
-                Console.WriteLine("\t--simple-dat [simple.png] - Override simple.dat (Copyright image), this option does nothing in --psp mode");
                 Console.WriteLine("\t--start-dat [start.png] - Override start.dat (startup image)");
 
+                Console.WriteLine("");
+                Console.WriteLine("Legend: <> - denotes a required argument [] - denotes an optional argument");
 
-                //Console.WriteLine("Debug: ");
-                //Console.WriteLine("\t--keys-txt-gen [act.dat] [console_id] [psp_license_folder] - Generate keys.txt from a folder of RIFs");
+                Console.WriteLine("Required: ");
+                Console.WriteLine("\teither --pops or --psp");
+                Console.WriteLine("\teither --vkey, --vkey-extract, --vkey-gen, and --rif; unless --nopspemudrm");
 
+                return 0;
             }
 
 
@@ -418,7 +425,7 @@ namespace ChovySign_CLI
                             case "--start-dat":
                                 mode = ArgumentParsingMode.STARTDAT_FILEPATH;
                                 break;
-                            case "--simple-dat":
+                            case "--pops-simple-dat":
                                 mode = ArgumentParsingMode.SIMPLEDAT_FILEPATH;
                                 break;
                             case "--keys-txt-gen":
