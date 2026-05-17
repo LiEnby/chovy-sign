@@ -144,7 +144,7 @@ namespace GameBuilder.Atrac3
         private void makeWav(byte[] pcmData)
         {
             Directory.CreateDirectory(tempDir);
-            Directory.CreateDirectory(Path.GetFileName(workingInput));
+            Directory.CreateDirectory(Path.GetDirectoryName(workingInput));
 
             using (FileStream wavStream = File.Open(workingInput, FileMode.Create))
             {
