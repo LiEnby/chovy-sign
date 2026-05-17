@@ -17,7 +17,6 @@ namespace LibChovy
         private byte[]? pic0 = null;
         private byte[]? pic1 = null;
         private byte[]? icon0 = null;
-        
         internal byte[]? simplePngOverride = null;
 
         public byte[]? EbootElfOverride = null;
@@ -42,6 +41,7 @@ namespace LibChovy
             get
             {
                 if (backupsFolder is null) backupsFolder = SettingsReader.BackupsFolder; // set to default backup folder
+                if (!CreatePsvImg) return backupsFolder;
                 return Path.Combine(SettingsReader.GetPs1Folder(backupsFolder), Account.AccountIdStr);
             }
             set
@@ -54,6 +54,7 @@ namespace LibChovy
         {
             get
             {
+                if (!CreatePsvImg) return outputFolder;
                 return Path.Combine(outputFolder, FirstDisc.DiscId);
             }
             set
@@ -199,8 +200,7 @@ namespace LibChovy
         {
             set
             {
-                if (File.Exists(value))
-                    this.simplePngOverride = File.ReadAllBytes(value);
+                if (File.Exists(value)) simplePngOverride = File.ReadAllBytes(value);
             }
         }
 
