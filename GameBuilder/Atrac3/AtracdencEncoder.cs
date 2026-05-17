@@ -21,7 +21,7 @@
         {
             get
             {
-                return "-e atrac3 --bitrate 132300 -i \"{0}\" -o \"{1}\"";
+                return "-e atrac3plus --bitrate 132300 -i \"{0}\" -o \"{1}\"";
             }
         }
 

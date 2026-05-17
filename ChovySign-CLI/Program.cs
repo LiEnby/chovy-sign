@@ -530,6 +530,9 @@ namespace ChovySign_CLI
                 if (simpleDat is not null)
                     popsParameters.SimplePngFilepath = simpleDat;
 
+                if (packagePsvImg == false && outputFolder is not null)
+                    popsParameters.OutputFolder = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "output");
+
                 popsParameters.CreatePsvImg = packagePsvImg;
 
 
@@ -553,7 +556,12 @@ namespace ChovySign_CLI
                 if (startDat is not null)
                     pspParameters.StartPngFilepath = startDat;
 
+                if (packagePsvImg == false && outputFolder is not null)
+                    pspParameters.OutputFolder = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "output");
+
                 pspParameters.CreatePsvImg = packagePsvImg;
+
+
 
                 pspParameters.Compress = pspCompress;
                 pspParameters.Umd = new UmdInfo(discs.First());

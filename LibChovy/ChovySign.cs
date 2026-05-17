@@ -5,6 +5,7 @@ using GameBuilder.Psp;
 using Li.Progress;
 using Org.BouncyCastle.Security;
 using PspCrypto;
+using System.Reflection.PortableExecutable;
 using Vita.PsvImgTools;
 
 namespace LibChovy
@@ -51,12 +52,18 @@ namespace LibChovy
 
                     if (!parameters.CreatePsvImg)
                     {
-                        File.WriteAllBytes(Path.Combine(parameters.OutputFolder, "__sce_ebootpbp"), ebootsig.ToArray());
-                        pbpBuilder.WritePbpToFile(Path.Combine(parameters.OutputFolder, "EBOOT.PBP"));
+                        
                     }
                     else
                     {
-                        createPsvImg(parameters.OutputFolder, parameters.Umd.DiscId, parameters.Umd.DataFiles["PARAM.SFO"], parameters.Umd.DataFiles["ICON0.PNG"], pbpBuilder, parameters.DrmRif, ebootsig, parameters.Account.CmaKey);
+                        createPsvImg(parameters.OutputFolder, 
+                                     parameters.Umd.DiscId, 
+                                     parameters.Umd.DataFiles["PARAM.SFO"], 
+                                     parameters.Umd.DataFiles["ICON0.PNG"], 
+                                     pbpBuilder, 
+                                     parameters.DrmRif, 
+                                     ebootsig, 
+                                     parameters.Account.CmaKey);
                     }
                 }
             }
@@ -128,16 +135,46 @@ namespace LibChovy
 
                 if (!parameters.CreatePsvImg)
                 {
-                    File.WriteAllBytes(Path.Combine(parameters.OutputFolder, "__sce_ebootpbp"), ebootsig.ToArray());
-                    pbpBuilder.WritePbpToFile(Path.Combine(parameters.OutputFolder, "EBOOT.PBP"));
+                    createPspFolder(Path.GetDirectoryName(parameters.OutputFolder), 
+                                    parameters.FirstDisc.DiscId, 
+                                    sfo, 
+                                    pbpBuilder, 
+                                    parameters.DrmRif);
                 }
                 else
                 {
-                    createPsvImg(parameters.OutputFolder, parameters.FirstDisc.DiscId, sfo, parameters.Icon0, pbpBuilder, parameters.DrmRif, ebootsig, parameters.Account.CmaKey);
+                    createPsvImg(parameters.OutputFolder, 
+                                 parameters.FirstDisc.DiscId, 
+                                 sfo, 
+                                 parameters.Icon0, 
+                                 pbpBuilder, 
+                                 parameters.DrmRif, 
+                                 ebootsig, 
+                                 parameters.Account.CmaKey);
                 }
             }
         }
 
+
+        private void createPspFolder(string outputFolder, string discId,
+                                    byte[] sig, PbpBuilder pbp, NpDrmRif rif)
+        {
+            // create EBOOT.PBP
+            pbp.PbpStream.Seek(0x00, SeekOrigin.Begin);
+
+            string pspFolder = Path.Combine(outputFolder, "PSP");
+            string gameFolder = Path.Combine(pspFolder, "GAME", discId);
+            string licenseFolder = Path.Combine(pspFolder, "LICENSE", discId);
+
+            if (!Directory.Exists(pspFolder))     Directory.CreateDirectory(pspFolder);
+            if (!Directory.Exists(gameFolder))    Directory.CreateDirectory(gameFolder);
+            if (!Directory.Exists(licenseFolder)) Directory.CreateDirectory(licenseFolder);
+
+            File.WriteAllBytes(Path.Combine(gameFolder, "__sce_ebootpbp"), sig);
+            pbp.WritePbpToFile(Path.Combine(gameFolder, "EBOOT.PBP"));
+            File.WriteAllBytes(Path.Combine(licenseFolder, rif.ContentId + ".rif"), rif.Rif);
+
+        }
         private void createPsvImg(string outputFolder, string discId,
                                   byte[] sfo, byte[] icon0, 
                                   PbpBuilder pbp, NpDrmRif license, byte[] sig,
@@ -150,9 +187,9 @@ namespace LibChovy
             string licenseFolder = Path.Combine(outputFolder, "license");
             string sceSysFolder = Path.Combine(outputFolder, "sce_sys");
 
-            if (!Directory.Exists(gameFolder)) Directory.CreateDirectory(gameFolder);
+            if (!Directory.Exists(gameFolder))    Directory.CreateDirectory(gameFolder);
             if (!Directory.Exists(licenseFolder)) Directory.CreateDirectory(licenseFolder);
-            if (!Directory.Exists(sceSysFolder)) Directory.CreateDirectory(sceSysFolder);
+            if (!Directory.Exists(sceSysFolder))  Directory.CreateDirectory(sceSysFolder);
 
 
             using (FileStream gamePsvimg = File.Open(Path.Combine(gameFolder, "game.psvimg"), FileMode.Create, FileAccess.ReadWrite))
