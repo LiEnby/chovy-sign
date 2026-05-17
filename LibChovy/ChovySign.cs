@@ -135,7 +135,7 @@ namespace LibChovy
 
                 if (!parameters.CreatePsvImg)
                 {
-                    createPspFolder(Path.GetDirectoryName(parameters.OutputFolder), 
+                    createPspFolder(parameters.OutputFolder, 
                                     parameters.FirstDisc.DiscId, 
                                     sfo, 
                                     pbpBuilder, 
