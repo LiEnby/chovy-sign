@@ -561,8 +561,6 @@ namespace ChovySign_CLI
 
                 pspParameters.CreatePsvImg = packagePsvImg;
 
-
-
                 pspParameters.Compress = pspCompress;
                 pspParameters.Umd = new UmdInfo(discs.First());
                 

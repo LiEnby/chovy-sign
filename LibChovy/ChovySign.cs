@@ -52,7 +52,11 @@ namespace LibChovy
 
                     if (!parameters.CreatePsvImg)
                     {
-                        
+                        createPspFolder(parameters.OutputFolder,
+                                        parameters.Umd.DiscId,
+                                        parameters.Umd.DataFiles["PARAM.SFO"],
+                                        pbpBuilder,
+                                        parameters.DrmRif);
                     }
                     else
                     {
