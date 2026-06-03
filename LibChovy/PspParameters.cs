@@ -14,6 +14,7 @@ namespace LibChovy
         {
             get
             {
+                if (!CreatePsvImg) return outputFolder;
                 return Path.Combine(outputFolder, Umd.DiscId);
             }
             set
