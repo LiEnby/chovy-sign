@@ -31,7 +31,7 @@ namespace PspCrypto
         /* USER module. */
         DECRYPT_MODE_UNKNOWN_23 = 23,
         /* USER module. */
-        DECRYPT_MODE_UNKNOWN_25 = 25,
+        DECRYPT_MODE_UMD_UPDATE_EXEC = 25,
     }
 
     [StructLayout(LayoutKind.Sequential, Pack = 1)]

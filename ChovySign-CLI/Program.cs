@@ -48,12 +48,18 @@ namespace ChovySign_CLI
         // --account-id
         private static UInt64? accountId = null;
 
+        // --elf
+        private static string elfFile = "";
+        private static SceExecFileDecryptMode encryptMode = SceExecFileDecryptMode.DECRYPT_MODE_UMD_GAME_EXEC;
+        private static uint tag = 0xD9160BF0;
+        private static byte[]? config = null;
+
+
         enum PbpMode
         {
             PSP = 0,
             POPS = 1,
-            PCENGINE = 2,
-            NEOGEO = 3
+            ELF = 2,
         }
         enum ArgumentParsingMode
         {
@@ -72,6 +78,8 @@ namespace ChovySign_CLI
 
             POPS_INFO,
             POPS_EBOOT,
+
+            ELF_SIGN,
 
             ACCOUNT_ID,
 
@@ -148,6 +156,32 @@ namespace ChovySign_CLI
                     foreach(string disc in discs) 
                         if(!Path.Exists(disc)) 
                             return Error("--pops: file not found", 4);
+
+                    break;
+                case ArgumentParsingMode.ELF_SIGN:
+                    if (parameters.Count < 1) return Error("--elf: a path to a elf is required", 4);
+                    if (!File.Exists(parameters[0])) return Error("--elf: file not found", 4);
+                    try
+                    {
+                        elfFile = parameters[0];
+                        if (parameters.Count >= 2) encryptMode = (SceExecFileDecryptMode)Enum.Parse(typeof(SceExecFileDecryptMode), parameters[1]);
+                        if (parameters.Count >= 3) tag = uint.Parse(parameters[2], NumberStyles.HexNumber);
+                        if (parameters.Count >= 4)
+                        {
+                            if (!File.Exists(parameters[3])) return Error("--elf: config file not found", 4);
+                            config = File.ReadAllBytes(parameters[3]);
+                        }
+                    }
+                    catch(ArgumentException)
+                    {
+                        Console.WriteLine("--elf invalid decrypt mode needs one of:");
+                        foreach (string ename in Enum.GetNames(typeof(SceExecFileDecryptMode)))
+                        {
+                            Console.WriteLine(ename);
+                        }
+                        return Error("please select one of those and try again.", 4);
+                    }
+
 
                     break;
                 case ArgumentParsingMode.PSP_UMD:
@@ -339,6 +373,9 @@ namespace ChovySign_CLI
                 Console.WriteLine("PSP Options: ");
                 Console.WriteLine("\t--psp <umd.iso> [compress; true/false] - Specify PSP UMD Disc Image");
 
+                Console.WriteLine("ELF Options: ");
+                Console.WriteLine("\t--elf <file.elf> [encrypt_mode] [tag] [config] - Encrypt PSP/POPS EBOOT");
+
                 Console.WriteLine("Vita CMA Options: ");
                 Console.WriteLine("\t--account-id <account_id> - Override CMA account id");
                 Console.WriteLine("\t--output-folder <output_folder> - Override CMA Backups Directory");
@@ -358,7 +395,7 @@ namespace ChovySign_CLI
                 Console.WriteLine("Legend: <> - denotes a required argument [] - denotes an optional argument");
 
                 Console.WriteLine("Required: ");
-                Console.WriteLine("\teither --pops or --psp");
+                Console.WriteLine("\teither --pops, --psp or --elf");
                 Console.WriteLine("\teither --vkey, --vkey-extract, --vkey-gen, and --rif; unless --nopspemudrm");
 
                 return 0;
@@ -393,7 +430,14 @@ namespace ChovySign_CLI
 
                                 pbpMode = PbpMode.PSP;
                                 break;
+                            case "--elf":
+                                mode = ArgumentParsingMode.ELF_SIGN;
 
+                                if (pbpMode is not null)
+                                    return Error("pbpMode is already set to: " + pbpMode.ToString() + " cannot do that *and* ELF", 2);
+
+                                pbpMode = PbpMode.ELF;
+                                break;
                             case "--vkey":
                                 mode = ArgumentParsingMode.VERSIONKEY;
 
@@ -565,6 +609,23 @@ namespace ChovySign_CLI
                 pspParameters.Umd = new UmdInfo(discs.First());
                 
                 csign.Go(pspParameters);
+            }
+            else if(pbpMode == PbpMode.ELF)
+            {
+                
+                byte[] elfData = File.ReadAllBytes(elfFile);
+                byte[] encrypted = new byte[elfData.Length * 2];
+                int sz = SceMesgLed.Encrypt(encrypted, elfData, tag, encryptMode, drmInfo.GetFixedKey(), drmInfo.ContentId, config == null ? Array.Empty<byte>() : config);
+                
+                if(sz > 0)
+                {
+                    Array.Resize(ref encrypted, sz);
+                    File.WriteAllBytes(elfFile + ".psp", encrypted);
+                }
+                else
+                {
+                    return Error("failed to encrypt elf", sz);
+                }
             }
             return 0;
         }

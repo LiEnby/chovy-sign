@@ -2298,6 +2298,11 @@ namespace PspCrypto
                     pspHdr.compAttribute = 0;
                     pspHdr.dataOffset = 0x80;
                     break;
+                case SceExecFileDecryptMode.DECRYPT_MODE_UMD_UPDATE_EXEC:
+                    compress = true;
+                    pspHdr.dataOffset = 0x890;
+                    pspHdr.compAttribute = 2;
+                    break;
                 case SceExecFileDecryptMode.DECRYPT_MODE_POPS_EXEC:
                     compress = true;
                     pspHdr.modName[0] = 0x20;
@@ -2656,7 +2661,7 @@ namespace PspCrypto
                 KirkMemory.Slice(0xd0, 0x80).Span.CopyTo(pspHdr.RawHdr);
             }
 
-            return ret;
+            return pspHdr.pspSize;
         }
     }
 }

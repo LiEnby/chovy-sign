@@ -67,7 +67,7 @@ namespace GameBuilder.Pops
 
         public override byte[] GenerateDataPsp()
         {
-            Span<byte> loaderEnc = new byte[0x9B13];
+            byte[] loaderEnc = new byte[this.EbootElf.Length * 2];
 
             if (this.PatchEboot)
             {
@@ -84,7 +84,7 @@ namespace GameBuilder.Pops
                 Array.ConstrainedCopy(highBits, 0, this.EbootElf, 0x694, 0x2);
             }
 
-            SceMesgLed.Encrypt(
+            int sz = SceMesgLed.Encrypt(
                 loaderEnc,
                 this.EbootElf,
                 0x0DAA06F0,
@@ -92,7 +92,14 @@ namespace GameBuilder.Pops
                 DrmInfo.VersionKey,
                 DrmInfo.ContentId, 
                 this.ConfigBin);
-            return loaderEnc.ToArray();
+
+            if(sz > 0)
+            {
+                Array.Resize(ref loaderEnc, sz);
+                return loaderEnc;
+            }
+
+            throw new Exception("Failed to encrypt simple.prx!, error code: " + sz);
         }
 
 
