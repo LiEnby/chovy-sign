@@ -48,6 +48,49 @@ jobs:
       with:
         name: PbpResign-Windows-x86_64
         path: build/publish/PbpResign/windows
+  build-mac:
+    runs-on: macos-latest
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+      
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 10.0.x
+        include-prerelease: false
+        
+    - name: Restore dependencies
+      run: |
+        dotnet restore ChovySign-GUI
+        dotnet restore ChovySign-CLI
+        dotnet restore PbpResign
+
+    - name: Build mac
+      continue-on-error: false
+      run: |
+        dotnet publish -p:PublishProfile=MacARM64 ChovySign-GUI
+        dotnet publish -p:PublishProfile=MacARM64 ChovySign-CLI
+        dotnet publish -p:PublishProfile=MacARM64 PbpResign
+        
+    - name: Upload mac gui
+      uses: actions/upload-artifact@v4
+      with:
+        name: ChovySign2-GUI-Mac-ARM64
+        path: build/publish/ChovySign-GUI/mac
+
+    - name: Upload mac cli
+      uses: actions/upload-artifact@v4
+      with:
+        name: ChovySign2-CLI-Mac-ARM64
+        path: build/publish/ChovySign-CLI/mac
+
+    - name: Upload mac PbpResign
+      uses: actions/upload-artifact@v4
+      with:
+        name: PbpResign-Mac-ARM64
+        path: build/publish/PbpResign/mac
 
   build-linux:
     runs-on: ubuntu-latest
