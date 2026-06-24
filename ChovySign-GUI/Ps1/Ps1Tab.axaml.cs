@@ -3,6 +3,7 @@ using ChovySign_GUI.Global;
 using ChovySign_GUI.Popup.Global;
 using ChovySign_GUI.Settings;
 using GameBuilder.Atrac3;
+using GameBuilder.Pops;
 using GameBuilder.Psp;
 using LibChovy;
 using System;
@@ -73,6 +74,16 @@ namespace ChovySign_GUI.Ps1
             popsParameters.OutputFolder = SettingsTab.Settings.CmaDirectory;
             popsParameters.CreatePsvImg = SettingsTab.Settings.PackagePsvimg;
 
+            switch(SettingsTab.Settings.AtracEncoder)
+            {
+                case AtracEncoder.SONY_ATRAC3_TOOL:
+                    popsParameters.Atrac3EncoderOverride = new Atrac3ToolEncoder();
+                    break;
+                case AtracEncoder.ATRACDENC:
+                    popsParameters.Atrac3EncoderOverride = new AtracdencEncoder();
+                    break;
+            }
+                
 
             progressStatus.Parameters = popsParameters;
 

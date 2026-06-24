@@ -3,6 +3,8 @@ using GameBuilder.Pops.LibCrypt;
 using GameBuilder;
 using Vita.ContentManager;
 using System;
+using GameBuilder.Atrac3;
+using GameBuilder.Pops;
 
 namespace ChovySign_GUI.Settings
 {
@@ -27,6 +29,16 @@ namespace ChovySign_GUI.Settings
             }
         }
 
+        public AtracEncoder AtracEncoder {
+            get
+            {
+                // skip because no at3tool for these platforms ...
+                if (!OperatingSystem.IsWindows() && !OperatingSystem.IsLinux()) return (AtracEncoder)this.atrac3Encoder.SelectedIndex + 1;
+
+                // use selected atrac encoder.
+                return (AtracEncoder)this.atrac3Encoder.SelectedIndex;
+            }
+        }
         public string CmaDirectory
         {
             get
@@ -75,6 +87,14 @@ namespace ChovySign_GUI.Settings
             InitializeComponent();
 
             libCryptMode.Items = new string[2] { "Magic Word in ISO Header", "Sub Channel PGD" };
+
+            // at3tool only ever released for linux and windows. 
+            if (OperatingSystem.IsLinux() || OperatingSystem.IsWindows())
+                atrac3Encoder.Items = new string[2] { "Sony at3tool", "atracdenc" };
+            else
+                atrac3Encoder.Items = new string[1] { "atracdenc" };
+            
+
             streamType.Items = new string[2] { "MemoryStream - Create EBOOT in memory, faster, but high memory usage", "FileStream - Create EBOOT with temporary files, slower, but less memory usage" };
 
             cmaDirectory.Default = SettingsReader.BackupsFolder;

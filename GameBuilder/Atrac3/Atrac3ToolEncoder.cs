@@ -6,8 +6,8 @@
         {
             get
             {
-                if (OperatingSystem.IsWindows()) return "at3tool.exe";
-                else if (OperatingSystem.IsLinux()) return "at3tool.elf";
+                if (OperatingSystem.IsWindows()) return Path.Combine("at3tool", "at3tool.exe");
+                else if (OperatingSystem.IsLinux()) return Path.Combine("at3tool", "at3tool.elf");
 
                 throw new PlatformNotSupportedException("No at3tool for your platform!");
             }

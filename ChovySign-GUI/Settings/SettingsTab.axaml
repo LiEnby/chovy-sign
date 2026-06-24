@@ -19,6 +19,7 @@
 				<RowDefinition Height="1*"/>
 				<RowDefinition Height="1*"/>
 				<RowDefinition Height="1*"/>
+				<RowDefinition Height="1*"/>
 			</Grid.RowDefinitions>
 
 			
@@ -50,11 +51,16 @@
 								 Label="LibCrypt Method:"
 								 HorizontalAlignment="Stretch"
 								 Grid.Row="4"/>
+			<Settings:ConfigDropDown Name="atrac3Encoder"
+								 ConfigKey="USE_ATRAC_TOOL"
+								 Label="Atrac3 Encoder:"
+								 HorizontalAlignment="Stretch"
+								 Grid.Row="5"/>
 			<Settings:ConfigDropDown Name="streamType"
 								ConfigKey="USE_STREAM_TYPE"
 								Label="Build Stream Type:"
 								HorizontalAlignment="Stretch"
-								Grid.Row="5"/>
+								Grid.Row="6"/>
 
 		</Grid>
 	</Grid>

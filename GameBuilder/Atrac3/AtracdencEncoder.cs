@@ -2,16 +2,21 @@
 {
     public class AtracdencEncoder : BinaryAtracEncoder
     {
+        public override byte[] StripAtracHeader(string inFile)
+        {
+            // no need to strip atrac header since it just outputs raw atrac3 data.
+            return File.ReadAllBytes(inFile);
+        }
         public override string ProgramName
         {
             get
             {
                 if (OperatingSystem.IsLinux())
-                    return "atracdenc.elf";
+                    return Path.Combine("atracdenc", "atracdenc.elf");
                 else if (OperatingSystem.IsWindows())
-                    return "atracdenc.exe";
+                    return Path.Combine("atracdenc", "atracdenc.exe");
                 else if (OperatingSystem.IsMacOS())
-                    return "atracdenc.mach";
+                    return Path.Combine("atracdenc", "atracdenc.mach");
 
                 throw new PlatformNotSupportedException("no atracdenc for this platform");
             }
@@ -21,7 +26,7 @@
         {
             get
             {
-                return "-e atrac3plus --bitrate 132300 -i \"{0}\" -o \"{1}\"";
+                return "-e atrac3plus --bitrate 132300 --container raw  -i \"{0}\"-o \"{1}\"";
             }
         }
 

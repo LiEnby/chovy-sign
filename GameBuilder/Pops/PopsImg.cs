@@ -14,7 +14,8 @@ namespace GameBuilder.Pops
         public byte[] EbootElf;
         public byte[] ConfigBin;
         public bool PatchEboot;
-        public IAtracEncoderBase AtracEncoder = new Atrac3ToolEncoder();
+
+        public IAtracEncoderBase AtracEncoder = OperatingSystem.IsMacOS() ? new AtracdencEncoder() : new Atrac3ToolEncoder();
 
         public byte[] SimplePgd
         {

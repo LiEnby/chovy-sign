@@ -2,6 +2,7 @@
 using Li.Utilities;
 
 using System.Diagnostics;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 namespace GameBuilder.Atrac3
@@ -110,11 +111,9 @@ namespace GameBuilder.Atrac3
             }
         }
 
-        private byte[] stripAtracHeader()
+        public virtual byte[] StripAtracHeader(string inFile)
         {
-            Directory.CreateDirectory(tempDir);
-
-            using (FileStream at3Stream = File.OpenRead(workingOutput))
+            using (FileStream at3Stream = File.OpenRead(inFile))
             {
                 StreamUtil at3Util = new StreamUtil(at3Stream);
                 string magic = at3Util.ReadStrLen(4);
@@ -140,11 +139,9 @@ namespace GameBuilder.Atrac3
             }
         }
 
-        private void makeWav(byte[] pcmData)
+        public virtual void MakeWav(byte[] pcmData, string outputFile)
         {
-            Directory.CreateDirectory(tempDir);
-
-            using (FileStream wavStream = File.Open(workingInput, FileMode.Create))
+            using (FileStream wavStream = File.Open(outputFile, FileMode.Create))
             {
                 // CD-AUDIO standard settings
                 int fileSize = pcmData.Length;
@@ -198,10 +195,10 @@ namespace GameBuilder.Atrac3
         public byte[] EncodeToAtrac(byte[] pcmData)
         {
             ensureFilesAvailable();
-            
-            makeWav(pcmData);
+
+            MakeWav(pcmData, workingInput);
             runProgram();
-            byte[] rawAtracData = stripAtracHeader();
+            byte[] rawAtracData = StripAtracHeader(workingOutput);
 
             cleanup();
             return rawAtracData;
