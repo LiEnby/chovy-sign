@@ -1,5 +1,4 @@
-﻿using GameBuilder.Atrac3;
-using Li.Progress;
+﻿using Li.Progress;
 using GameBuilder.Cue;
 using GameBuilder.Psp;
 using PspCrypto;
@@ -20,13 +19,12 @@ namespace GameBuilder.Pops
         public BuildStream CompressedIso;
 
         private StreamUtil isoHeaderUtil;
-        private IAtracEncoderBase atrac3Encoder;
 
         const int COMPRESS_BLOCK_SZ = 0x9300;
         const int DEFAULT_ISO_OFFSET = 0x100000;
         public int IsoOffset;
 
-        internal DiscCompressor(PopsImg srcImg, PSInfo disc, IAtracEncoderBase encoder, int offset = DEFAULT_ISO_OFFSET)
+        internal DiscCompressor(PopsImg srcImg, PSInfo disc, int offset = DEFAULT_ISO_OFFSET)
         {
             this.srcImg = srcImg;
             this.disc = disc;
@@ -36,7 +34,6 @@ namespace GameBuilder.Pops
             this.CompressedIso = new BuildStream();
 
             this.isoHeaderUtil = new StreamUtil(IsoHeader);
-            this.atrac3Encoder = encoder;
             this.IsoOffset = offset;
         }
 
@@ -188,7 +185,7 @@ namespace GameBuilder.Pops
 
                     byte[] pcmData = new byte[audioStream.Length];
                     audioStream.ReadExactly(pcmData);
-                    byte[] atracData = atrac3Encoder.EncodeToAtrac(pcmData);
+                    byte[] atracData = srcImg.AtracEncoder.EncodeToAtrac(pcmData);
 
                     writeCDAEntry(Convert.ToInt32(CompressedIso.Position), atracData.Length, key);
 

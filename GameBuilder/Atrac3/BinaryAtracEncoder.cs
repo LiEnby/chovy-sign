@@ -81,7 +81,7 @@ namespace GameBuilder.Atrac3
 
             return libaryPath;
         }
-        private void runProgram()
+        public virtual void RunProgram()
         {
             using (Process proc = new Process())
             {
@@ -197,7 +197,7 @@ namespace GameBuilder.Atrac3
             ensureFilesAvailable();
 
             MakeWav(pcmData, workingInput);
-            runProgram();
+            RunProgram();
             byte[] rawAtracData = StripAtracHeader(workingOutput);
 
             cleanup();

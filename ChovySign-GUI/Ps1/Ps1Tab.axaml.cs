@@ -3,7 +3,6 @@ using ChovySign_GUI.Global;
 using ChovySign_GUI.Popup.Global;
 using ChovySign_GUI.Settings;
 using GameBuilder.Atrac3;
-using GameBuilder.Pops;
 using GameBuilder.Psp;
 using LibChovy;
 using System;
@@ -76,10 +75,10 @@ namespace ChovySign_GUI.Ps1
 
             switch(SettingsTab.Settings.AtracEncoder)
             {
-                case AtracEncoder.SONY_ATRAC3_TOOL:
+                case AtracEncoderEnum.SONY_ATRAC3_TOOL:
                     popsParameters.Atrac3EncoderOverride = new Atrac3ToolEncoder();
                     break;
-                case AtracEncoder.ATRACDENC:
+                case AtracEncoderEnum.ATRACDENC:
                     popsParameters.Atrac3EncoderOverride = new AtracdencEncoder();
                     break;
             }

@@ -4,7 +4,6 @@ using GameBuilder;
 using Vita.ContentManager;
 using System;
 using GameBuilder.Atrac3;
-using GameBuilder.Pops;
 
 namespace ChovySign_GUI.Settings
 {
@@ -29,14 +28,14 @@ namespace ChovySign_GUI.Settings
             }
         }
 
-        public AtracEncoder AtracEncoder {
+        public AtracEncoderEnum AtracEncoder {
             get
             {
                 // skip because no at3tool for these platforms ...
-                if (!OperatingSystem.IsWindows() && !OperatingSystem.IsLinux()) return (AtracEncoder)this.atrac3Encoder.SelectedIndex + 1;
+                if (!OperatingSystem.IsWindows() && !OperatingSystem.IsLinux()) return (AtracEncoderEnum)this.atrac3Encoder.SelectedIndex + 1;
 
                 // use selected atrac encoder.
-                return (AtracEncoder)this.atrac3Encoder.SelectedIndex;
+                return (AtracEncoderEnum)this.atrac3Encoder.SelectedIndex;
             }
         }
         public string CmaDirectory

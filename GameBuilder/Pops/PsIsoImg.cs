@@ -14,13 +14,14 @@ namespace GameBuilder.Pops
 
         public PsIsoImg(NpDrmInfo versionKey, PSInfo disc, IAtracEncoderBase encoder) : base(versionKey)
         {
-            this.compressor = new DiscCompressor(this, disc, encoder);
+            this.compressor = new DiscCompressor(this, disc);
             this.compressor.RegisterCallback(onProgress);
+            this.AtracEncoder = encoder;
         }
 
         public PsIsoImg(NpDrmInfo versionKey, PSInfo disc) : base(versionKey)
         {
-            this.compressor = new DiscCompressor(this, disc, new Atrac3ToolEncoder());
+            this.compressor = new DiscCompressor(this, disc);
             this.compressor.RegisterCallback(onProgress);
         }
 
