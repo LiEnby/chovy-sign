@@ -21,13 +21,7 @@
             }
         }
 
-        public override string ExpectedOutput 
-        {
-            get
-            {
-                return "Total Encoded Bytes";
-            }
-        }
+        
 
     }
 }

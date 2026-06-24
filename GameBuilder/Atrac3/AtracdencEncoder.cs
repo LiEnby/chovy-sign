@@ -30,12 +30,5 @@
             }
         }
 
-        public override string ExpectedOutput
-        {
-            get
-            {
-                return "Done";
-            }
-        }
     }
 }

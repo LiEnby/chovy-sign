@@ -2,7 +2,6 @@
 using Li.Utilities;
 
 using System.Diagnostics;
-using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 namespace GameBuilder.Atrac3
@@ -11,7 +10,6 @@ namespace GameBuilder.Atrac3
     {
         public abstract string ProgramName { get; }
         public abstract string ProgramArguments { get; }
-        public abstract string ExpectedOutput { get; }
 
 
         [DllImport("libc", SetLastError = true)]
@@ -97,17 +95,11 @@ namespace GameBuilder.Atrac3
 
                 proc.StartInfo.UseShellExecute = false;
                 proc.StartInfo.CreateNoWindow = true;
-                proc.StartInfo.RedirectStandardOutput = true;
-                proc.StartInfo.RedirectStandardError = true;
-                proc.StartInfo.RedirectStandardInput = true;
 
                 proc.Start();
-                string stdout = proc.StandardOutput.ReadToEnd();
-                string stderr = proc.StandardError.ReadToEnd();
                 proc.WaitForExit();
 
-                if (proc.ExitCode == 0 && !(stdout.Contains(ExpectedOutput) || stdout.Contains(ExpectedOutput)))
-                    throw new Exception("atrac encode process was unsuccessful: \n\tSTDOUT: " + stdout + "\n\tSTDERR: "+stderr+"exit code: "+proc.ExitCode);
+                if (proc.ExitCode != 0) throw new Exception("atrac encode process was unsuccessful exit code: "+proc.ExitCode);
             }
         }
 
