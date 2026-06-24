@@ -2299,7 +2299,7 @@ namespace PspCrypto
                     pspHdr.dataOffset = 0x80;
                     break;
                 case SceExecFileDecryptMode.DECRYPT_MODE_UMD_UPDATE_EXEC:
-                    compress = true;
+                    //compress = true;
                     pspHdr.dataOffset = 0x890;
                     pspHdr.compAttribute = 2;
                     break;

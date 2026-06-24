@@ -32,6 +32,7 @@ namespace LibChovy
             get
             {
                 if (backupsFolder is null) backupsFolder = SettingsReader.BackupsFolder; // set to default backup folder
+                if (!CreatePsvImg) return backupsFolder;
                 return Path.Combine(SettingsReader.GetPspFolder(backupsFolder), Account.AccountIdStr);
             }
             set
