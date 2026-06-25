@@ -8,14 +8,17 @@ namespace GameBuilder.Atrac3
 {
     public abstract class BinaryAtracEncoder : IAtracEncoderBase
     {
+        private const string LD_LIBRARY_PATH = "LD_LIBRARY_PATH";
+
         public abstract string ProgramName { get; }
         public abstract string ProgramArguments { get; }
-
 
         [DllImport("libc", SetLastError = true)]
         private static extern int setenv(string name, string value, bool overwrite);
         [DllImport("libc", SetLastError = true)]
         private static extern int chmod(string pathname, int mode);
+
+        private string tmp_random = Rng.RandomStr(0x10);
 
         public BinaryAtracEncoder()
         {
@@ -25,8 +28,6 @@ namespace GameBuilder.Atrac3
         {
             cleanup();
         }
-        private const string LD_LIBRARY_PATH = "LD_LIBRARY_PATH";
-        private string tmp_random = Rng.RandomStr(0x10);
 
         private string programFilepath
         {
