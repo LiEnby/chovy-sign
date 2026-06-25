@@ -70,55 +70,48 @@ jobs:
     - name: Build mac
       continue-on-error: false
       run: |
+        # build Chovy-Sign GUI
         dotnet publish -p:PublishProfile=MacARM64 ChovySign-GUI
-        dotnet publish -p:PublishProfile=MacARM64 ChovySign-CLI
-        dotnet publish -p:PublishProfile=MacARM64 PbpResign
-        
         dotnet publish -p:PublishProfile=Mac64 ChovySign-GUI
+        cp -rv build/publish/ChovySign-GUI/mac build/publish/ChovySign-GUI/mac-universal
+        rm -f "build/publish/ChovySign-GUI/mac-universal/ChovySign v2"
+        lipo -create -output "build/publish/ChovySign-GUI/mac-universal/ChovySign v2" "build/publish/ChovySign-GUI/mac-x64/ChovySign v2" "build/publish/ChovySign-GUI/mac/ChovySign v2"
+        
+        
+        # build Chovy-Sign CLI
+        dotnet publish -p:PublishProfile=MacARM64 ChovySign-CLI
         dotnet publish -p:PublishProfile=Mac64 ChovySign-CLI
+        cp -rv build/publish/ChovySign-CLI/mac build/publish/ChovySign-CLI/mac-universal
+        rm -f "build/publish/ChovySign-CLI/mac-universal/ChovySign-CLI"
+        lipo -create -output "build/publish/ChovySign-CLI/mac-universal/ChovySign-CLI" "build/publish/ChovySign-CLI/mac-x64/ChovySign-CLI" "build/publish/ChovySign-CLI/mac/ChovySign-CLI"
+        
+        
+        # build PbpResign
+        dotnet publish -p:PublishProfile=MacARM64 PbpResign
         dotnet publish -p:PublishProfile=Mac64 PbpResign
+        cp -rv build/publish/PbpResign/mac build/publish/PbpResign/mac-universal
+        rm -f "build/publish/PbpResign/mac-universal/PbpResign"
+        lipo -create -output "build/publish/PbpResign/mac-universal/PbpResign" "build/publish/PbpResign/mac-x64/PbpResign" "build/publish/PbpResign/mac/PbpResign"
         
-#        cp -rv build/publish/ChovySign-GUI/mac build/publish/ChovySign-GUI/mac-universal
-#        lipo -create -output build/publish/ChovySign-GUI/mac-universal/Chovy-Sign\ v2
+    - name: Upload Mac GUI
+      uses: actions/upload-artifact@v4
+      with:
+        name: ChovySign2-GUI-Mac-Universal2
+        path: build/publish/ChovySign-GUI/mac-universal
+
+    - name: Upload Mac CLI
+      uses: actions/upload-artifact@v4
+      with:
+        name: ChovySign2-CLI-Mac-Universal2
+        path: build/publish/ChovySign-CLI/mac-universal
+
+    - name: Upload Mac PbpResign
+      uses: actions/upload-artifact@v4
+      with:
+        name: PbpResign-Mac-Universal2
+        path: build/publish/ChovySign-CLI/mac-universal
         
-# ARM Mac
-    - name: Upload mac gui
-      uses: actions/upload-artifact@v4
-      with:
-        name: ChovySign2-GUI-Mac-ARM64
-        path: build/publish/ChovySign-GUI/mac
 
-    - name: Upload mac cli
-      uses: actions/upload-artifact@v4
-      with:
-        name: ChovySign2-CLI-Mac-ARM64
-        path: build/publish/ChovySign-CLI/mac
-
-    - name: Upload mac PbpResign
-      uses: actions/upload-artifact@v4
-      with:
-        name: PbpResign-Mac-ARM64
-        path: build/publish/PbpResign/mac
-        
-# Intel Mac
-    - name: Upload intel mac gui
-      uses: actions/upload-artifact@v4
-      with:
-        name: ChovySign2-GUI-Mac-x86_64
-        path: build/publish/ChovySign-GUI/mac-x64
-
-    - name: Upload intel mac cli
-      uses: actions/upload-artifact@v4
-      with:
-        name: ChovySign2-CLI-Mac-x86_64
-        path: build/publish/ChovySign-CLI/mac-x64
-
-    - name: Upload intel mac PbpResign
-      uses: actions/upload-artifact@v4
-      with:
-        name: PbpResign-Mac-x86_64
-        path: build/publish/PbpResign/mac-x64
-        
   build-linux:
     runs-on: ubuntu-latest
     steps:
