@@ -78,6 +78,9 @@ jobs:
         dotnet publish -p:PublishProfile=Mac64 ChovySign-CLI
         dotnet publish -p:PublishProfile=Mac64 PbpResign
         
+#        cp -rv build/publish/ChovySign-GUI/mac build/publish/ChovySign-GUI/mac-universal
+#        lipo -create -output build/publish/ChovySign-GUI/mac-universal/Chovy-Sign\ v2
+        
 # ARM Mac
     - name: Upload mac gui
       uses: actions/upload-artifact@v4
