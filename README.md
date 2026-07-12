@@ -113,3 +113,5 @@ xdotnano ([PSXTract](https://github.com/xdotnano/PSXtract))
 swarzesherz ([sign_np](https://github.com/swarzesherz/sign_np))
 
 tpunix ([kirk_engine](https://github.com/tpunix/kirk_engine))
+
+dcherednik (For [atracdenc](https://github.com/dcherednik/atracdenc) Open source Atrac3 Encoder.)
