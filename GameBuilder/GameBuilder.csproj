@@ -28,7 +28,7 @@
   </ItemGroup>
 
   <ItemGroup>
-     <ContentWithTargetPath Include="resources\tools\**">
+     <ContentWithTargetPath Include="Resources\tools\**">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         <TargetPath>tools/%(RecursiveDir)%(Filename)%(Extension)</TargetPath>
      </ContentWithTargetPath>
