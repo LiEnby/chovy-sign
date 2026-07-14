@@ -54,15 +54,12 @@ namespace ChovySign_GUI.Ps1
         {
             get
             {
+                if (iconCache is null) return defaultIcon;
                 return iconCache;
             }
             set
             {
-                if (value is not null)
-                    iconCache = value;
-                else
-                    iconCache = defaultIcon;
-
+                iconCache = value;
                 loadIcon(iconCache);
             }
         }
@@ -71,15 +68,12 @@ namespace ChovySign_GUI.Ps1
         {
             get
             {
+                if(pic0Cache is null) return LibChovy.Resources.PIC0;
                 return pic0Cache;
             }
             set
             {
-                if (value is not null)
-                    pic0Cache = value;
-                else
-                    pic0Cache = LibChovy.Resources.PIC0;
-
+                pic0Cache = value;
             }
         }
 
@@ -87,21 +81,20 @@ namespace ChovySign_GUI.Ps1
         {
             get
             {
+                if (pic1Cache is null) return LibChovy.Resources.PIC1;
                 return pic1Cache;
             }
             set
             {
-                if (value is not null)
-                    pic1Cache = value;
-                else
-                    pic1Cache = LibChovy.Resources.PIC1;
-
+                pic1Cache = value;
             }
         }
 
 
         private void loadIcon(byte[] imageData)
         {
+            if (imageData is null) imageData = defaultIcon;
+
             using (MemoryStream imageStream = new MemoryStream(imageData))
                 this.iconPreview.Source = new Bitmap(imageStream);
         }
@@ -127,10 +120,6 @@ namespace ChovySign_GUI.Ps1
                         Icon0 = imgData;
                         return;
                     }
-                }
-                else
-                {
-                    Icon0 = null;
                 }
             }
             catch (FileNotFoundException e)
