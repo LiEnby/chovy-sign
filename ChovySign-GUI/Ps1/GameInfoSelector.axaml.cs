@@ -23,9 +23,9 @@ namespace ChovySign_GUI.Ps1
     {
         private byte[] defaultIcon = LibChovy.Resources.ICON0;
 
-        private byte[] iconCache;
-        private byte[] pic0Cache;
-        private byte[] pic1Cache;
+        private byte[] iconCache = null;
+        private byte[] pic0Cache = null;
+        private byte[] pic1Cache = null;
         public string DiscId
         {
             get
@@ -78,7 +78,7 @@ namespace ChovySign_GUI.Ps1
                 if (value is not null)
                     pic0Cache = value;
                 else
-                    iconCache = LibChovy.Resources.PIC0;
+                    pic0Cache = LibChovy.Resources.PIC0;
 
             }
         }
@@ -94,7 +94,7 @@ namespace ChovySign_GUI.Ps1
                 if (value is not null)
                     pic1Cache = value;
                 else
-                    iconCache = LibChovy.Resources.PIC1;
+                    pic1Cache = LibChovy.Resources.PIC1;
 
             }
         }
@@ -117,6 +117,7 @@ namespace ChovySign_GUI.Ps1
                 Title = disc.DiscName;
                 DiscId = disc.DiscId;
 
+                
                 if (!File.Exists(this.iconFile.FilePath) && SettingsTab.Settings is not null && SettingsTab.Settings.DownloadPs1Covers)
                 {
                     byte[] imgData = await Downloader.DownloadCover(disc);
@@ -127,8 +128,10 @@ namespace ChovySign_GUI.Ps1
                         return;
                     }
                 }
-                defaultIcon = LibChovy.Resources.ICON0;
-
+                else
+                {
+                    Icon0 = null;
+                }
             }
             catch (FileNotFoundException e)
             {
