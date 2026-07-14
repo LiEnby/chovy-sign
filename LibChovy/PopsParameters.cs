@@ -77,17 +77,9 @@ namespace LibChovy
         public byte[] Icon0
         {
             get
-            {
-                if (icon0 is null)
-                {
-                    byte[] coverImg = Downloader.DownloadCover(FirstDisc).Result;
-                    icon0 = coverImg;
-                    return coverImg;
-                }
-                else
-                {
-                    return icon0;
-                }
+            {                
+                if (icon0 is null) return Resources.ICON0;
+                return icon0;
             }
             set
             {

@@ -118,7 +118,6 @@ namespace ChovySign_GUI.Ps1
                     {
                         defaultIcon = imgData;
                         Icon0 = imgData;
-                        return;
                     }
                 }
             }
