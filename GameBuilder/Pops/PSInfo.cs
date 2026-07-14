@@ -93,8 +93,20 @@ namespace GameBuilder.Pops
 
                                     if (line.StartsWith("BOOT"))
                                     {
-                                        // wew thats a big one liner xD
-                                        this.discId = line.Split('=').Last().Trim().Split(';').First().Replace('\\', '/').Split('/').Last().Replace(".", "").Replace("_", "");
+                                        // extract discid from boot line...
+                                        this.discId = line
+                                                        .Split('=')
+                                                        .Last()
+                                                        .Trim()
+                                                        .Split(';')
+                                                        .First()
+                                                        .Replace('\\', '/')
+                                                        .Split('/')
+                                                        .Last()
+                                                        .Replace(".", "")
+                                                        .Replace("_", "")
+                                                        .Replace("CDROM:", "");
+                                        break;
                                     }
                                 }
                             }

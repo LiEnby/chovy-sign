@@ -111,7 +111,9 @@ namespace ChovySign_GUI.Ps1
                 DiscId = disc.DiscId;
 
                 
-                if (!File.Exists(this.iconFile.FilePath) && SettingsTab.Settings is not null && SettingsTab.Settings.DownloadPs1Covers)
+                if (!File.Exists(this.iconFile.FilePath) && 
+                    SettingsTab.Settings is not null && 
+                    SettingsTab.Settings.DownloadPs1Covers)
                 {
                     byte[] imgData = await Downloader.DownloadCover(disc);
                     if(imgData is not null)
