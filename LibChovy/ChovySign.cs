@@ -54,7 +54,7 @@ namespace LibChovy
                     {
                         createPspFolder(parameters.OutputFolder,
                                         parameters.Umd.DiscId,
-                                        parameters.Umd.DataFiles["PARAM.SFO"],
+                                        ebootsig,
                                         pbpBuilder,
                                         parameters.DrmRif);
                     }
@@ -140,8 +140,8 @@ namespace LibChovy
                 if (!parameters.CreatePsvImg)
                 {
                     createPspFolder(parameters.OutputFolder, 
-                                    parameters.FirstDisc.DiscId, 
-                                    sfo, 
+                                    parameters.FirstDisc.DiscId,
+                                    ebootsig, 
                                     pbpBuilder, 
                                     parameters.DrmRif);
                 }
@@ -151,9 +151,9 @@ namespace LibChovy
                                  parameters.FirstDisc.DiscId, 
                                  sfo, 
                                  parameters.Icon0, 
-                                 pbpBuilder, 
+                                 pbpBuilder,
                                  parameters.DrmRif, 
-                                 ebootsig, 
+                                 ebootsig,
                                  parameters.Account.CmaKey);
                 }
             }
