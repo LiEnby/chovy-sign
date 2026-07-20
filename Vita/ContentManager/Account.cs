@@ -20,9 +20,7 @@ namespace Vita.ContentManager
             get
             {
                 if (Devkit) return new byte[8];
-                byte[] aidBytes = BitConverter.GetBytes(accountId);
-                aidBytes.Reverse();
-                return aidBytes;
+                return BitConverter.GetBytes(accountId).Reverse().ToArray();
             }
         }
         public string AccountIdStr

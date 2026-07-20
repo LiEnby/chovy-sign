@@ -3,9 +3,7 @@ using GameBuilder.Atrac3;
 using GameBuilder.Pops;
 using GameBuilder.Psp;
 using Li.Progress;
-using Org.BouncyCastle.Security;
 using PspCrypto;
-using System.Reflection.PortableExecutable;
 using Vita.PsvImgTools;
 
 namespace LibChovy
