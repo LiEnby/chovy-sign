@@ -2,7 +2,7 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Platform.Storage;
-using Org.BouncyCastle.Asn1.X509;
+using Avalonia.Styling;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -143,7 +143,7 @@ namespace ChovySign_GUI.Global
                     FolderPickerOpenOptions selectdir = new FolderPickerOpenOptions();
                     selectdir.Title = "Select directory.";
                     selectdir.AllowMultiple = false;
-                    if (this.ContainsFile) selectdir.SuggestedStartLocation = await currentWindow.StorageProvider.TryGetFolderFromPathAsync(this.FilePath);
+                    selectdir.SuggestedStartLocation = await currentWindow.StorageProvider.TryGetFolderFromPathAsync(this.ContainsFile ? this.FilePath : Environment.CurrentDirectory);
 
                     // open directory
                     var folders = await currentWindow.StorageProvider.OpenFolderPickerAsync(selectdir);
@@ -162,6 +162,7 @@ namespace ChovySign_GUI.Global
                     FilePickerOpenOptions selectfile = new FilePickerOpenOptions();
                     selectfile.Title = "Select " + fileTypeName;
                     selectfile.AllowMultiple = false;
+                    selectfile.SuggestedStartLocation = await currentWindow.StorageProvider.TryGetFolderFromPathAsync(this.ContainsFile ? this.FilePath : Environment.CurrentDirectory);
 
                     if (extension != "")
                     {
