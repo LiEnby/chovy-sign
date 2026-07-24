@@ -1,14 +1,13 @@
 using Avalonia.Controls;
 using Avalonia.Interactivity;
-using Li.Utilities;
 using ChovySign_GUI.Global;
 using LibChovy.Config;
 using LibChovy.VersionKey;
 using GameBuilder.Psp;
 using System;
-using System.IO;
 using System.Text.RegularExpressions;
 using static ChovySign_GUI.Popup.Global.MessageBox;
+
 namespace ChovySign_GUI.Popup.Global.KeySelector
 {
     public partial class NoPspEmuDrmMethodGUI : Window

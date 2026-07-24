@@ -19,7 +19,7 @@ namespace ChovySign_GUI.Psp
                 this.keySelector.IsValid && 
                 this.isoSelector.HasUmd &&
                 SettingsTab.Settings is not null &&
-                Directory.Exists(SettingsTab.Settings.CmaDirectory)
+                Directory.Exists(SettingsTab.Settings.OutputDirectory)
             );
         }
         public PspTab()
@@ -54,7 +54,7 @@ namespace ChovySign_GUI.Psp
             if (SettingsTab.Settings is null) throw new NullReferenceException("SettingsTab.Settings is null");
             if (keySelector.Rif is null) throw new NullReferenceException("keySelector.Rif is null");
             if (keySelector.VersionKey is null) throw new NullReferenceException("keySelector.VersionKey is null");
-            if (!Directory.Exists(SettingsTab.Settings.CmaDirectory)) throw new FileNotFoundException("SettingsTab.Settings.CmaDirectory not found!");
+            if (!Directory.Exists(SettingsTab.Settings.OutputDirectory)) throw new FileNotFoundException("SettingsTab.Settings.CmaDirectory not found!");
 
             NpDrmRif rifInfo = new NpDrmRif(keySelector.Rif);
             NpDrmInfo drmInfo = new NpDrmInfo(keySelector.VersionKey, rifInfo.ContentId, keySelector.KeyIndex);
@@ -68,7 +68,7 @@ namespace ChovySign_GUI.Psp
 
             // read settings from settings tab.
             pspParameters.Account = new Account(SettingsTab.Settings.AccountId);
-            pspParameters.OutputFolder = SettingsTab.Settings.CmaDirectory;
+            pspParameters.OutputFolder = SettingsTab.Settings.OutputDirectory;
             pspParameters.CreatePsvImg = SettingsTab.Settings.PackagePsvimg;
 
             progressStatus.Parameters = pspParameters;

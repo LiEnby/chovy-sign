@@ -5,7 +5,8 @@ namespace LibChovy.Config
     public class ChovyFileConfig : ChovyConfig
     {
         private const char SEPERATOR = ',';
-        public static string ConfigFileName = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), PRODUCT_FAMILY, PRODUCT_NAME + ".cfg");
+        private static string configFamilyPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), PRODUCT_FAMILY);
+        public static string ConfigFileName = Path.Combine(configFamilyPath, PRODUCT_NAME + ".cfg");
         private Dictionary<string, object> config;
 
         private void saveDict()
@@ -151,6 +152,12 @@ namespace LibChovy.Config
         {
             config[key.ToUpperInvariant()] = value;
             saveDict();
+        }
+
+        public override void Delete()
+        {
+            Directory.Delete(configFamilyPath, true);
+            Environment.Exit(0);
         }
     }
 }

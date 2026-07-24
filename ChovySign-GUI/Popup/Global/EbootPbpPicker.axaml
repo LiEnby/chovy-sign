@@ -1,0 +1,27 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:Global="clr-namespace:ChovySign_GUI.Global"
+		mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        x:Class="ChovySign_GUI.Popup.Global.EbootPbpPicker"
+        Title="Select EBOOT.PBP" Icon="/ICON.PNG">
+  <Grid>
+	<Grid.RowDefinitions>
+		<RowDefinition Height="75"/>
+		<RowDefinition Height="1*"/>
+		<RowDefinition Height="40"/>
+
+  </Grid.RowDefinitions>
+	  
+	<Grid VerticalAlignment="Top" Grid.Row="0">
+	    <Grid.ColumnDefinitions>
+			<ColumnDefinition Width="1*"/>
+		</Grid.ColumnDefinitions>
+	    <Global:BrowseButton Name="ms0Dir" Label="Memory Stick" IsDirectory="True" Grid.Column="0" HorizontalAlignment="Stretch"/>
+	</Grid>
+  
+	<ListBox Name="ebootList" VerticalAlignment="Stretch" Grid.Row="1"/>
+	<Button Name="selectBtn" Click="selectBtnClick" Grid.Row="2" VerticalAlignment="Center" HorizontalAlignment="Center">Select EBOOT.PBP</Button>
+  </Grid>
+</Window>

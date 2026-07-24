@@ -7,13 +7,20 @@ namespace LibChovy.Config
 {
     public class ChovyRegistryConfig : ChovyConfig
     {
-        private static string chovyKeyPath = Path.Combine("Software", PRODUCT_FAMILY, PRODUCT_NAME);
+        private static string chovyKeyFamilyPath = Path.Combine("Software", PRODUCT_FAMILY);
+        private static string chovyKeyPath = Path.Combine(chovyKeyFamilyPath, PRODUCT_NAME);
         private RegistryKey chovyRegistryKey;
         public ChovyRegistryConfig()
         {
             if (!OperatingSystem.IsWindows()) throw new PlatformNotSupportedException("Cannot use ChovyRegistryConfig on OS other than windows.");
 
             chovyRegistryKey = Registry.CurrentUser.CreateSubKey(chovyKeyPath, true);
+        }
+
+        public override void Delete()
+        {
+            Registry.CurrentUser.DeleteSubKeyTree(chovyKeyFamilyPath);
+            Environment.Exit(0);
         }
 
         public override bool? GetBool(string key)

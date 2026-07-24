@@ -1,9 +1,12 @@
 using Avalonia.Controls;
-using GameBuilder.Pops.LibCrypt;
+using Avalonia.Interactivity;
+using ChovySign_GUI.Popup.Global;
 using GameBuilder;
-using Vita.ContentManager;
-using System;
 using GameBuilder.Atrac3;
+using GameBuilder.Pops.LibCrypt;
+using LibChovy.Config;
+using System;
+using Vita.ContentManager;
 
 namespace ChovySign_GUI.Settings
 {
@@ -11,6 +14,14 @@ namespace ChovySign_GUI.Settings
     {
         public static SettingsTab? Settings = null;
 
+        private async void deleteCfgClick(object sender, RoutedEventArgs e)
+        {
+            Window? currentWindow = TopLevel.GetTopLevel(this) as Window;
+            if (currentWindow is not Window) throw new Exception("could not find current window");
+
+            if(await MessageBox.Show(currentWindow, "Do you want to delete all Chovy-Sign2 data?\nThis option should be used if you want to fully un-install Chovy-Sign2 from your PC.", "Are you sure?", MessageBox.MessageBoxButtons.YesNo) == MessageBox.MessageBoxResult.Yes)
+                ChovyConfig.CurrentConfig.Delete();
+        }
         public StreamType BuildStreamType
         {
             get
@@ -38,7 +49,7 @@ namespace ChovySign_GUI.Settings
                 return (AtracEncoderEnum)this.atrac3Encoder.SelectedIndex;
             }
         }
-        public string CmaDirectory
+        public string OutputDirectory
         {
             get
             {
@@ -89,7 +100,7 @@ namespace ChovySign_GUI.Settings
 
             // at3tool only ever released for linux and windows. 
             if (OperatingSystem.IsLinux() || OperatingSystem.IsWindows())
-                atrac3Encoder.Items = new string[2] { "Sony at3tool", "atracdenc" };
+                atrac3Encoder.Items = new string[2] { "at3tool", "atracdenc" };
             else
                 atrac3Encoder.Items = new string[1] { "atracdenc" };
             

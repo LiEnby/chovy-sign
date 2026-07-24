@@ -9,6 +9,8 @@ using LibChovy.Config;
 using LibChovy.VersionKey;
 using System;
 using System.Globalization;
+using System.IO;
+using Vita.ContentManager;
 using static PspCrypto.SceNpDrm;
 
 namespace ChovySign_GUI.Global
@@ -143,20 +145,38 @@ namespace ChovySign_GUI.Global
                     if(SettingsTab.Settings is not null) SettingsTab.Settings.AccountId = rif.AccountIdBE;
                     break;
                 case VersionKeyMethod.EBOOT_PBP_METHOD:
-                    CmaBackupPicker ebootBackupSelector = new CmaBackupPicker();
-                    ebootBackupSelector.BackupType = new string[] { "PGAME", "PSGAME" };
+                    if(SettingsTab.Settings is not null && SettingsTab.Settings.PackagePsvimg)
+                    {
+                        CmaBackupPicker ebootBackupSelector = new CmaBackupPicker();
+                        ebootBackupSelector.BackupType = new string[] { "PGAME", "PSGAME" };
 
-                    string? gameBackupFolder = await ebootBackupSelector.ShowDialog<string>(currentWindow);
-                    string accountId = ebootBackupSelector.AccountId;
-                    if (gameBackupFolder is null) break;
-                    if (accountId == "") break;
+                        string? gameBackupFolder = await ebootBackupSelector.ShowDialog<string>(currentWindow);
+                        string accountId = ebootBackupSelector.AccountId;
+                        if (gameBackupFolder is null) break;
+                        if (accountId == "") break;
 
-                    key = CMAVersionKeyHelper.GetKeyFromGamePsvimg(gameBackupFolder, accountId, this.keyIndex);
-                    rif = CMAVersionKeyHelper.GetRifFromLicensePsvimg(gameBackupFolder, accountId);
+                        key = CMAVersionKeyHelper.GetKeyFromGamePsvimg(gameBackupFolder, accountId, this.keyIndex);
+                        rif = CMAVersionKeyHelper.GetRifFromLicensePsvimg(gameBackupFolder, accountId);
 
-                    // change settings to match newly selected info
-                    if(SettingsTab.Settings is not null) SettingsTab.Settings.AccountId = UInt64.Parse(accountId, NumberStyles.HexNumber);
-                    
+                        // change settings to match newly selected info
+                        if (SettingsTab.Settings is not null) SettingsTab.Settings.AccountId = UInt64.Parse(accountId, NumberStyles.HexNumber);
+
+                    }
+                    else
+                    {
+                        EbootPbpPicker ebootSelector = new EbootPbpPicker();
+
+                        string? gameEboot = await ebootSelector.ShowDialog<string>(currentWindow);
+                        if (gameEboot is null) break;
+
+                        using (FileStream fs = File.OpenRead(gameEboot)) 
+                            key = EbootPbpMethod.GetVersionKey(fs, this.keyIndex);
+
+                        string rifFile = Path.Combine(ebootSelector.Ms0Dir, "PSP", "LICENSE", key.ContentId + ".rif");
+                        rif = new NpDrmRif(File.ReadAllBytes(rifFile));
+                    }
+
+
                     break;
                 case VersionKeyMethod.NOPSPEMUDRM_METHOD:
                     NoPspEmuDrmMethodGUI noPspEmuDrmMethodGUI = new NoPspEmuDrmMethodGUI();
@@ -168,19 +188,37 @@ namespace ChovySign_GUI.Global
 
                     break;
                 case VersionKeyMethod.KEYS_TXT_METHOD:
-                    CmaBackupPicker pspLicenseBackupSelector = new CmaBackupPicker();
-                    pspLicenseBackupSelector.BackupType = new string[] { "PGAME", "PSGAME" };
-                    pspLicenseBackupSelector.Filter = KeysTxtMethod.TitleIds;
+                    if(SettingsTab.Settings is not null && SettingsTab.Settings.PackagePsvimg)
+                    {
+                        CmaBackupPicker pspLicenseBackupSelector = new CmaBackupPicker();
+                        pspLicenseBackupSelector.BackupType = new string[] { "PGAME", "PSGAME" };
+                        pspLicenseBackupSelector.Filter = KeysTxtMethod.TitleIds;
 
-                    gameBackupFolder = await pspLicenseBackupSelector.ShowDialog<string>(currentWindow);
-                    accountId = pspLicenseBackupSelector.AccountId;
-                    if (gameBackupFolder is null) break;
-                    if (accountId == "") break;
+                        string gameBackupFolder = await pspLicenseBackupSelector.ShowDialog<string>(currentWindow);
+                        string accountId = pspLicenseBackupSelector.AccountId;
+                        if (gameBackupFolder is null) break;
+                        if (accountId == "") break;
 
-                    rif = CMAVersionKeyHelper.GetRifFromLicensePsvimg(gameBackupFolder, accountId);
-                    if (rif is null) break;
+                        rif = CMAVersionKeyHelper.GetRifFromLicensePsvimg(gameBackupFolder, accountId);
+                        if (rif is null) break;
 
-                    key = KeysTxtMethod.GetVersionKey(rif.ContentId, this.KeyIndex);
+                        key = KeysTxtMethod.GetVersionKey(rif.ContentId, this.KeyIndex);
+                    }
+                    else
+                    {
+                        EbootPbpPicker ebootSelector = new EbootPbpPicker();
+                        ebootSelector.Filter = KeysTxtMethod.TitleIds;
+
+
+                        string? gameEboot = await ebootSelector.ShowDialog<string>(currentWindow);
+                        if (gameEboot is null) break;
+
+                        using (FileStream fs = File.OpenRead(gameEboot))
+                            key = EbootPbpMethod.GetVersionKey(fs, this.keyIndex);
+
+                        string rifFile = Path.Combine(ebootSelector.Ms0Dir, "PSP", "LICENSE", key.ContentId + ".rif");
+                        rif = new NpDrmRif(File.ReadAllBytes(rifFile));
+                    }
                     break;
 
             }

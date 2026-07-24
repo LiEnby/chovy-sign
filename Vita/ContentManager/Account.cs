@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Vita.ContentManager
+﻿namespace Vita.ContentManager
 {
     public class Account
     {

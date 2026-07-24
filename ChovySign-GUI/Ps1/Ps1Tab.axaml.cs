@@ -50,7 +50,7 @@ namespace ChovySign_GUI.Ps1
             if (SettingsTab.Settings is null) throw new NullReferenceException("SettingsTab.Settings is null");
             if (keySelector.Rif is null) throw new NullReferenceException("keySelector.Rif is null");
             if (keySelector.VersionKey is null) throw new NullReferenceException("keySelector.VersionKey is null");
-            if (!Directory.Exists(SettingsTab.Settings.CmaDirectory)) throw new FileNotFoundException("SettingsTab.Settings.CmaDirectory not found!");
+            if (!Directory.Exists(SettingsTab.Settings.OutputDirectory)) throw new FileNotFoundException("SettingsTab.Settings.CmaDirectory not found!");
 
             NpDrmRif rifInfo = new NpDrmRif(keySelector.Rif);
             NpDrmInfo drmInfo = new NpDrmInfo(keySelector.VersionKey, rifInfo.ContentId, keySelector.KeyIndex);
@@ -70,7 +70,7 @@ namespace ChovySign_GUI.Ps1
             popsParameters.Account = new Account(SettingsTab.Settings.AccountId);
 
             popsParameters.CrackMethod = SettingsTab.Settings.LibcryptMode;
-            popsParameters.OutputFolder = SettingsTab.Settings.CmaDirectory;
+            popsParameters.OutputFolder = SettingsTab.Settings.OutputDirectory;
             popsParameters.CreatePsvImg = SettingsTab.Settings.PackagePsvimg;
 
             switch(SettingsTab.Settings.AtracEncoder)
@@ -111,7 +111,7 @@ namespace ChovySign_GUI.Ps1
                 gameInfo.Title != String.Empty && 
                 gameInfo.DiscId.Length == 9 &&
                 SettingsTab.Settings is not null &&
-                Directory.Exists(SettingsTab.Settings.CmaDirectory));      
+                Directory.Exists(SettingsTab.Settings.OutputDirectory));      
         }
         private void onKeyValidityChanged(object? sender, EventArgs e)
         {

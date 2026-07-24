@@ -53,6 +53,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Update="Popup\Global\EbootPbpPicker.axaml.cs">
+      <DependentUpon>EbootPbpPicker.axaml</DependentUpon>
+    </Compile>
     <Compile Update="Popup\Global\KeySelector\NoPspEmuDrmMethodGUI.axaml.cs">
       <DependentUpon>NoPspEmuDrmMethodGUI.axaml</DependentUpon>
     </Compile>

@@ -53,6 +53,8 @@ namespace LibChovy.Config
         public abstract void SetInt64(string key, UInt64 value);
         public abstract void SetBytes(string key, byte[] value);
 
+        public abstract void Delete();
+
         private static ChovyConfig? config = null;
         public static ChovyConfig CurrentConfig
         {

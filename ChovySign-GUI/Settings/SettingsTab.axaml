@@ -20,6 +20,7 @@
 				<RowDefinition Height="1*"/>
 				<RowDefinition Height="1*"/>
 				<RowDefinition Height="1*"/>
+				<RowDefinition Height="1*"/>
 			</Grid.RowDefinitions>
 
 			
@@ -61,6 +62,13 @@
 								Label="Build Stream Type:"
 								HorizontalAlignment="Stretch"
 								Grid.Row="6"/>
+
+			<Button Name="deleteConfig" 
+								Content="Delete Configuration" 
+								HorizontalAlignment="Center"
+								VerticalAlignment="Center"
+								Click="deleteCfgClick"
+								Grid.Row="7"/>
 
 		</Grid>
 	</Grid>

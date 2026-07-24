@@ -115,7 +115,11 @@ namespace Vita.ContentManager
                 if (cmaFolder is not null) return cmaFolder;
                 cmaFolder = getSonyCmaPSVitaFolder();
                 if (cmaFolder is not null) return cmaFolder;
-                return getDefaultCmaPSVitaFolder();
+                cmaFolder = getDefaultCmaPSVitaFolder();
+
+                if (!Path.Exists(cmaFolder)) cmaFolder = Environment.CurrentDirectory;
+
+                return cmaFolder;
             }
         }
 
