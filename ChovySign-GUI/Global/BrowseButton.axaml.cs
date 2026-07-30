@@ -153,8 +153,7 @@ namespace ChovySign_GUI.Global
                     {
                         string? localPath = storageFolder.TryGetLocalPath();
 
-                        if (localPath is not null)
-                            this.FilePath = localPath;
+                        if (localPath is not null) this.FilePath = localPath;
                     }
                 }
                 else
@@ -182,9 +181,7 @@ namespace ChovySign_GUI.Global
                     {
                         string? localPath = storageFiles.TryGetLocalPath();
 
-                        if (localPath is not null)
-                            this.FilePath = localPath;
-
+                        if (localPath is not null) this.FilePath = localPath;
                     }
                 }
 

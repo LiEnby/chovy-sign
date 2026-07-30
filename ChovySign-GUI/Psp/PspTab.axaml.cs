@@ -46,7 +46,9 @@ namespace ChovySign_GUI.Psp
             if (currentWindow is not Window) throw new Exception("could not find current window");
 
             _ = App.PlayFinishSound();
-            await MessageBox.Show(currentWindow, "Finished creating PSP Game!\nCan now go restore it to your PSVita using Content Manager.", "Done!", MessageBoxButtons.Ok);
+
+            if (SettingsTab.Settings is not null && SettingsTab.Settings.PackagePsvimg) await MessageBox.Show(currentWindow, "Finished creating PSP Game!\nCan now go restore it to your PSVita using Content Manager.", "Done!", MessageBoxButtons.Ok);
+            else await MessageBox.Show(currentWindow, "Finished creating PSP Game!\nFolder written to \"" + ((SettingsTab.Settings is not null) ? SettingsTab.Settings.OutputDirectory : "") + "\" can now copy it to your PSP/PSVita Memory Stick., ", "Done!", MessageBoxButtons.Ok);
         }
 
         private void onProcessStarting(object? sender, EventArgs e)

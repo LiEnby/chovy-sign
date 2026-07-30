@@ -4,8 +4,6 @@ using System.Collections.Generic;
 
 namespace ChovySign_GUI.Global
 {
-
-
     public partial class LabeledComboBox : UserControl
     {
         public string Label
